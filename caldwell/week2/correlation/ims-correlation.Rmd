@@ -1311,6 +1311,165 @@ noise_summary |>
   filter(abs(spurious_cor) > 0.2)
 ```
 
+## Adding Correlation Statistics to Plots
+
+### The stat_cor() function
+
+While we've learned how to calculate correlation coefficients using `cor()` and `cor.test()`, it's often useful to display the correlation directly on your scatterplot. The `ggpubr` package provides a convenient function called `stat_cor()` that adds correlation statistics as text to your plots.
+
+First, let's load the package:
+
+```{r load-ggpubr, echo = TRUE}
+library(ggpubr)
+```
+
+### Basic usage
+
+The `stat_cor()` function works as an additional layer in your `ggplot()` call, similar to how we add `geom_point()` or `geom_smooth()`. Here's a basic example using the `possum` dataset:
+
+```{r stat-cor-basic, exercise = TRUE}
+ggplot(data = possum, aes(x = tail_l, y = total_l)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  stat_cor()
+```
+
+By default, `stat_cor()` displays the correlation coefficient (R) and the p-value in the upper left corner of the plot.
+
+### Customizing stat_cor()
+
+You can customize what statistics are displayed and where they appear. Here are some common options:
+
+**Choosing which method to display:**
+
+```{r stat-cor-method, exercise = TRUE}
+# Display Pearson correlation (default)
+ggplot(data = possum, aes(x = tail_l, y = total_l)) +
+  geom_point() +
+  stat_cor(method = "pearson")
+
+# Display Spearman correlation
+ggplot(data = possum, aes(x = tail_l, y = total_l)) +
+  geom_point() +
+  stat_cor(method = "spearman")
+```
+
+**Changing the position:**
+
+```{r stat-cor-position, exercise = TRUE}
+# Place in bottom right corner
+ggplot(data = possum, aes(x = tail_l, y = total_l)) +
+  geom_point() +
+  stat_cor(label.x = 42, label.y = 77)
+```
+
+The `label.x` and `label.y` arguments control where the text appears. You'll need to adjust these based on the range of your data.
+
+**Displaying only certain statistics:**
+
+```{r stat-cor-label, exercise = TRUE}
+# Show only R and p-value
+ggplot(data = possum, aes(x = tail_l, y = total_l)) +
+  geom_point() +
+  stat_cor(aes(label = paste(..r.label.., ..p.label.., sep = "~`,`~")))
+
+# Show R-squared instead of R
+ggplot(data = possum, aes(x = tail_l, y = total_l)) +
+  geom_point() +
+  stat_cor(aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~")))
+```
+
+### Practical example
+
+Let's apply this to one of our earlier examples with the `bdims` dataset:
+
+```{r stat-cor-bdims, exercise = TRUE}
+ggplot(data = bdims, aes(x = hgt, y = wgt)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", se = FALSE, color = "blue") +
+  stat_cor(method = "pearson") +
+  labs(
+    x = "Height (cm)",
+    y = "Weight (kg)",
+    title = "Relationship between Height and Weight"
+  )
+```
+
+### Your turn!
+
+Use the `mlbbat10` dataset to create a scatterplot of slugging percentage (`slg`) versus on-base percentage (`obp`) for players with at least 200 at-bats. Include:
+- Points
+- A regression line
+- The correlation coefficient and p-value using `stat_cor()`
+- Appropriate axis labels
+
+```{r ex-stat-cor, exercise = TRUE}
+# Filter the data
+mlbbat10_filtered <- mlbbat10 |>
+  filter(at_bat >= 200)
+
+# Create your plot
+ggplot(data = ___, aes(x = ___, y = ___)) +
+  ___ +
+  ___ +
+  ___ +
+  labs(___)
+```
+
+```{r ex-stat-cor-hint-1}
+mlbbat10_filtered <- mlbbat10 |>
+  filter(at_bat >= 200)
+
+ggplot(data = mlbbat10_filtered, aes(x = obp, y = slg)) +
+  geom_point() +
+  ___ +
+  ___
+```
+
+```{r ex-stat-cor-hint-2}
+mlbbat10_filtered <- mlbbat10 |>
+  filter(at_bat >= 200)
+
+ggplot(data = mlbbat10_filtered, aes(x = obp, y = slg)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  stat_cor() +
+  labs(
+    x = "On-Base Percentage",
+    y = "Slugging Percentage"
+  )
+```
+
+```{r ex-stat-cor-solution}
+mlbbat10_filtered <- mlbbat10 |>
+  filter(at_bat >= 200)
+
+ggplot(data = mlbbat10_filtered, aes(x = obp, y = slg)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", se = FALSE) +
+  stat_cor(method = "pearson") +
+  labs(
+    x = "On-Base Percentage",
+    y = "Slugging Percentage",
+    title = "Relationship between OBP and SLG"
+  )
+```
+
+### When to use stat_cor()
+
+The `stat_cor()` function is particularly useful when:
+- Creating quick exploratory plots where you want to see the correlation at a glance
+- Making presentations where you want correlation information visible on the plot
+- Comparing multiple relationships side-by-side (especially with faceted plots)
+
+However, for formal statistical reports, you should still report the full results from `cor.test()`, which provides confidence intervals and additional statistical information.
+
+### Key takeaways
+
+✓ `stat_cor()` adds correlation statistics directly to your ggplot  
+✓ You can customize the method (Pearson, Spearman, Kendall)  
+✓ Position and displayed statistics are customizable  
+✓ It's a convenience function for visualization, not a replacement for formal testing
 
 ## Congratulations!
 
