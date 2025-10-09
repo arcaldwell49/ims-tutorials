@@ -104,6 +104,44 @@ hash_encoder_ui <- {
 }
 ```
 
+## Introduction
+
+### Welcome!
+
+In previous lessons, you learned how to fit linear regression models using the method of least squares. You can now create models that predict a response variable based on an explanatory variable, and you understand how the regression line minimizes the sum of squared residuals.
+
+But knowing *how* to fit a model is only part of the story. When using statistical models, you also need to know **how well** your model performs. Does it make accurate predictions? How much of the variability in your data does it explain? Are there unusual observations that might be affecting your results?
+
+In this tutorial, you'll learn how to answer these critical questions by assessing and interpreting the quality of your regression models.
+
+### Learning Objectives
+
+By the end of this tutorial, you will be able to:
+
+1. **Calculate and interpret measures of model accuracy**
+   - Compute the Sum of Squared Errors (SSE)
+   - Calculate and explain Root Mean Squared Error (RMSE)
+   - Understand what "residual standard error" means in practical terms
+
+2. **Assess overall model fit**
+   - Compute the coefficient of determination (R²)
+   - Interpret R² as the proportion of variance explained
+   - Understand the relationship between R² and correlation
+   - Recognize the limitations of relying solely on R²
+
+3. **Identify and evaluate unusual observations**
+   - Distinguish between leverage and influence
+   - Calculate leverage scores using the `.hat` statistic
+   - Measure influence using Cook's distance
+   - Understand when an outlier affects your model
+
+4. **Make informed decisions about outliers**
+   - Evaluate whether removing an outlier is justified
+   - Consider how outlier removal changes the scope of inference
+   - Act with scientific integrity when handling unusual data points
+
+Let's get started! `r emo::ji("baseball")`
+
 ## Assessing model fit
 
 ### How well does our textbook model fit?
@@ -449,7 +487,7 @@ lm(formula = poverty_2010 ~ hs_grad_2010, data = county_complete) |>
   summary()
 ```
 
-```{r mc2}
+```{r mc3}
 question("How should this value be interpreted?",
   answer("46.4% of the variability in high school graduate rate among U.S. counties can be explained by poverty rate.", message = "Wrong!"),
   answer("46.4% of the variability in poverty rate among U.S. counties can be explained by high school graduation rate.", correct = TRUE, message = "Right! The $R^2$ represents the percentage of the variability of the response variable that can be explained by the explanatory variable."),

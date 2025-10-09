@@ -4,10 +4,18 @@ output:
   learnr::tutorial:
     progressive: true
     allow_skip: true
+knit: (function(input, ...) {
+    rmarkdown::render(
+      input,
+      envir = globalenv()
+    )
+  })
 runtime: shiny_prerendered
 ---
 
 ```{r setup, include=FALSE}
+library(here)
+
 library(learnr)
 library(openintro)
 library(mosaic)
@@ -20,11 +28,11 @@ library(performance)
 library(see)
 library(ggfortify)
 library(shiny)
+library(here)
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 
 # From http://www.rossmanchance.com/iscam2/data/movies03.txt
-hypdata_nonequalvar <- read_delim(here::here("caldwell","week4",
-                                             "inference","data",
+hypdata_nonequalvar <- read_delim(here::here("data",
                                              "movies03.txt"), "\t") |>
   select(response = box.office, explanatory = score)
 
@@ -50,8 +58,7 @@ response <-   explanatory*4.7 + 10 + epsilon*explanatory
 nonequaldata <- data.frame(explanatory, response)
 nonequal_lm <- augment(lm(response ~ explanatory, data=nonequaldata))
 
-starbucks <- readr::read_delim(here::here("caldwell","week4",
-                                             "inference","data",
+starbucks <- readr::read_delim(here::here("data",
                                           "starbucks.txt"), "\t", escape_double = FALSE, trim_ws = TRUE)
 starbucks_lowFib <- starbucks |> filter(Fiber < 15)
 

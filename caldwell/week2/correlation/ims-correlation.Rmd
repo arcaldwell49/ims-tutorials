@@ -12,6 +12,7 @@ library(learnr)
 library(tidyverse)
 library(openintro)
 library(emo)
+library(ggpubr)
 
 knitr::opts_chunk$set(echo = FALSE, 
                       fig.align = "center", 
@@ -97,6 +98,10 @@ hash_encoder_ui <- {
   }), )
 }
 ```
+
+
+## Introduction
+
 
 Welcome! In this tutorial, you'll learn how to measure and interpret the strength of linear relationships between two variables using correlation coefficients.
 
