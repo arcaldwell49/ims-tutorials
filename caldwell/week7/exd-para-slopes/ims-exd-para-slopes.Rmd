@@ -141,7 +141,7 @@ ggplot(data = mpg, aes(x = displ, y = hwy, color = factor(year))) +
   geom_segment(data = filter(augment(mod), hwy <= 25 & displ > 6.1 & displ < 7), 
                aes(xend = displ, yend = .fitted, color = `factor(year)`), 
                arrow = arrow(length = unit(0.3,"cm")), 
-               size = 1) + 
+               linewidth = 1) + 
   geom_point()
 ```
 
@@ -155,7 +155,7 @@ Note that this necessarily makes our parallel slopes model more flexible than a 
 
 The coefficient of determination---usually called R-squared or $R^2$---carries over from simple linear regression. Recall that the sum of the squared residuals (or errors) is denoted SSE. If the model fits the data better, then the residuals are smaller, the SSE is smaller, and the $R^2$ value is higher. The total sum of the squares---denoted SST---is a function of the response variable alone and does not depend on the model. 
 
-In general, a higher $R^2$ may be a sign of a better model fit, but the situation becomes more complicated in multiple regression because additional explanatory variables will always increase $R^2$. Thus, model fits in multiple regression are often compared using the adjusted $R^2$ value defined here. Note that the only difference is that a penalty is applied as the number of explanatory variables $p$ increases. Unlike $R^2$, adjusted $R^2$ will not necessarily increase as new explanatory variables are added---it could go up or down.
+In general, a higher $R^2$ may be a sign of a better model fit, but the situation becomes more complicated in multiple regression because additional explanatory variables will always increase $R^2$. Thus, model fits in multiple regression are often compared using the adjusted $R^2$ value defined here. Note that the only difference is that a penalty is applied as the number of explanatory variables $p$ increases. Unlike $R^2$, adjusted $R^2$ will not necessarily increase as new explanatory variables are added---it could go up or down. The downside is that it is no longer directly interpretable as a percentage of variance explained.
 
 To summarize:
 
@@ -334,6 +334,1209 @@ predict(mod)
 augment(mod)
 ```
 
+## Predicted R-squared: Evaluating Predictive Performance
+
+### Beyond Regular R-squared
+
+You've already learned about R-squared and adjusted R-squared as measures of model fit. But there's another important question we should ask: **How well will our model predict NEW data that it hasn't seen before?**
+
+This is where **Predicted R-squared** comes in. It's a more stringent test of model quality that tells us about the model's **predictive performance**, not just its ability to fit the data it was trained on.
+
+**Learning Objectives for this section:**
+
+By the end of this section, you will be able to:
+
+1. Understand the difference between model **fit** and model **prediction**
+2. Calculate Predicted R-squared using the `olsrr` package
+3. Interpret Predicted R-squared values in context
+4. Compare models using multiple R-squared metrics
+5. Understand when models might overfit the data
+6. Make informed decisions about model selection based on predictive performance
+
+### The OLSRR Package
+
+The `olsrr` package (Ordinary Least Squares Regression in R) provides tools for building and evaluating regression models. One of its most useful functions is `ols_pred_rsq()`, which calculates the predicted R-squared.
+
+Let's load the package and see it in action:
+
+```{r pred-r2-setup, echo=TRUE, message=FALSE, warning=FALSE}
+library(olsrr)
+library(tidyverse)
+library(broom)
+
+# We'll use the mariokart dataset
+# Fit a simple model first
+model_simple <- lm(total_pr ~ duration, data = mariokart)
+```
+
+---
+
+## Three Types of R-squared: Understanding the Differences
+
+### 1. Regular R-squared (R²)
+
+**What it measures:** The proportion of variance in the response variable explained by the model **using the same data that built the model**.
+
+```{r regular-r2, echo=TRUE}
+# Get regular R-squared
+summary(model_simple)$r.squared
+```
+
+**Interpretation:** "Our model explains X% of the variance in the auction price using the data we have."
+
+**Limitation:** It **always increases** (or stays the same) when you add more predictors, even if those predictors are useless! This can lead to overfitting.
+
+### 2. Adjusted R-squared (R²-adj)
+
+**What it measures:** R-squared with a **penalty for adding more predictors**.
+
+```{r adjusted-r2, echo=TRUE}
+# Get adjusted R-squared
+summary(model_simple)$adj.r.squared
+```
+
+**Interpretation:** "..." not directly interpretable, but useful for comparing models.
+
+**Improvement:** Penalizes unnecessary complexity, so it won't always increase when you add predictors.
+
+**Limitation:** Still uses the same data for fitting and evaluation. A
+
+### 3. Predicted R-squared (R²-pred)
+
+**What it measures:** How well the model predicts **new observations** through **cross-validation**.
+
+```{r predicted-r2, echo=TRUE}
+# Get predicted R-squared
+ols_pred_rsq(model_simple)
+```
+
+**Interpretation:** "Our model would explain X% of the variance in new data it hasn't seen before."
+
+**Why it's better:** Uses **leave-one-out cross-validation** (LOOCV):
+
+1. Remove one observation
+2. Fit the model on the remaining data
+3. Predict the removed observation
+4. Repeat for all observations
+5. Calculate R-squared using these predictions
+
+**Key insight:** Predicted R-squared tells us about **generalization** of the model
+
+---
+
+## How Predicted R-squared Works: The Cross-Validation Process
+
+Let's understand the process step by step:
+
+### The LOOCV Algorithm
+
+```{r loocv-explanation, echo=TRUE, eval=FALSE}
+# Conceptually, predicted R-squared does this:
+
+# For each observation i in the dataset:
+#   1. Remove observation i
+#   2. Fit model on the remaining n-1 observations
+#   3. Predict observation i using this model
+#   4. Calculate prediction error for observation i
+
+# Then: Calculate R-squared using all predictions vs. actual values
+```
+
+### Visual Understanding
+
+Imagine you have 100 observations:
+
+1. **Round 1:** Remove observation #1, fit model on observations #2-100, predict #1
+2. **Round 2:** Remove observation #2, fit model on observations #1, 3-100, predict #2
+3. **Round 3:** Remove observation #3, fit model on observations #1-2, 4-100, predict #3
+4. ... continue for all 100 observations
+5. **Final step:** Calculate how well all these predictions match reality
+
+This is **much more demanding** than regular R-squared because:
+
+- Each prediction uses a model that has never seen that data point
+- It simulates how the model will perform on truly new data
+- It reveals overfitting (when a model fits the training data but not new data)
+
+---
+
+## Comparing the Three R-squared Values
+
+Let's fit several models and compare all three metrics:
+
+```{r compare-r2-values, echo=TRUE}
+# Model 1: Simple model
+model1 <- lm(total_pr ~ duration, data = mariokart)
+
+# Model 2: Two predictors
+model2 <- lm(total_pr ~ duration + start_pr, data = mariokart)
+
+# Model 3: Three predictors
+model3 <- lm(total_pr ~ duration + start_pr + cond, data = mariokart)
+
+# Model 4: Many predictors
+model4 <- lm(total_pr ~ duration + start_pr + cond + wheels + n_bids, 
+             data = mariokart)
+
+# Create a comparison table
+model_comparison <- tibble(
+  Model = c("1: Duration only", 
+            "2: Duration + Start Price",
+            "3: + Condition",
+            "4: + Wheels + Bids"),
+  `R-squared` = c(summary(model1)$r.squared,
+                  summary(model2)$r.squared,
+                  summary(model3)$r.squared,
+                  summary(model4)$r.squared),
+  `Adj R-squared` = c(summary(model1)$adj.r.squared,
+                      summary(model2)$adj.r.squared,
+                      summary(model3)$adj.r.squared,
+                      summary(model4)$adj.r.squared),
+  `Pred R-squared` = c(ols_pred_rsq(model1),
+                       ols_pred_rsq(model2),
+                       ols_pred_rsq(model3),
+                       ols_pred_rsq(model4))
+)
+
+# Display the comparison
+model_comparison
+```
+
+### What to Notice
+
+Look at the patterns:
+
+1. **R-squared always increases** (or stays the same) as we add predictors
+2. **Adjusted R-squared** might decrease if predictors don't help much
+3. **Predicted R-squared** can decrease substantially if we're overfitting
+
+### Example Interpretation
+
+```{r interpret-comparison, echo=TRUE}
+# Let's interpret these results
+cat("Model 1:\n")
+cat("Regular R²: Fits", round(summary(model1)$r.squared * 100, 1), 
+    "% of variance in our data\n")
+cat("Predicted R²: Would predict", round(ols_pred_rsq(model1) * 100, 1), 
+    "% of variance in new data\n")
+cat("Gap:", round((summary(model1)$r.squared - ols_pred_rsq(model1)) * 100, 1), 
+    "percentage points\n\n")
+
+cat("Model 4:\n")
+cat("Regular R²: Fits", round(summary(model4)$r.squared * 100, 1), 
+    "% of variance in our data\n")
+cat("Predicted R²: Would predict", round(ols_pred_rsq(model4) * 100, 1), 
+    "% of variance in new data\n")
+cat("Gap:", round((summary(model4)$r.squared - ols_pred_rsq(model4)) * 100, 1), 
+    "percentage points\n")
+```
+
+---
+
+## Understanding Overfitting Through Predicted R-squared
+
+### What is Overfitting?
+
+**Overfitting** occurs when a model learns the noise in the training data rather than the true underlying patterns. It's like memorizing answers to practice problems instead of understanding the concepts.
+
+**Signs of overfitting:**
+
+- Large gap between R² and Predicted R²
+- Very high R² but poor predictions on new data
+
+
+### Example: Detecting Overfitting
+
+```{r overfitting-example, echo=TRUE}
+# Let's create an overfitted model
+# Adding many variables including some that shouldn't matter
+
+# Suppose we add polynomial terms
+model_overfit <- lm(total_pr ~ duration + I(duration^2) + I(duration^3) + 
+                    start_pr + I(start_pr^2) + I(start_pr^3) +
+                    cond + wheels + n_bids, 
+                    data = mariokart)
+
+# Compare metrics
+cat("Overfitted Model:\n")
+cat("R-squared:", round(summary(model_overfit)$r.squared, 4), "\n")
+cat("Adjusted R-squared:", round(summary(model_overfit)$adj.r.squared, 4), "\n")
+cat("Predicted R-squared:", round(ols_pred_rsq(model_overfit), 4), "\n")
+cat("\nGap between R² and Pred R²:", 
+    round(summary(model_overfit)$r.squared - ols_pred_rsq(model_overfit), 4), "\n")
+```
+
+**Interpretation:**
+
+- If the gap is **small** (< 0.05): Good! Model generalizes well
+- If the gap is **moderate** (0.05 - 0.15): Some overfitting, but acceptable
+- If the gap is **large** (> 0.15): Warning! Model may not generalize well
+
+---
+
+## Using Predicted R-squared for Model Selection
+
+### The Decision Framework
+
+When comparing models, consider all three metrics together:
+
+```{r decision-framework, echo=TRUE}
+# Function to summarize a model
+summarize_model <- function(model, name) {
+  tibble(
+    Model = name,
+    `R²` = summary(model)$r.squared,
+    `Adj R²` = summary(model)$adj.r.squared,
+    `Pred R²` = ols_pred_rsq(model),
+    `Gap (R² - Pred R²)` = `R²` - `Pred R²`,
+    `Num Predictors` = length(coef(model)) - 1
+  )
+}
+
+# Compare our models
+bind_rows(
+  summarize_model(model1, "Model 1"),
+  summarize_model(model2, "Model 2"),
+  summarize_model(model3, "Model 3"),
+  summarize_model(model4, "Model 4")
+)
+```
+
+### Decision Rules
+
+**Choose the model with:**
+
+1. ✅ **Highest Predicted R-squared** (best predictive performance)
+2. ✅ **Small gap** between R² and Pred R² (less overfitting)
+3. ✅ **Parsimony** when Pred R² values are similar (simpler is better)
+
+**Avoid models with:**
+
+- ❌ Low Predicted R-squared (poor predictions)
+- ❌ Large gap between R² and Pred R² (overfitting)
+- ❌ Unnecessary complexity (many predictors, little gain)
+
+### Example Decision
+
+```{r example-decision, echo=TRUE}
+# Let's say Model 2 and Model 3 have similar Pred R²
+# Model 2: Pred R² = 0.52, 2 predictors
+# Model 3: Pred R² = 0.54, 3 predictors
+
+cat("Model 2 vs Model 3:\n")
+cat("Pred R² improvement: 0.54 - 0.52 = 0.02 (2 percentage points)\n")
+cat("Cost: 1 additional predictor\n\n")
+cat("Decision: Is 2% improvement worth the added complexity?\n")
+cat("In this case: Depends on context, but probably not enough gain.\n")
+```
+
+---
+
+## Predicted R-squared and Sample Size
+
+### Important Consideration
+
+Predicted R-squared is affected by sample size:
+
+- **Large samples** (n > 100): Predicted R² usually close to Adjusted R²
+- **Small samples** (n < 50): Predicted R² can be much lower than Adjusted R²
+- **Very small samples** (n < 30): Predicted R² can be negative!
+
+### Why Negative Predicted R-squared?
+
+```{r negative-pred-r2, echo=TRUE, eval=FALSE}
+# With very small samples or bad models:
+ols_pred_rsq(bad_model)
+# [1] -0.0523
+
+# This means: The model predicts WORSE than just using the mean!
+```
+
+**Interpretation of negative values:**
+
+- Your model's predictions are worse than simply predicting the mean for everyone
+- The model doesn't generalize at all
+- You need to simplify the model or get more data
+
+---
+
+## Interactive Practice: Predicted R-squared
+
+### Exercise 1: Calculate and Compare
+
+Using the `babies` dataset, fit two models and compare their predicted R-squared values:
+- Model A: Predict birthweight from gestation only
+- Model B: Predict birthweight from gestation, smoke, and age
+
+```{r ex-pred-r2-1, exercise=TRUE}
+# Fit Model A
+
+
+# Fit Model B
+
+
+# Compare predicted R-squared
+
+
+
+```
+
+```{r ex-pred-r2-1-hint-1}
+# Start with Model A
+modelA <- lm(bwt ~ gestation, data = babies)
+```
+
+```{r ex-pred-r2-1-hint-2}
+# Then Model B
+modelB <- lm(bwt ~ gestation + smoke + age, data = babies)
+```
+
+```{r ex-pred-r2-1-solution}
+# Fit Model A
+modelA <- lm(bwt ~ gestation, data = babies)
+
+# Fit Model B
+modelB <- lm(bwt ~ gestation + smoke + age, data = babies)
+
+# Compare predicted R-squared
+cat("Model A Predicted R²:", ols_pred_rsq(modelA), "\n")
+cat("Model B Predicted R²:", ols_pred_rsq(modelB), "\n")
+cat("Improvement:", ols_pred_rsq(modelB) - ols_pred_rsq(modelA), "\n")
+```
+
+### Exercise 2: Interpret the Results
+
+```{r mc-pred-r2-1}
+question("If Model A has Predicted R² = 0.45 and Model B has Predicted R² = 0.52, what does this tell us?",
+  answer("Model B fits our current data 7% better than Model A.", 
+         message = "That would be regular R-squared. Predicted R² tells us about new data."),
+  answer("Model B would predict about 7 percentage points more variance in new data than Model A.", 
+         correct = TRUE,
+         message = "Exactly! Predicted R-squared tells us about predictive performance on unseen data."),
+  answer("We should always use Model B because it's more complex.", 
+         message = "We need to consider whether the improvement justifies the added complexity."),
+  answer("Model A is overfitting the data.", 
+         message = "We'd need to compare regular R² to Predicted R² to assess overfitting."),
+  allow_retry = TRUE
+)
+```
+
+### Exercise 3: Creating a Complete Comparison
+
+Create a complete comparison table for three babies models:
+
+```{r ex-pred-r2-3, exercise=TRUE}
+# Model 1: gestation only
+# Model 2: gestation + smoke
+# Model 3: gestation + smoke + age + height + weight
+
+# Your code here:
+
+
+
+
+```
+
+```{r ex-pred-r2-3-solution}
+# Fit all three models
+mod1 <- lm(bwt ~ gestation, data = babies)
+mod2 <- lm(bwt ~ gestation + smoke, data = babies)
+mod3 <- lm(bwt ~ gestation + smoke + age + height + weight, data = babies)
+
+# Create comparison table
+tibble(
+  Model = c("Gestation only", "Add Smoke", "Add Age + Height + Weight"),
+  `R²` = c(summary(mod1)$r.squared, 
+           summary(mod2)$r.squared, 
+           summary(mod3)$r.squared),
+  `Adj R²` = c(summary(mod1)$adj.r.squared,
+               summary(mod2)$adj.r.squared,
+               summary(mod3)$adj.r.squared),
+  `Pred R²` = c(ols_pred_rsq(mod1),
+                ols_pred_rsq(mod2),
+                ols_pred_rsq(mod3))
+)
+```
+
+---
+
+## Advanced: Other OLSRR Functions
+
+The `olsrr` package provides many other useful functions for regression diagnostics:
+
+### Model Fit Statistics
+
+```{r olsrr-fit-stats, echo=TRUE, eval=FALSE}
+# Get comprehensive model statistics
+ols_regress(model3)
+```
+
+This provides:
+- All R-squared metrics
+- AIC and BIC (information criteria)
+- RMSE (Root Mean Squared Error)
+- Parameter estimates with confidence intervals
+
+### Cook's Distance
+
+```{r olsrr-cooks, echo=TRUE, eval=FALSE}
+# Identify influential observations
+ols_plot_cooksd_bar(model3)
+```
+
+### Additional Diagnostic Plots
+
+```{r olsrr-diagnostics, echo=TRUE, eval=FALSE}
+# Residual plots
+ols_plot_resid_fit(model3)      # Residuals vs Fitted
+ols_plot_resid_qq(model3)       # Q-Q plot
+ols_plot_resid_hist(model3)     # Histogram of residuals
+
+# Influence plots
+ols_plot_cooksd_chart(model3)   # Cook's D Chart
+ols_plot_dffits(model3)         # DFFITS
+ols_plot_resid_lev(model3)      # Residuals vs Leverage
+```
+
+**Note:** While these functions are useful, the `performance` package's `check_model()` often provides a more comprehensive overview. The `olsrr` package excels specifically for predicted R-squared.
+
+---
+
+## Real-World Application: When Predicted R-squared Matters Most
+
+### Scenario 1: Building a Prediction Tool
+
+**Context:** You're building a model to predict auction prices for future listings.
+
+**Why Predicted R² matters:**
+
+- Regular R² tells you how well you fit to the data you already have
+- Predicted R² gives you an estimate of how well you'll predict future auctions
+- The gap reveals if you're overfitting to quirks in your training data
+
+```{r pred-scenario-1, echo=TRUE, eval=FALSE}
+# Good: Predicted R² close to R²
+# Model will perform similarly on new auctions
+
+# Bad: Large gap between R² and Predicted R²  
+# Model memorized training data but won't generalize
+```
+
+### Scenario 2: Comparing Different Modeling Approaches
+
+**Context:** Comparing a simple model vs. a complex model
+
+```{r pred-scenario-2, echo=TRUE}
+# Simple model
+simple_mod <- lm(total_pr ~ start_pr + duration + cond + wheels + n_bids, data = mariokart)
+
+# Complex model  
+complex_mod <- lm(total_pr ~ start_pr + duration + cond + wheels + n_bids + 
+                  I(start_pr^2) + start_pr:cond, data = mariokart)
+
+# Which is better?
+cat("Simple Model:\n")
+cat("  R²:", round(summary(simple_mod)$r.squared, 3), "\n")
+cat("  Pred R²:", round(ols_pred_rsq(simple_mod), 3), "\n\n")
+
+cat("Complex Model:\n")
+cat("  R²:", round(summary(complex_mod)$r.squared, 3), "\n")
+cat("  Pred R²:", round(ols_pred_rsq(complex_mod), 3), "\n")
+```
+
+**Decision criteria:**
+- If complex model's Pred R² is substantially higher: Use it
+- If complex model's Pred R² is similar or lower: Use simple model (parsimony)
+- Always consider the gap between R² and Pred R²
+
+### Scenario 3: After Removing Outliers
+
+**Context:** You've removed outliers and want to verify improvement
+
+```{r pred-scenario-3, echo=TRUE, eval=FALSE}
+# Original model (with outliers)
+model_original <- lm(total_pr ~ start_pr + cond, data = mariokart)
+pred_r2_original <- ols_pred_rsq(model_original)
+
+# Remove outliers
+outlier_indices <- which(check_outliers(model_original))
+mariokart_clean <- mariokart[-outlier_indices, ]
+
+# New model (without outliers)
+model_clean <- lm(total_pr ~ start_pr + cond, data = mariokart_clean)
+pred_r2_clean <- ols_pred_rsq(model_clean)
+
+# Did removing outliers help predictive performance?
+cat("Improvement in Pred R²:", pred_r2_clean - pred_r2_original)
+```
+
+**What to look for:**
+
+- ✅ If Pred R² improves: Outliers were hurting generalization
+- ⚠️ If Pred R² stays similar: Outliers weren't the main issue
+- ❌ If Pred R² decreases: Outliers were actually informative!
+
+---
+
+## Summary: Predicted R-squared Best Practices
+
+### Key Takeaways
+
+1. **Predicted R-squared measures predictive performance**
+
+   - Uses cross-validation (LOOCV)
+   - Tells you how well the model will work on new data
+   - More stringent than regular or adjusted R-squared
+
+2. **Compare all three R-squared metrics**
+
+   - R²: How well model fits current data
+   - Adj R²: Fit with penalty for complexity (not directly interpretable)
+   - Pred R²: How well model predicts new data
+
+
+
+### Essential R Code
+
+```{r summary-code, echo=TRUE, eval=FALSE}
+# Load package
+library(olsrr)
+
+# Calculate predicted R-squared
+ols_pred_rsq(model)
+
+# Compare models
+tibble(
+  Model = c("Model 1", "Model 2"),
+  `Regular R²` = c(summary(mod1)$r.squared, summary(mod2)$r.squared),
+  `Adjusted R²` = c(summary(mod1)$adj.r.squared, summary(mod2)$adj.r.squared),
+  `Predicted R²` = c(ols_pred_rsq(mod1), ols_pred_rsq(mod2))
+)
+
+# Check for overfitting
+gap <- summary(model)$r.squared - ols_pred_rsq(model)
+if (gap > 0.15) {
+  cat("Warning: Large gap suggests overfitting\n")
+}
+```
+
+### When to Use Each Metric
+
+| Metric | Best For | Interpretation |
+|--------|----------|----------------|
+| **R²** | Quick assessment | "How well does this model fit my current data?" |
+| **Adj R²** | Model comparison with different # of predictors | "How well does this model fit, accounting for complexity?" |
+| **Pred R²** | Prediction tasks & assessing generalization | "How well will this model predict new observations?" |
+
+### Final Advice
+
+> "The model with the highest R-squared isn't always the best model. The model with the highest **Predicted R-squared** is usually the best choice for real-world predictions."
+
+Remember: You want a model that **generalizes** to new data, not one that simply memorizes your training data. Predicted R-squared is your best tool for evaluating this crucial property.
+
+---
+
+## Quiz: Test Your Understanding on R-squared
+
+```{r final-quiz-1}
+question("Which R-squared metric uses cross-validation?",
+  answer("Regular R-squared", message = "This uses all data for both fitting and evaluation."),
+  answer("Adjusted R-squared", message = "This adjusts regular R² with a penalty, but doesn't use cross-validation."),
+  answer("Predicted R-squared", correct = TRUE, message = "Correct! It uses leave-one-out cross-validation."),
+  allow_retry = TRUE
+)
+```
+
+```{r final-quiz-2}
+question("A model has R² = 0.85 and Predicted R² = 0.55. What does this suggest?",
+  answer("The model is excellent and ready to use.", 
+         message = "The large gap suggests problems."),
+  answer("The model is likely overfitting the training data.", 
+         correct = TRUE,
+         message = "Exactly! A gap of 0.30 is very large and suggests overfitting."),
+  answer("We need to add more predictors to improve performance.", 
+         message = "Adding predictors would likely make overfitting worse!"),
+  answer("Cross-validation failed and the result is unreliable.",
+         message = "The result is reliable - it's telling us the model doesn't generalize well."),
+  allow_retry = TRUE
+)
+```
+
+```{r final-quiz-3}
+question("When comparing two models, Model A has Pred R² = 0.62 (3 predictors) and Model B has Pred R² = 0.64 (8 predictors). Which should you choose?",
+  answer("Always Model B because it has higher Predicted R².", 
+         message = "Consider whether 2% improvement justifies 5 extra predictors."),
+  answer("Always Model A because it's simpler.", 
+         message = "Model B does predict better, so we need to weigh the tradeoff."),
+  answer("It depends - weigh the 2% improvement against added complexity.", 
+         correct = TRUE,
+         message = "Right! With such a small difference, parsimony suggests Model A might be better."),
+  answer("Neither - the Predicted R² values are too similar to distinguish.",
+         message = "We can still choose based on parsimony and practical considerations."),
+  allow_retry = TRUE
+)
+```
+
+## Information Criteria: AIC and BIC
+
+### Beyond R-squared: Another Way to Compare Models
+
+You've learned several ways to compare models: R-squared, adjusted R-squared, and predicted R-squared. Now we'll add two more powerful tools to your toolkit: **AIC** (Akaike Information Criterion) and **BIC** (Bayesian Information Criterion).
+
+These metrics answer a fundamental question: **Which model strikes the best balance between fit and simplicity?**
+
+**Learning Objectives:**
+
+By the end of this section, you will be able to:
+
+1. Understand what AIC and BIC measure and why they're useful
+2. Calculate AIC and BIC for regression models in R
+3. Interpret AIC and BIC values to compare competing models
+4. Understand the difference between AIC and BIC's penalty for complexity
+5. Use information criteria alongside R-squared metrics for model selection
+
+---
+
+## What Are Information Criteria?
+
+### The Core Concept
+
+Information criteria are measures of model quality that **balance two competing goals:**
+
+1. **Goodness of fit**: How well does the model explain the data?
+2. **Parsimony**: How simple is the model?
+
+Think of it like shopping for a car:
+
+- You want good performance (fit)
+- But you don't want to pay for features you don't need (complexity)
+- Information criteria help you find the best value
+
+### The Formula
+
+Both AIC and BIC have a similar structure:
+
+$$\text{Information Criterion} = -2 \times \text{log-likelihood} + \text{penalty} \times \text{number of parameters}$$
+
+**Key components:**
+
+- **Log-likelihood**: Measures how well the model fits (lower is better fit)
+- **Penalty term**: Punishes model complexity (more parameters = higher penalty)
+- **Lower values are better** - we want good fit with low complexity
+
+---
+
+## AIC: Akaike Information Criterion
+
+### The Formula
+
+$$\text{AIC} = -2 \times \ln(L) + 2k$$
+
+Where:
+
+- $L$ = likelihood of the model (how probable the data are, given the model)
+- $k$ = number of parameters (including intercept)
+- The penalty is **2k** (relatively lenient)
+
+### What Does It Optimize?
+
+AIC is designed to minimize **prediction error**. It asks: "Which model will best predict new observations?"
+
+**Philosophy:** AIC is willing to include more parameters if they improve predictive performance, even slightly.
+
+### Computing AIC in R
+
+```{r aic-example, echo=TRUE}
+# Fit several models with different numbers of predictors
+model1 <- lm(total_pr ~ duration, data = mariokart)
+model2 <- lm(total_pr ~ duration + start_pr, data = mariokart)
+model3 <- lm(total_pr ~ duration + start_pr + cond, data = mariokart)
+model4 <- lm(total_pr ~ duration + start_pr + cond + wheels + n_bids, 
+             data = mariokart)
+
+# Extract AIC values
+AIC(model1)
+AIC(model2)
+AIC(model3)
+AIC(model4)
+```
+
+### Interpreting AIC
+
+**Key principle: Lower is better**
+
+```{r aic-interpretation, echo=TRUE}
+# Compare all models
+aic_values <- c(AIC(model1), AIC(model2), AIC(model3), AIC(model4))
+names(aic_values) <- c("Model 1", "Model 2", "Model 3", "Model 4")
+aic_values
+
+# Find the best model
+cat("\nBest model according to AIC:", names(which.min(aic_values)), "\n")
+```
+
+**Rules of thumb for AIC differences (ΔAIC):**
+
+- ΔAIC < 2: Models are essentially equivalent
+- ΔAIC 2-7: Moderate evidence for model with lower AIC
+- ΔAIC 7-10: Strong evidence for model with lower AIC
+- ΔAIC > 10: Overwhelming evidence for model with lower AIC
+
+```{r aic-differences, echo=TRUE}
+# Calculate differences from the best model
+best_aic <- min(aic_values)
+delta_aic <- aic_values - best_aic
+
+cat("AIC differences from best model:\n")
+print(round(delta_aic, 2))
+```
+
+---
+
+## BIC: Bayesian Information Criterion
+
+### The Formula
+
+$$\text{BIC} = -2 \times \ln(L) + k \times \ln(n)$$
+
+Where:
+
+- $L$ = likelihood of the model
+- $k$ = number of parameters
+- $n$ = sample size
+- The penalty is **k × ln(n)** (typically more strict than AIC)
+
+### What Does It Optimize?
+
+BIC is designed to find the **true model**. It asks: "Which model structure is most likely to have generated this data?"
+
+**Philosophy:** BIC more strongly penalizes complexity and favors simpler models, especially with large samples.
+
+### The Key Difference: Penalty Severity
+
+```{r penalty-comparison, echo=TRUE}
+# Sample size
+n <- nrow(mariokart)
+
+# For a model with 5 parameters (k=5):
+k <- 5
+
+aic_penalty <- 2 * k
+bic_penalty <- k * log(n)
+
+cat("Sample size:", n, "\n")
+cat("Number of parameters:", k, "\n\n")
+cat("AIC penalty:", aic_penalty, "\n")
+cat("BIC penalty:", round(bic_penalty, 2), "\n")
+cat("\nBIC penalty is", round(bic_penalty / aic_penalty, 2), 
+    "times larger than AIC!\n")
+```
+
+**Important insight:** 
+
+- When **n > 8** (which is almost always!), BIC penalizes complexity more than AIC
+- The larger the sample, the bigger the difference
+- BIC will generally prefer *simpler* models than AIC
+
+### Computing BIC in R
+
+```{r bic-example, echo=TRUE}
+# Extract BIC values for our models
+BIC(model1)
+BIC(model2)
+BIC(model3)
+BIC(model4)
+
+# Compare all models
+bic_values <- c(BIC(model1), BIC(model2), BIC(model3), BIC(model4))
+names(bic_values) <- c("Model 1", "Model 2", "Model 3", "Model 4")
+bic_values
+
+# Find the best model
+cat("\nBest model according to BIC:", names(which.min(bic_values)), "\n")
+```
+
+---
+
+## AIC vs. BIC: Which Should You Use?
+
+### Direct Comparison
+
+Let's compare what AIC and BIC tell us about the same models:
+
+```{r aic-bic-comparison, echo=TRUE}
+# Create a comparison table
+comparison <- tibble(
+  Model = c("Model 1: Duration",
+            "Model 2: + Start Price", 
+            "Model 3: + Condition",
+            "Model 4: + Wheels + Bids"),
+  `Num Params` = c(2, 3, 4, 6),
+  AIC = c(AIC(model1), AIC(model2), AIC(model3), AIC(model4)),
+  BIC = c(BIC(model1), BIC(model2), BIC(model3), BIC(model4))
+) %>%
+  mutate(
+    `ΔAIC` = AIC - min(AIC),
+    `ΔBIC` = BIC - min(BIC),
+    `Best AIC` = ifelse(AIC == min(AIC), "✓", ""),
+    `Best BIC` = ifelse(BIC == min(BIC), "✓", "")
+  )
+
+comparison
+```
+
+### When to Use Each
+
+| Use AIC when... | Use BIC when... |
+|----------------|-----------------|
+| Your goal is **prediction** | Your goal is **explanation/inference** |
+| You want to minimize prediction error | You want to find the "true" model structure |
+| You're willing to accept complexity for better predictions | You strongly value parsimony |
+| Sample size is small to moderate | Sample size is large |
+
+Arguably, AIC is more common in practice, especially in fields focused on prediction (e.g., machine learning). BIC is often favored when parsimony and interpretability are paramount (e.g., social sciences). However, in cases where inference is the main concern, model comparison approach (such as AIC or BIC) are generally avoided with models often being specified based on theory.
+
+### Common Scenarios
+
+**Scenario 1: Both agree**
+```{r scenario-1, echo=TRUE, eval=FALSE}
+# AIC selects Model 3
+# BIC selects Model 3
+# → Clear choice: Use Model 3
+```
+
+**Scenario 2: AIC prefers more complex model**
+```{r scenario-2, echo=TRUE, eval=FALSE}
+# AIC selects Model 4 (6 parameters)
+# BIC selects Model 3 (4 parameters)
+# → Common pattern: BIC is more conservative
+# → Decision depends on your goal:
+#    - Prediction task? Follow AIC (Model 4)
+#    - Inference task? Follow BIC (Model 3)
+```
+
+**Scenario 3: Small differences**
+```{r scenario-3, echo=TRUE, eval=FALSE}
+# ΔAIC between models: 1.5 (< 2)
+# → Models are essentially equivalent
+# → Choose simpler model (principle of parsimony)
+```
+
+---
+
+## Combining Information Criteria with R-squared Metrics
+
+### The Complete Picture
+
+The best approach is to consider **multiple criteria together**:
+
+```{r complete-comparison, echo=TRUE}
+# Create comprehensive comparison
+full_comparison <- tibble(
+  Model = c("1: Duration", "2: + Start Price", "3: + Condition", 
+            "4: + Wheels + Bids"),
+  `# Params` = c(2, 3, 4, 6),
+  `R²` = c(summary(model1)$r.squared,
+           summary(model2)$r.squared,
+           summary(model3)$r.squared,
+           summary(model4)$r.squared),
+  `Adj R²` = c(summary(model1)$adj.r.squared,
+               summary(model2)$adj.r.squared,
+               summary(model3)$adj.r.squared,
+               summary(model4)$adj.r.squared),
+  `Pred R²` = c(ols_pred_rsq(model1),
+                ols_pred_rsq(model2),
+                ols_pred_rsq(model3),
+                ols_pred_rsq(model4)),
+  AIC = c(AIC(model1), AIC(model2), AIC(model3), AIC(model4)),
+  BIC = c(BIC(model1), BIC(model2), BIC(model3), BIC(model4))
+) %>%
+  mutate(
+    `ΔAIC` = AIC - min(AIC),
+    `ΔBIC` = BIC - min(BIC)
+  )
+
+# Display (round for readability)
+full_comparison %>%
+  mutate(across(where(is.numeric), ~round(., 3)))
+```
+
+### Decision Framework
+
+Consider all metrics together:
+
+```{r pred-decision-framework, echo=TRUE}
+# Function to identify best model by each criterion
+identify_best <- function(comparison_df) {
+  cat("Best model according to each metric:\n\n")
+  
+  cat("R-squared:", 
+      comparison_df$Model[which.max(comparison_df$`R²`)], "\n")
+  cat("Adjusted R-squared:", 
+      comparison_df$Model[which.max(comparison_df$`Adj R²`)], "\n")
+  cat("Predicted R-squared:", 
+      comparison_df$Model[which.max(comparison_df$`Pred R²`)], "\n")
+  cat("AIC (minimum):", 
+      comparison_df$Model[which.min(comparison_df$AIC)], "\n")
+  cat("BIC (minimum):", 
+      comparison_df$Model[which.min(comparison_df$BIC)], "\n")
+}
+
+identify_best(full_comparison)
+```
+
+**Interpretation strategy:**
+
+1. **If all metrics agree**: Clear winner! Use that model.
+
+2. **If R² says one thing, but AIC/BIC say another**: 
+   - R² might be showing overfitting
+   - Trust AIC/BIC more, especially if Predicted R² is low
+
+3. **If AIC and BIC disagree**:
+   - For prediction: Follow AIC
+   - For inference: Follow BIC
+   - Check if ΔAIC or ΔBIC < 2 (essentially equivalent)
+
+4. **If Predicted R² is much lower than R²**:
+   - Sign of overfitting
+   - Prefer model with better Predicted R² (even if R² is lower)
+   - Information criteria will usually agree
+   
+All of this depends upon model assumptions being met and the context of your analysis.
+
+---
+
+
+
+## Common Pitfalls and Misconceptions
+
+### ❌ Mistake 1: Comparing AIC/BIC Across Different Datasets
+
+```{r mistake-1, echo=TRUE, eval=FALSE}
+# WRONG: These AIC values can't be compared!
+model_babies <- lm(bwt ~ gestation, data = babies)
+model_mario <- lm(total_pr ~ duration, data = mariokart)
+
+AIC(model_babies)  # 15234
+AIC(model_mario)   # 621
+
+# You can't say mariokart model is "better" because AIC is lower!
+```
+
+**Why?** AIC depends on:
+
+- The response variable scale
+- The sample size
+- The data distribution
+
+**Correct approach:** Only compare AIC/BIC for models fitted to the **same dataset** with the **same response variable**.
+
+### ❌ Mistake 2: Thinking Higher AIC/BIC is Better
+
+It is possible to have a negative AIC or BIC value. This does NOT mean the model is "better" in absolute terms.
+
+```{r mistake-2, echo=TRUE, eval=FALSE}
+# WRONG interpretation:
+# "Model A has AIC = -500, Model B has AIC = -450"
+# "Model B is better because -500 > -450 in abosolute terms"
+
+# CORRECT interpretation:
+# "Model A is better because-500 < -450"
+# Remember: LOWER is better!
+```
+
+### ❌ Mistake 3: Using Only AIC/BIC Without Checking Assumptions
+
+```{r mistake-3, echo=TRUE, eval=FALSE}
+# WRONG workflow:
+# 1. Fit models
+# 2. Pick lowest AIC
+# 3. Done!
+
+# CORRECT workflow:
+# 1. Fit models
+# 2. Check diagnostics (check_model)
+# 3. Compare AIC/BIC for models that meet assumptions
+# 4. Verify with Predicted R² or cross-validation
+```
+
+**Important:** AIC and BIC assume:
+
+- Model is correctly specified
+- Residuals meet assumptions
+- No major outliers distorting fit
+
+Always run diagnostics before trusting information criteria!
+
+### ❌ Mistake 4: Treating Small Differences as Meaningful
+
+```{r mistake-4, echo=TRUE, eval=FALSE}
+# Model A: AIC = 450.2
+# Model B: AIC = 450.8
+
+# WRONG: "Model A is definitely better"
+# RIGHT: "ΔAIC = 0.6 < 2, models are essentially equivalent"
+```
+
+**Rule:** If ΔAIC < 2 or ΔBIC < 2, consider models equivalent and choose the simpler one.
+
+---
+
+## Interactive Practice: Using Information Criteria
+
+### Exercise 1: Calculate and Interpret
+
+Using the `mariokart` dataset, fit three models and identify the best one using AIC and BIC:
+
+```{r ex-ic-1, exercise=TRUE}
+# Model 1: wheels only
+# Model 2: wheels + cond
+# Model 3: wheels + cond + start_pr
+
+# Your code:
+
+
+
+
+```
+
+```{r ex-ic-1-solution}
+# Fit models
+m1 <- lm(total_pr ~ wheels, data = mariokart)
+m2 <- lm(total_pr ~ wheels + cond, data = mariokart)
+m3 <- lm(total_pr ~ wheels + cond + start_pr, data = mariokart)
+
+# Compare
+tibble(
+  Model = c("Wheels", "+ Condition", "+ Start Price"),
+  AIC = c(AIC(m1), AIC(m2), AIC(m3)),
+  BIC = c(BIC(m1), BIC(m2), BIC(m3))
+) %>%
+  mutate(
+    ΔAIC = AIC - min(AIC),
+    ΔBIC = BIC - min(BIC)
+  )
+```
+
+### Exercise 2: Interpretation Quiz
+
+```{r mc-ic-1}
+question("Model A has AIC = 245.3 and Model B has AIC = 248.1. What can you conclude?",
+  answer("Model A has a substantially better fit than Model B.", 
+         message = "Check the difference: 248.1 - 245.3 = 2.8"),
+  answer("Model B has a substantially better fit than Model A.",
+         message = "Remember: lower AIC is better, not higher!"),
+  answer("Model A has a moderately better fit than Model B (ΔAIC ≈ 2.8).",
+         correct = TRUE,
+         message = "Correct! ΔAIC = 2.8 suggests moderate evidence for Model A."),
+  answer("The models are essentially equivalent.",
+         message = "ΔAIC = 2.8 is above the threshold of 2 for equivalence."),
+  allow_retry = TRUE
+)
+```
+
+```{r mc-ic-2}
+question("AIC selects a model with 8 predictors, while BIC selects a model with 5 predictors. Your goal is to make the most accurate predictions possible. Which should you follow?",
+  answer("Always follow BIC because simpler models are better.",
+         message = "Consider your goal - prediction or inference?"),
+  answer("Follow AIC because it's optimized for prediction.",
+         correct = TRUE,
+         message = "Right! AIC minimizes prediction error, which aligns with your goal."),
+  answer("Follow BIC because it's more conservative.",
+         message = "BIC is conservative for inference tasks, but you want prediction."),
+  answer("Average the two models somehow.",
+         message = "You should choose based on your objective, not average."),
+  allow_retry = TRUE
+)
+```
+
+
+---
+
+## Summary: Using Information Criteria Effectively
+
+### Key Takeaways
+
+1. **Both AIC and BIC balance fit and complexity**
+   - Lower values are better
+   - They automatically penalize unnecessary parameters
+
+2. **AIC vs BIC**
+   - AIC: Optimized for prediction, more lenient
+   - BIC: Optimized for finding true model, more strict
+   - BIC penalizes complexity more heavily (especially with large n)
+
+3. **Interpreting differences (Δ)**
+   - Δ < 2: Models essentially equivalent (choose simpler)
+   - Δ 2-7: Moderate evidence for better model
+   - Δ 7-10: Strong evidence
+   - Δ > 10: Overwhelming evidence
+
+4. **Use with other metrics**
+   - Don't rely on AIC/BIC alone
+   - Check diagnostics first
+   - Compare with Predicted R²
+   - Consider practical significance
+
+5. **Remember:**
+   - Only compare within same dataset
+   - Lower is better
+   - Check assumptions before trusting results
+   - Consider your research goal (prediction vs. inference)
+
+### Essential R Code
+
+```{r aic-summary-code, echo=TRUE, eval=FALSE}
+# Calculate information criteria
+AIC(model)
+BIC(model)
+
+# Compare multiple models
+aic_values <- c(AIC(model1), AIC(model2), AIC(model3))
+which.min(aic_values)  # Find best model
+
+# Calculate differences from best
+delta_aic <- aic_values - min(aic_values)
+
+# Complete comparison table
+tibble(
+  Model = c("Model 1", "Model 2", "Model 3"),
+  AIC = c(AIC(model1), AIC(model2), AIC(model3)),
+  BIC = c(BIC(model1), BIC(model2), BIC(model3))
+) %>%
+  mutate(
+    ΔAIC = AIC - min(AIC),
+    ΔBIC = BIC - min(BIC)
+  )
+```
+
+### Decision Flowchart
+
+```
+Start: Multiple candidate models
+  ↓
+Check diagnostics (all models meet assumptions?)
+  ↓ YES
+Calculate AIC and BIC for all models
+  ↓
+Do AIC and BIC agree on best model?
+  ↓ YES                              ↓ NO
+Use that model              Check research goal
+                                      ↓
+                         Prediction? → Use AIC's choice
+                         Inference?  → Use BIC's choice
+                                      ↓
+                         Check if ΔAIC or ΔBIC < 2
+                              ↓ YES: Models equivalent, use simpler
+                              ↓ NO: Use goal-appropriate choice
+  ↓
+Verify with Predicted R² or cross-validation
+  ↓
+Final model selected!
+```
+
+Now you have a complete toolkit for model comparison: R-squared metrics, Predicted R-squared, AIC, and BIC. Use them together to make informed decisions about model selection!
 
 ## Understanding Interaction
 

@@ -1,5 +1,5 @@
 ---
-title: "Introduction to data: 1 - Language of data"
+title: "Week 1: Using data in R"
 output: 
   learnr::tutorial:
     progressive: true
@@ -93,9 +93,9 @@ hash_encoder_ui <- {
 
 ## Welcome
 
-Hello, and welcome to **Introduction to data**!
+Hello, and welcome to the **introduction to data** tutorial!
 
-In this tutorial we will take you through concepts and R code that are essential for getting started with data analysis.
+In this tutorial we will take you through concepts and R code that are essential for getting started with data analysis. 
 
 Scientists seek to answer questions using rigorous methods and careful observations. These observations form the backbone of a statistical investigation and are called data. Statistics is the study of how best to collect, analyze, and draw conclusions from data. It is helpful to put statistics in the context of a general process of investigation:
 
@@ -111,7 +111,7 @@ We will focus on **steps 1 and 2** of this process in this tutorial.
 
 Our learning goals for the tutorial are *to internalize the language of data, load and view a dataset in R and distinguish between various variable types, classify a study as observational or experimental, and determine the scope of inference, distinguish between various sampling strategies, and identify the principles of experimental design.*
 
-This tutorial does not assume any previous R experience, but if you would like an introduction to R first, we recommend the [RStudio Primers](https://rstudio.cloud/learn/primers) or the [R Bootcamp](https://r-bootcamp.netlify.com/).
+This tutorial does not assume any previous R experience, but we will use R throughout the semester and this is meant to orientate you to using it.
 
 ## Packages
 
