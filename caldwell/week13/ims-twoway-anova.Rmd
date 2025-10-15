@@ -492,6 +492,7 @@ An **interaction effect** occurs when the effect of one factor **depends on** th
 When an interaction is present, you should be *extremely* careful (if ever) interpreting main effects alone! You should consider the factors together.
 
 **Example:** If we found "no main effect of supplement" but a significant interaction, it means:
+
 - On average across all doses, OJ and VC might be similar
 - BUT at specific doses, one might be much better than the other!
 
@@ -734,12 +735,14 @@ Notice that we never test a main effect in the presence of its interaction---we 
 **Why it violates marginality:**
 
 Type III compares these models:
+
 - For testing A: `lm(~ B + A:B)` vs. `lm(~ A + B + A:B)`
 - For testing B: `lm(~ A + A:B)` vs. `lm(~ A + B + A:B)`
 
 These model comparisons are **not hierarchical**! The reduced model includes the interaction A×B but is missing the main effect being tested. This violates the principle that you cannot have an interaction in a model without its corresponding main effects.
 
 **Model comparison notation:**
+
 - Main effect A: SS(A | B, AB) --- "A given B AND A×B" ⚠️
 - Main effect B: SS(B | A, AB) --- "B given A AND A×B" ⚠️
 - Interaction: SS(AB | A, B) --- "A×B given both main effects"
@@ -794,11 +797,13 @@ Despite these criticisms, Type III is common in some fields, particularly becaus
 **How Type II works in practice:**
 
 When the interaction is not significant:
+
 - Type II gives powerful tests of main effects
 - Main effects are interpretable (factors act independently)
 - This is exactly what we want!
 
 When the interaction IS significant:
+
 - Type II tells us the main effects aren't significant after controlling for other main effects
 - But this doesn't matter---we should focus on simple effects anyway!
 - The fact that Type II "assumes no interaction" just means it gives us less information about marginal means (which we don't care about with a significant interaction)
@@ -854,7 +859,7 @@ car::Anova(tooth_model_t3, type = "III")
 **Notice:**
 
 - The **interaction** test is identical (p = 0.0218 in both)
-- The **main effects** can differ slightly
+- The **main effects** can differ slightly (but don't in this case due to balance)
 - With balanced data like this, they're similar, but with unbalanced data, differences can be substantial
 
 **Interpretation with Type II (recommended):**
@@ -1154,14 +1159,13 @@ Take notes on what you observe before moving on!
 - Try transformations to stabilize variance
 - Use weighted least squares
 - Use robust standard errors
-- Report both Welch's ANOVA (unequal variances) and regular ANOVA
 
 **If influential outliers exist:**
 
 - Verify data accuracy
 - Run analysis with and without outliers
 - Report sensitivity analysis
-- Use robust regression methods
+- Consider alternative, robust methods
 
 **General advice:**
 
@@ -1183,18 +1187,21 @@ After fitting a factorial ANOVA, you **always keep the full model** with all int
 Your analysis strategy depends on your research questions and what you found:
 
 **Strategy 1: Focus on Simple Effects (when interaction is significant)**
+
 - **When:** Interaction p-value is small (typically p < 0.05)
 - **Why:** The effect of one factor depends on the level of the other
 - **How:** Use `emmeans` to compare levels of one factor within each level of the other
 - **Example:** Compare supplements within each dose level
 
 **Strategy 2: Examine Marginal Main Effects (when interaction is not significant)**
+
 - **When:** Interaction p-value is large (typically p > 0.05)
 - **Why:** Factors act independently; marginal averages are meaningful
 - **How:** Use `emmeans` to get marginal means (averaged across the other factor)
 - **Example:** Compare supplements averaged across all doses
 
 **Strategy 3: Examine Both (when interaction is borderline or you have theoretical reasons)**
+
 - **When:** Interaction is marginally significant or you want to fully understand the data
 - **Why:** Get a complete picture of both the interaction and marginal effects
 - **How:** Do both simple effects AND marginal means analyses
@@ -1238,7 +1245,7 @@ emmeans(tooth_model, pairwise ~ supp | dose)
   - At 1.0 mg: OJ vs. VC difference is...
   - At 2.0 mg: OJ vs. VC difference is...
 
-**Why this matters:** The interaction tells us the supplement effect is NOT the same at all doses. Simple effects show us exactly how it differs.
+**Why this matters:** The interaction tells us the supplement effect is NOT the same at all doses. Simple effects show us exactly how/where it differs.
 
 #### Alternative: Compare Doses Within Each Supplement
 
@@ -1256,6 +1263,7 @@ emmeans(tooth_model, pairwise ~ dose | supp)
 - Do the dose effects differ between supplements?
 
 **Both approaches are valid!** Choose based on your research question:
+
 - If supplement is the treatment of interest → compare supplements within doses
 - If dose is the treatment of interest → compare doses within supplements
 - For a complete picture → do both!
@@ -1277,10 +1285,10 @@ Let's use the course evaluations data where interaction might not be significant
 evals_model <- lm(score ~ rank * gender, data = evals_subset)
 
 # Check if interaction is significant
-Anova(evals_model, type = 3)
+Anova(evals_model, type = 2)
 ```
 
-Suppose the interaction is not significant (p > 0.05). We can now meaningfully interpret marginal means:
+Suppose the interaction is not significant (it actually is but let's just pretend okay?). We can now meaningfully interpret marginal means:
 
 ```{r echo=TRUE}
 # Marginal means for rank (averaged over gender)
@@ -1291,7 +1299,7 @@ rank_emm
 pairs(rank_emm, adjust = "tukey")
 ```
 
-**Interpretation:** These are the average evaluation scores for each rank, averaged across both genders. Since there's no interaction, this averaging is meaningful—the rank effect is similar for both genders.
+**Interpretation:** These are the average evaluation scores for each rank, averaged across both genders. Since we assume no interaction, this averaging is meaningful --- the rank effect is similar for both genders.
 
 ```{r echo=TRUE}
 # Marginal means for gender (averaged over rank)

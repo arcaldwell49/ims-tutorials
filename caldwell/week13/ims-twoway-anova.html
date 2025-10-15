@@ -180,10 +180,14 @@ middle, upper)</li>
 </ul>
 <p><strong>Model:</strong> <span class="math inline">\(y_{ij} = \mu +
 \alpha_i + \epsilon_{ij}\)</span></p>
-<p>Where: - <span class="math inline">\(\mu\)</span> = overall mean -
-<span class="math inline">\(\alpha_i\)</span> = effect of group <span
-class="math inline">\(i\)</span> - <span
-class="math inline">\(\epsilon_{ij}\)</span> = random error</p>
+<p>Where:</p>
+<ul>
+<li><span class="math inline">\(\mu\)</span> = overall mean</li>
+<li><span class="math inline">\(\alpha_i\)</span> = effect of group
+<span class="math inline">\(i\)</span></li>
+<li><span class="math inline">\(\epsilon_{ij}\)</span> = random
+error</li>
+</ul>
 </div>
 <div id="section-the-limitation-of-one-way-anova"
 class="section level3">
@@ -431,19 +435,24 @@ class="section level2">
 <p>The statistical model for two-way ANOVA is:</p>
 <p><span class="math display">\[y_{ijk} = \mu + \alpha_i + \beta_j +
 (\alpha\beta)_{ij} + \epsilon_{ijk}\]</span></p>
-<p>Where: - <span class="math inline">\(y_{ijk}\)</span> = the <span
+<p>Where:</p>
+<ul>
+<li><span class="math inline">\(y_{ijk}\)</span> = the <span
 class="math inline">\(k\)</span>-th observation in group <span
 class="math inline">\(i\)</span> of factor A and group <span
-class="math inline">\(j\)</span> of factor B - <span
-class="math inline">\(\mu\)</span> = overall (grand) mean - <span
-class="math inline">\(\alpha_i\)</span> = main effect of factor A at
-level <span class="math inline">\(i\)</span> - <span
-class="math inline">\(\beta_j\)</span> = main effect of factor B at
-level <span class="math inline">\(j\)</span> - <span
-class="math inline">\((\alpha\beta)_{ij}\)</span> = interaction effect
-between factor A (level <span class="math inline">\(i\)</span>) and
-factor B (level <span class="math inline">\(j\)</span>) - <span
-class="math inline">\(\epsilon_{ijk}\)</span> = random error term</p>
+class="math inline">\(j\)</span> of factor B</li>
+<li><span class="math inline">\(\mu\)</span> = overall (grand) mean</li>
+<li><span class="math inline">\(\alpha_i\)</span> = main effect of
+factor A at level <span class="math inline">\(i\)</span></li>
+<li><span class="math inline">\(\beta_j\)</span> = main effect of factor
+B at level <span class="math inline">\(j\)</span></li>
+<li><span class="math inline">\((\alpha\beta)_{ij}\)</span> =
+interaction effect between factor A (level <span
+class="math inline">\(i\)</span>) and factor B (level <span
+class="math inline">\(j\)</span>)</li>
+<li><span class="math inline">\(\epsilon_{ijk}\)</span> = random error
+term</li>
+</ul>
 </div>
 <div id="section-main-effects-explained" class="section level3">
 <h3>Main Effects Explained</h3>
@@ -501,9 +510,11 @@ for older adults</li>
 careful (if ever) interpreting main effects alone! You should consider
 the factors together.</p>
 <p><strong>Example:</strong> If we found “no main effect of supplement”
-but a significant interaction, it means: - On average across all doses,
-OJ and VC might be similar - BUT at specific doses, one might be much
-better than the other!</p>
+but a significant interaction, it means:</p>
+<ul>
+<li>On average across all doses, OJ and VC might be similar</li>
+<li>BUT at specific doses, one might be much better than the other!</li>
+</ul>
 </div>
 <div id="section-additive-vs.-interactive-models"
 class="section level3">
@@ -792,18 +803,23 @@ class="section level3">
 when an interaction is present</li>
 </ul>
 <p><strong>Why it violates marginality:</strong></p>
-<p>Type III compares these models: - For testing A:
-<code>lm(~ B + A:B)</code> vs. <code>lm(~ A + B + A:B)</code> - For
-testing B: <code>lm(~ A + A:B)</code>
-vs. <code>lm(~ A + B + A:B)</code></p>
+<p>Type III compares these models:</p>
+<ul>
+<li>For testing A: <code>lm(~ B + A:B)</code>
+vs. <code>lm(~ A + B + A:B)</code></li>
+<li>For testing B: <code>lm(~ A + A:B)</code>
+vs. <code>lm(~ A + B + A:B)</code></li>
+</ul>
 <p>These model comparisons are <strong>not hierarchical</strong>! The
 reduced model includes the interaction A×B but is missing the main
 effect being tested. This violates the principle that you cannot have an
 interaction in a model without its corresponding main effects.</p>
-<p><strong>Model comparison notation:</strong> - Main effect A: SS(A |
-B, AB) — “A given B AND A×B” ⚠️ - Main effect B: SS(B | A, AB) — “B
-given A AND A×B” ⚠️ - Interaction: SS(AB | A, B) — “A×B given both main
-effects”</p>
+<p><strong>Model comparison notation:</strong></p>
+<ul>
+<li>Main effect A: SS(A | B, AB) — “A given B AND A×B” ⚠️</li>
+<li>Main effect B: SS(B | A, AB) — “B given A AND A×B” ⚠️</li>
+<li>Interaction: SS(AB | A, B) — “A×B given both main effects”</li>
+</ul>
 </div>
 <div id="section-the-controversy-criticisms-of-type-iii"
 class="section level3">
@@ -879,15 +895,22 @@ Senn, Langsrud, Fox)</li>
 controlling for other main effects</li>
 </ol>
 <p><strong>How Type II works in practice:</strong></p>
-<p>When the interaction is not significant: - Type II gives powerful
-tests of main effects - Main effects are interpretable (factors act
-independently) - This is exactly what we want!</p>
-<p>When the interaction IS significant: - Type II tells us the main
-effects aren’t significant after controlling for other main effects -
-But this doesn’t matter—we should focus on simple effects anyway! - The
-fact that Type II “assumes no interaction” just means it gives us less
-information about marginal means (which we don’t care about with a
-significant interaction)</p>
+<p>When the interaction is not significant:</p>
+<ul>
+<li>Type II gives powerful tests of main effects</li>
+<li>Main effects are interpretable (factors act independently)</li>
+<li>This is exactly what we want!</li>
+</ul>
+<p>When the interaction IS significant:</p>
+<ul>
+<li>Type II tells us the main effects aren’t significant after
+controlling for other main effects</li>
+<li>But this doesn’t matter—we should focus on simple effects
+anyway!</li>
+<li>The fact that Type II “assumes no interaction” just means it gives
+us less information about marginal means (which we don’t care about with
+a significant interaction)</li>
+</ul>
 </div>
 <div id="section-when-you-might-use-type-iii" class="section level3">
 <h3>When You Might Use Type III</h3>
@@ -966,7 +989,8 @@ car::Anova(tooth_model_t3, type = &quot;III&quot;)</code></pre>
 <ul>
 <li>The <strong>interaction</strong> test is identical (p = 0.0218 in
 both)</li>
-<li>The <strong>main effects</strong> can differ slightly</li>
+<li>The <strong>main effects</strong> can differ slightly (but don’t in
+this case due to balance)</li>
 <li>With balanced data like this, they’re similar, but with unbalanced
 data, differences can be substantial</li>
 </ul>
@@ -1302,14 +1326,13 @@ test)</li>
 <li>Try transformations to stabilize variance</li>
 <li>Use weighted least squares</li>
 <li>Use robust standard errors</li>
-<li>Report both Welch’s ANOVA (unequal variances) and regular ANOVA</li>
 </ul>
 <p><strong>If influential outliers exist:</strong></p>
 <ul>
 <li>Verify data accuracy</li>
 <li>Run analysis with and without outliers</li>
 <li>Report sensitivity analysis</li>
-<li>Use robust regression methods</li>
+<li>Consider alternative, robust methods</li>
 </ul>
 <p><strong>General advice:</strong></p>
 <ul>
@@ -1340,26 +1363,41 @@ research questions.</p>
 <p>Your analysis strategy depends on your research questions and what
 you found:</p>
 <p><strong>Strategy 1: Focus on Simple Effects (when interaction is
-significant)</strong> - <strong>When:</strong> Interaction p-value is
-small (typically p &lt; 0.05) - <strong>Why:</strong> The effect of one
-factor depends on the level of the other - <strong>How:</strong> Use
-<code>emmeans</code> to compare levels of one factor within each level
-of the other - <strong>Example:</strong> Compare supplements within each
-dose level</p>
+significant)</strong></p>
+<ul>
+<li><strong>When:</strong> Interaction p-value is small (typically p
+&lt; 0.05)</li>
+<li><strong>Why:</strong> The effect of one factor depends on the level
+of the other</li>
+<li><strong>How:</strong> Use <code>emmeans</code> to compare levels of
+one factor within each level of the other</li>
+<li><strong>Example:</strong> Compare supplements within each dose
+level</li>
+</ul>
 <p><strong>Strategy 2: Examine Marginal Main Effects (when interaction
-is not significant)</strong> - <strong>When:</strong> Interaction
-p-value is large (typically p &gt; 0.05) - <strong>Why:</strong> Factors
-act independently; marginal averages are meaningful -
-<strong>How:</strong> Use <code>emmeans</code> to get marginal means
-(averaged across the other factor) - <strong>Example:</strong> Compare
-supplements averaged across all doses</p>
+is not significant)</strong></p>
+<ul>
+<li><strong>When:</strong> Interaction p-value is large (typically p
+&gt; 0.05)</li>
+<li><strong>Why:</strong> Factors act independently; marginal averages
+are meaningful</li>
+<li><strong>How:</strong> Use <code>emmeans</code> to get marginal means
+(averaged across the other factor)</li>
+<li><strong>Example:</strong> Compare supplements averaged across all
+doses</li>
+</ul>
 <p><strong>Strategy 3: Examine Both (when interaction is borderline or
-you have theoretical reasons)</strong> - <strong>When:</strong>
-Interaction is marginally significant or you want to fully understand
-the data - <strong>Why:</strong> Get a complete picture of both the
-interaction and marginal effects - <strong>How:</strong> Do both simple
-effects AND marginal means analyses - <strong>Report:</strong> Be clear
-about what each analysis shows</p>
+you have theoretical reasons)</strong></p>
+<ul>
+<li><strong>When:</strong> Interaction is marginally significant or you
+want to fully understand the data</li>
+<li><strong>Why:</strong> Get a complete picture of both the interaction
+and marginal effects</li>
+<li><strong>How:</strong> Do both simple effects AND marginal means
+analyses</li>
+<li><strong>Report:</strong> Be clear about what each analysis
+shows</li>
+</ul>
 <p><strong>Key point:</strong> The full model (<code>~ A * B</code>) is
 always fit. We’re just asking different questions of it!</p>
 </div>
@@ -1440,7 +1478,7 @@ dose level separately
 </ul>
 <p><strong>Why this matters:</strong> The interaction tells us the
 supplement effect is NOT the same at all doses. Simple effects show us
-exactly how it differs.</p>
+exactly how/where it differs.</p>
 </div>
 <div id="section-alternative-compare-doses-within-each-supplement"
 class="section level4">
@@ -1485,10 +1523,14 @@ emmeans(tooth_model, pairwise ~ dose | supp)</code></pre>
 <li>Do the dose effects differ between supplements?</li>
 </ul>
 <p><strong>Both approaches are valid!</strong> Choose based on your
-research question: - If supplement is the treatment of interest →
-compare supplements within doses - If dose is the treatment of interest
-→ compare doses within supplements - For a complete picture → do
-both!</p>
+research question:</p>
+<ul>
+<li>If supplement is the treatment of interest → compare supplements
+within doses</li>
+<li>If dose is the treatment of interest → compare doses within
+supplements</li>
+<li>For a complete picture → do both!</li>
+</ul>
 </div>
 </div>
 <div
@@ -1511,14 +1553,15 @@ significant:</p>
 evals_model &lt;- lm(score ~ rank * gender, data = evals_subset)
 
 # Check if interaction is significant
-Anova(evals_model, type = 3)</code></pre>
+Anova(evals_model, type = 2)</code></pre>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["Sum Sq"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["Df"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["F value"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Pr(>F)"],"name":[4],"type":["dbl"],"align":["right"]}],"data":[{"1":"6459.841556","2":"1","3":"22980.927715","4":"0.000000e+00","_rn_":"(Intercept)"},{"1":"1.440645","2":"2","3":"2.562551","4":"7.821541e-02","_rn_":"rank"},{"1":"4.472946","2":"1","3":"15.912535","4":"7.723851e-05","_rn_":"gender"},{"1":"3.695126","2":"2","3":"6.572717","4":"1.533871e-03","_rn_":"rank:gender"},{"1":"128.460767","2":"457","3":"NA","4":"NA","_rn_":"Residuals"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["Sum Sq"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["Df"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["F value"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Pr(>F)"],"name":[4],"type":["dbl"],"align":["right"]}],"data":[{"1":"2.238235","2":"2","3":"3.981268","4":"0.019312897","_rn_":"rank"},{"1":"2.909303","2":"1","3":"10.349865","4":"0.001386823","_rn_":"gender"},{"1":"3.695126","2":"2","3":"6.572717","4":"0.001533871","_rn_":"rank:gender"},{"1":"128.460767","2":"457","3":"NA","4":"NA","_rn_":"Residuals"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
-<p>Suppose the interaction is not significant (p &gt; 0.05). We can now
-meaningfully interpret marginal means:</p>
+<p>Suppose the interaction is not significant (it actually is but let’s
+just pretend okay?). We can now meaningfully interpret marginal
+means:</p>
 <pre class="r"><code># Marginal means for rank (averaged over gender)
 rank_emm &lt;- emmeans(evals_model, ~ rank)
 rank_emm</code></pre>
@@ -1539,9 +1582,9 @@ pairs(rank_emm, adjust = &quot;tukey&quot;)</code></pre>
 ## Results are averaged over the levels of: gender 
 ## P value adjustment: tukey method for comparing a family of 3 estimates</code></pre>
 <p><strong>Interpretation:</strong> These are the average evaluation
-scores for each rank, averaged across both genders. Since there’s no
-interaction, this averaging is meaningful—the rank effect is similar for
-both genders.</p>
+scores for each rank, averaged across both genders. Since we assume no
+interaction, this averaging is meaningful — the rank effect is similar
+for both genders.</p>
 <pre class="r"><code># Marginal means for gender (averaged over rank)
 gender_emm &lt;- emmeans(evals_model, ~ gender)
 gender_emm</code></pre>
@@ -1998,7 +2041,7 @@ solutions, please enter your identifying information, then click the button belo
 <label class="control-label" id="studentID-label" for="studentID">What is your student ID?</label>
 <input id="studentID" type="text" class="shiny-input-text form-control" value="" data-update-on="change"/>
 </div>
-<div id="out451f5d4f90941ab2" class="shiny-text-output"></div>
+<div id="outc2d4d48357512c9f" class="shiny-text-output"></div>
 </div>
 <div class="row" style="padding-bottom: 0.5em;">
 <div class="col-sm-3">
