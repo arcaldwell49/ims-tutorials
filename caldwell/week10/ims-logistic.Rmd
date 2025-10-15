@@ -1,5 +1,5 @@
 ---
-title: "Regression modeling: 9 - Logistic Regression"
+title: "Week 10: Generalized Linear Models and Logistic Regression"
 output: 
   learnr::tutorial:
     progressive: true
@@ -16,7 +16,7 @@ library(Stat2Data)
 library(tidyverse)
 library(broom)
 library(emo)
-
+library(marginaleffects)
 # knitr options ----------------------------------------------------------------
 
 knitr::opts_chunk$set(fig.align = "center", 
@@ -99,6 +99,95 @@ hash_encoder_ui <- {
   }), )
 }
 ```
+
+
+
+## Welcome to Generalized Linear Models
+
+Welcome to this interactive tutorial on logistic regression and generalized linear models (GLMs)! 
+
+### What You'll Learn
+
+By the end of this tutorial, you will be able to:
+
+1. **Understand when to use logistic regression** - Recognize situations where a binary outcome variable requires a different modeling approach than linear regression
+2. **Build logistic regression models in R** - Use the `glm()` function with the appropriate family argument to fit models for binary outcomes
+3. **Interpret coefficients on different scales** - Convert between and interpret results on the log-odds, odds, and probability scales
+4. **Make predictions** - Generate both probabilistic and binary predictions for new observations
+5. **Evaluate model performance** - Create and interpret confusion matrices to assess prediction accuracy
+6. **Apply multiple predictors** - Extend simple logistic regression to include multiple explanatory variables
+
+### Real-World Applications
+
+Throughout this tutorial, you'll work with two compelling datasets:
+- **Stanford Heart Transplant Study**: Modeling 5-year survival rates of heart transplant patients
+- **Medical School Admissions**: Predicting acceptance based on student GPA
+
+Let's get started!
+
+## Introduction to Generalized Linear Models
+
+### Beyond Linear Regression
+
+So far in your statistical journey, you've primarily worked with **linear regression**, where the response variable is continuous and approximately normally distributed. But what happens when your response variable doesn't meet these assumptions?
+
+- What if you want to predict whether a student gets **accepted** or **rejected** (binary outcome)?
+- What if you're counting the **number of emails** received per day (count data)?
+- What if you're modeling **survival time** (positive and skewed)?
+
+This is where **Generalized Linear Models (GLMs)** come to the rescue!
+
+### The GLM Framework
+
+Generalized Linear Models extend the linear regression framework to accommodate response variables from different probability distributions. The key innovation is the use of a **link function** that transforms the response variable to connect it with a linear combination of predictors.
+
+**The GLM Structure:**
+
+$$E(Y) = g^{-1}(\beta_0 + \beta_1 x_1 + \beta_2 x_2 + \ldots)$$
+
+Where $g$ is the **link function** that maps the expected value of Y to the linear predictor.
+
+### Common Types of GLMs
+
+Different response variable types call for different GLM families:
+
+| Response Type | GLM Family | Link Function | Example |
+|--------------|------------|---------------|---------|
+| Binary (0/1) | Binomial | **Logit** | Disease diagnosis (yes/no) |
+| Binary (0/1) | Binomial | **Probit** | Pass/fail outcomes |
+| Binary (0/1) | Binomial | **Cloglog** | Rare events (e.g., equipment failure) |
+| Count (0, 1, 2, ...) | Poisson | Log | Number of customer complaints |
+| Continuous (positive) | Gamma | Log | Insurance claim amounts |
+
+### Focus on Binary Outcomes
+
+In this tutorial, we'll focus on modeling **binary outcomes** using the **binomial family** of GLMs. The most common approach is **logistic regression**, which uses the **logit link function**:
+
+$$\text{logit}(p) = \log\left(\frac{p}{1-p}\right) = \beta_0 + \beta_1 x_1 + \ldots$$
+
+This ensures that predicted probabilities always fall between 0 and 1—a critical requirement!
+
+### Alternative Link Functions for Binary Data
+
+While logistic regression is the most popular choice for binary outcomes, two alternatives exist:
+
+**Probit Regression** uses the inverse cumulative distribution function of the standard normal distribution as its link. It's particularly useful when you believe the underlying latent process follows a normal distribution (common in psychology and economics). The probit and logit models often give similar results, but probit is sometimes preferred for theoretical reasons, ease of interpretation, or just convention of the area in which it is used.
+
+**Complementary Log-Log (Cloglog)** is designed for situations where one outcome is much rarer than the other, or when the data arise from a survival or time-to-event process measured in discrete time intervals.
+
+In R, you can specify these alternatives using:
+```r
+# Logistic regression (default)
+glm(y ~ x, data = mydata, family = binomial(link = "logit"))
+
+# Probit regression
+glm(y ~ x, data = mydata, family = binomial(link = "probit"))
+
+# Complementary log-log
+glm(y ~ x, data = mydata, family = binomial(link = "cloglog"))
+```
+
+For this tutorial, we'll stick with logistic regression as it's the most widely used and its coefficients have an intuitive interpretation in terms of odds ratios.
 
 
 ## Logistic Regression
@@ -900,7 +989,14 @@ mod_plus |>
   table()
 ```
 
-So how well did our model perform? One common way of assessing performance of models for a categorical response is via a confusion matrix. This simply cross-tabulates the reality with what our model predicted. In this case, our model predicted that 91 patients would die, and only 12 would live. Of those 91, 71 actually did die, while of the 12, 8 actually lived. Thus, our overall accuracy was 79 out of 103, or about 77%. 
+So how well did our model perform? One common way of assessing performance of models for a categorical response is via a **confusion matrix**. This cross-tabulates the actual outcomes with our model's predictions:
+
+- **True Negatives (71)**: Correctly predicted death
+- **False Positives (20)**: Predicted alive but actually died  
+- **False Negatives (4)**: Predicted death but actually alive
+- **True Positives (8)**: Correctly predicted survival
+
+Our overall accuracy was 79 out of 103, or about **77%**.
 
 Note that our model predicted only 12 patients would live, but more than twice as many patients actually survived. Our model's under-prediction is probably a consequence of the low survival rate overall, coupled with our clumsy rounding scheme. One way to improve the accuracy of our binary predictions would be to experiment with looser rounding thresholds.
 
@@ -927,8 +1023,13 @@ new_data <- ___
 
 ```
 
-```{r ex8-hint}
-new_data <- data.frame(GPA = 3.51)
+```{r ex8-hint-1}
+# Start by creating a data frame with the GPA value
+new_data <- data.frame(GPA = ___)
+```
+```{r ex8-hint-2}
+# Use augment with newdata and type.predict arguments
+augment(___, newdata = ___, type.predict = "___")
 ```
 
 ```{r ex8-solution}
@@ -991,9 +1092,267 @@ tidy_mod |>
 ```
 
 
+## Advanced Topics: Marginal Effects and Non-Collapsibility
+
+So far, we've focused on interpreting odds ratios from logistic regression models. However, there are some important nuances about these effects that you should be aware of as you advance in your statistical practice.
+
+### The Problem of Non-Collapsibility
+
+One surprising property of odds ratios is that they are **non-collapsible**. The **non-collapsibility of the odds ratio (OR)** is a mathematical property where the crude (unadjusted) odds ratio for a population does not equal the weighted average of the odds ratios within specific strata of a confounding variable, even when there is no actual confounding. 
+
+This occurs because the odds ratio reflects the non-linear relationship between odds and probabilities, which means the OR can change based on the distribution of the risk factors in the population. This phenomenon can lead to different ORs when adjusting for covariates, making the OR less portable across populations with varying baseline risk.
+
+#### A Concrete Example
+
+To really understand non-collapsibility, let's work through a simple example. Imagine a clinical trial with 4000 patients testing two treatments (A vs B) for a binary outcome. The trial has equal numbers of males and females, and sex is a strong risk factor (but is perfectly balanced across treatment groups—so there's no confounding).
+
+**Within males only:**
+- Treatment A: 500 with Y=1 out of 1000 patients
+- Treatment B: 100 with Y=1 out of 1000 patients  
+- **Odds Ratio (A vs B) = 9.0**
+
+**Within females only:**
+- Treatment A: 900 with Y=1 out of 1000 patients
+- Treatment B: 500 with Y=1 out of 1000 patients
+- **Odds Ratio (A vs B) = 9.0**
+
+So the treatment effect is identical (OR = 9) for both males and females. There is no treatment-by-sex interaction.
+
+**But what happens when we ignore sex and just look at the pooled data?**
+
+**Pooled (ignoring sex):**
+- Treatment A: 1400 with Y=1 out of 2000 patients
+- Treatment B: 600 with Y=1 out of 2000 patients
+- **Odds Ratio (A vs B) = 5.44**
+
+Wait... what? The odds ratio went from 9.0 (in both subgroups) to 5.44 (in the pooled data)! And note that 5.44 is **not** a weighted average of 9 and 9. *This is non-collapsibility in action*!
+
+```{r echo=TRUE}
+# Let's verify this with our heart transplant data
+# Simple model: only transplant status (marginal/unadjusted)
+mod_marginal <- glm(is_alive ~ transplant, 
+                    data = heart_transplant, family = binomial)
+
+# Adjusted model: transplant + age (conditional)
+mod_conditional <- glm(is_alive ~ transplant + age, 
+                       data = heart_transplant, family = binomial)
+
+# Compare the transplant effect
+exp(coef(mod_marginal)["transplanttreatment"])  # Marginal OR
+exp(coef(mod_conditional)["transplanttreatment"])  # Conditional OR
+```
+
+The odds ratio for transplant changes when we adjust for age, even though age and transplant status might be completely unrelated (no confounding). This is a mathematical property of odds ratios, not evidence of confounding.
+
+#### Why Does the Unadjusted OR Not Generalize?
+
+Here's the key insight: **The unadjusted (marginal) OR of 5.44 doesn't apply to males, doesn't apply to females, and doesn't generalize to other populations!**
+
+If we took our trial results to a different clinical population with a different sex distribution, the marginal OR would change! Let's see what happens if we apply our results to populations with different proportions of females:
+
+| Proportion Female | Marginal OR |
+|-------------------|-------------|
+| 50% (original)    | 5.44        |
+| 80%               | 6.43        |
+| 60%               | 6.03        |
+| 40%               | 5.00        |
+| 20%               | 3.94        |
+| 10%               | 3.38        |
+
+The marginal OR changes dramatically based on the sex composition of the population, even though the true treatment effect (OR = 9) is the same for everyone!
+
+In contrast, the **conditional OR of 9.0 remains constant** regardless of the population's sex distribution. It generalizes because it describes the treatment effect for a specific type of patient (male or female), not an average over an arbitrary mix.
+
+#### What Does the Marginal OR Mean?
+
+The unadjusted OR of 5.44 applies only to a population with exactly 50% females and 50% males—because that's how our sample was constituted. It would apply to an individual patient only if we somehow didn't know the patient's sex and believed there was exactly a 50% chance they were female.
+
+But in clinical practice, we treat individuals, not populations. When counseling a specific patient, we know their sex (and other risk factors). The conditional OR of 9.0 tells us about the treatment effect for *that specific patient*, while the marginal OR of 5.44 tells us about an average over a specific population mix that may not match our patient.
+
+This non-collapsibility means that odds ratios can vary across populations with different baseline risk profiles, making unadjusted ORs less comparable across studies or populations with different risk factor distributions.
+
+### Conditional vs. Marginal Effects
+
+Understanding non-collapsibility leads us to an important distinction:
+
+- **Conditional effects** (what logistic regression coefficients give us): The effect of a predictor at the reference level of all other predictors in the model. When we exponentiate coefficients to get odds ratios, we're describing effects for a specific subgroup defined by the other covariates.
+
+- **Marginal effects**: The population-average effect of a predictor, averaging over the actual distribution of other variables in your data.
+
+**The key choice**: Do you want to know the effect at a specific set of covariate values (conditional), or the average effect across your population (marginal)?
+
+For linear regression, these two types of effects are the same --- this is what we call **collapsibility**. But for logistic regression (and most other GLMs), they differ because of the non-linear link function.
+
+### Why Does This Matter?
+
+Understanding this distinction is crucial for proper interpretation:
+
+1. **Portability across populations**: Because conditional odds ratios depend on the baseline risk distribution, they may not generalize well to populations with different risk profiles
+2. **When comparing studies**: If two studies use different sets of control variables or have different baseline risks, their odds ratios aren't directly comparable
+3. **For policy questions**: "What is the average effect in the population?" is answered by marginal effects, not conditional odds ratios at reference levels
+4. **For individual predictions**: Conditional effects are ideal when you want to know effects for specific individuals with known covariate values
+
+### The marginaleffects Package
+
+The **marginaleffects** package provides tools to compute marginal effects, average predictions, and other quantities that are often more interpretable than raw coefficients.
+
+Let's explore some of its key functions:
+
+```{r echo=TRUE}
+# Load the package (you may need to install it first)
+library(marginaleffects)
+
+# Our model with age and transplant
+mod <- glm(is_alive ~ age + transplant, 
+           data = heart_transplant, family = binomial)
+summary(mod)
+# Average marginal effects (AME)
+avg_slopes(mod)
+```
+
+The `avg_slopes()` function computes the **average marginal effect** for each predictor. This tells us: on average across all patients in our sample, how much does a one-unit increase in age change the probability of survival? This is a population-average effect, not a conditional effect at reference levels. Also note, that `marginaleffects` automatically puts it on the response scale (probabilities), which is often easier to interpret.
+
+### Comparing Predictions at Different Values
+
+We can also compare predicted probabilities at different covariate values:
+
+```{r echo=TRUE}
+# Compare predictions for treatment vs. control, averaging over age distribution
+predictions(mod, newdata = datagrid(transplant = c("control", "treatment")))
+```
+
+This shows us the average predicted probability of survival for the control and treatment groups, averaging over the distribution of ages in our data. This gives us the marginal probability for each transplant group.
+
+### Average Treatment Effect
+
+We can compute the average treatment effect directly:
+
+```{r echo=TRUE}
+# Average treatment effect (difference in probabilities)
+avg_comparisons(mod, variables = "transplant")
+```
+
+This tells us that, on average across the population, receiving a heart transplant increases the probability of 5-year survival by approximately X percentage points.
+
+Compare this marginal effect (a probability difference, averaged across the population) to the conditional odds ratio we computed earlier (which applies at the reference level of age). Both are valid, but they answer different questions!
+
+We can also calculate the average marginal effect of transplant in terms of the ATE in terms of the odds ratio or the risk ratio. It is important to remember that the odds ratio is non-collapsible, so this average odds ratio will not equal the conditional odds ratio from the model coefficients!
+
+```{r echo=TRUE}
+# Average treatment effect (odds ratio)
+avg_comparisons(mod, variables = "transplant",
+                comparison = "lnoravg",
+                transform = "exp")
+# Average treatment effect (risk ratio)
+avg_comparisons(mod, variables = "transplant",
+                comparison = "lnratioavg",
+                transform = "exp")
+```
+
+### Marginal Effects at Specific Values
+
+Sometimes you want to know the effect at a specific, meaningful value of the covariates (a conditional effect, but expressed as a probability change rather than an odds ratio):
+
+```{r echo=TRUE}
+# Marginal effect of age for a 50-year-old in the treatment group
+slopes(mod, newdata = datagrid(age = 50, transplant = "treatment"))
+```
+
+This tells us: for a 50-year-old patient who received a transplant (conditional on these covariate values), how much does an additional year of age change their probability of survival?
+
+### Visualizing Marginal Effects
+
+One of the most powerful features of the marginaleffects package is visualization:
+
+```{r echo=TRUE}
+# Plot predicted probabilities across the range of age, by transplant status
+plot_predictions(mod, condition = c("age", "transplant"))
+```
+
+This creates a plot showing how the predicted probability of survival changes with age, separately for the treatment and control groups.
+
+### When to Use Each Approach
+
+**Use conditional effects (regression coefficients/odds ratios) when:**
+
+- You want to describe effects at the *reference* level of other covariates
+- You want effects that are constant on the log-odds scale
+- You're interested in individual-level predictions for people with specific covariate profiles
+
+**Use marginal effects when:**
+
+- You want population-average effects (or at specific values of the covariates)
+- You need to communicate results to a non-technical audience (probabilities are easier to understand than odds ratios)
+- You're comparing effects across studies with different populations or covariate adjustment
+- You want effects that are more portable across populations with different baseline risk distributions
+
+### Practice with Marginal Effects
+
+Let's practice using the marginaleffects package with the medical school admissions data.
+
+The model `mod` predicting medical school acceptance from GPA has been created for you.
+
+- Use `avg_slopes()` to compute the average marginal effect of GPA
+- Use `plot_predictions()` to visualize how predicted probability of acceptance changes with GPA
+
+```{r}
+mod <- glm(Acceptance ~ GPA, data = MedGPA, family = binomial)
+```
+
+```{r ex10, exercise=TRUE}
+# Load marginaleffects package
+library(marginaleffects)
+
+# Average marginal effect of GPA
+___
+
+# Plot predicted probabilities
+___
+```
+
+```{r ex10-hint-1}
+# Use avg_slopes() with the model object
+avg_slopes(___)
+```
+
+```{r ex10-hint-2}
+# Use plot_predictions() with condition argument
+plot_predictions(___, condition = "___")
+```
+
+```{r ex10-solution}
+# Load marginaleffects package
+library(marginaleffects)
+
+# Average marginal effect of GPA
+avg_slopes(mod)
+
+# Plot predicted probabilities
+plot_predictions(mod, condition = "GPA")
+```
+
+### Interpreting the Results
+
+When you run `avg_slopes(mod)`, you should see that the average marginal effect of GPA is approximately 0.94 (this may vary slightly depending on your data). This means that, on average across the population, a one-point increase in GPA is associated with about a 94 percentage point increase in the probability of acceptance to medical school.
+
+Compare this to the odds ratio interpretation we used earlier! The odds ratio tells us about multiplicative changes in odds at the reference level, while the marginal effect tells us about additive changes in probability averaged across the population. Both are correct, but they answer different questions.
+
+### Key Takeaways
+
+- **Odds ratios are non-collapsible**: They change when you add or remove variables from the model, even when those variables are unrelated to the predictor of interest. This is a mathematical property, not evidence of confounding.
+- **Non-collapsibility affects portability**: Odds ratios may not generalize well across populations with different baseline risk distributions
+- **Conditional vs. marginal**: The choice between conditional effects (regression coefficients at reference levels) and marginal effects (population averages) depends on whether you want to describe effects for specific covariate profiles or average effects across your population
+- **The marginaleffects package** provides tools to compute and visualize marginal effects and can make results more interpretable
+- **Both approaches are valid**: Choose based on your research question, audience, and whether you need population averages or effects at specific covariate values
+
+Understanding these concepts will make you a more sophisticated consumer and producer of logistic regression analyses!
+
+
 ## Congratulations!
 
-You have successfully completed this tutorial on evaluating and extending parallel slopes models!
+You have successfully completed this tutorial!
+
+You're now ready to generate your submission hash. Click "Next Topic" to proceed.
 
 ## Submit
 
