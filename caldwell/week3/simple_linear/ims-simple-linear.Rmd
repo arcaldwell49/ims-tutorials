@@ -8,10 +8,9 @@ runtime: shiny_prerendered
 ---
 
 ```{r setup, message=FALSE, warning=FALSE, include=FALSE}
-library(emo)
 library(learnr)
-library(tidyverse)
-library(openintro)
+library(dplyr)
+library(ggplot2)
 
 knitr::opts_chunk$set(echo = FALSE, 
                       fig.align = "center", 
@@ -22,17 +21,13 @@ knitr::opts_chunk$set(echo = FALSE,
 
 tutorial_options(exercise.eval = FALSE)
 
+# Load datasets from local RDS files
+possum <- readRDS("data/possum.rds")
+bdims <- readRDS("data/bdims.rds")
+Galton <- readRDS("data/Galton.rds")
+
 # Hash generation helpers
-# Should ideally be loaded from the imstutorials package when it exists
 is_server_context <- function(.envir) {
-  # We are in the server context if there are the follow:
-  # * input - input reactive values
-  # * output - shiny output
-  # * session - shiny session
-  #
-  # Check context by examining the class of each of these.
-  # If any is missing then it will be a NULL which will fail.
-  
   inherits(.envir$input, "reactivevalues") &
     inherits(.envir$output, "shinyoutput") &
     inherits(.envir$session, "ShinySession")
@@ -45,18 +40,16 @@ check_server_context <- function(.envir) {
     stop(err, call. = FALSE)
   }
 }
+
 encoder_logic <- function(strip_output = FALSE) {
   p <- parent.frame()
   check_server_context(p)
-  # Make this var available within the local context below
   assign("strip_output", strip_output, envir = p)
-  # Evaluate in parent frame to get input, output, and session
   local(
     {
       encoded_txt <- shiny::eventReactive(
         input$hash_generate,
         {
-          # shiny::getDefaultReactiveDomain()$userData$tutorial_state
           state <- learnr:::get_tutorial_state()
           shiny::validate(shiny::need(length(state) > 0, "No progress yet."))
           shiny::validate(shiny::need(nchar(input$name) > 0, "No name entered."))
@@ -76,7 +69,7 @@ encoder_logic <- function(strip_output = FALSE) {
             answer = as.list(c(input$name, input$studentID)),
             timestamp = format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z", tz = "UTC")
           )
-          learnrhash::encode_obj(bind_rows(user_info, user_state))
+          learnrhash::encode_obj(dplyr::bind_rows(user_info, user_state))
         }
       )
       output$hash_output <- shiny::renderText(encoded_txt())
@@ -501,9 +494,9 @@ bdims_summary |>
 
 You've learned how to:
 
-✓ Visualize regression lines with `geom_smooth(method = "lm")`  
-✓ Understand that the least squares line minimizes $\sum e^2$  
-✓ Calculate slope as $r \cdot \frac{s_y}{s_x}$  
+✓ Visualize regression lines with `geom_smooth(method = "lm")`
+✓ Understand that the least squares line minimizes $\sum e^2$
+✓ Calculate slope as $r \cdot \frac{s_y}{s_x}$
 ✓ Interpret fitted values ($\hat{y}$) and residuals ($e$)
 
 Next, we'll explore a related but distinct concept: regression to the mean.
@@ -532,7 +525,7 @@ In the plot below, pay attention to:
 If tall fathers had equally tall sons, what would the slope be? Compare this to what you observe.
 
 ```{r}
-Galton_men <- mosaicData::Galton |>
+Galton_men <- Galton |>
  filter(sex == "M")
 Galton_summary <- Galton_men |>
  summarize(N = n(),

@@ -9,22 +9,26 @@ runtime: shiny_prerendered
 
 ```{r setup, message=FALSE, warning=FALSE, include=FALSE}
 # load packages ----------------------------------------------------------------
-
 library(learnr)
 library(broom)
-library(tidyverse)
-library(openintro)
-library(Lahman)
-library(emo)
+library(dplyr)
+library(ggplot2)
 
 # knitr options ----------------------------------------------------------------
-
 knitr::opts_chunk$set(fig.align = "center",
                       fig.height = 3,
                       fig.width = 5,
                       echo = FALSE,
                       message = FALSE,
                       warning = FALSE)
+
+# Load datasets from local RDS files
+textbooks <- readRDS("data/textbooks.rds")
+possum <- readRDS("data/possum.rds")
+bdims <- readRDS("data/bdims.rds")
+mlbbat10 <- readRDS("data/mlbbat10.rds")
+county_complete <- readRDS("data/county_complete.rds")
+Batting <- readRDS("data/Batting.rds")
 
 # data prep --------------------------------------------------------------------
 
@@ -35,16 +39,7 @@ wgt_hgt_mod <- lm(wgt ~ hgt, data = bdims)
 mod_slg_obp <- lm(slg ~ obp, data = filter(mlbbat10, at_bat >= 10))
 
 # Hash generation helpers
-# Should ideally be loaded from the imstutorials package when it exists
 is_server_context <- function(.envir) {
-  # We are in the server context if there are the follow:
-  # * input - input reactive values
-  # * output - shiny output
-  # * session - shiny session
-  #
-  # Check context by examining the class of each of these.
-  # If any is missing then it will be a NULL which will fail.
-  
   inherits(.envir$input, "reactivevalues") &
     inherits(.envir$output, "shinyoutput") &
     inherits(.envir$session, "ShinySession")
@@ -57,18 +52,16 @@ check_server_context <- function(.envir) {
     stop(err, call. = FALSE)
   }
 }
+
 encoder_logic <- function(strip_output = FALSE) {
   p <- parent.frame()
   check_server_context(p)
-  # Make this var available within the local context below
   assign("strip_output", strip_output, envir = p)
-  # Evaluate in parent frame to get input, output, and session
   local(
     {
       encoded_txt <- shiny::eventReactive(
         input$hash_generate,
         {
-          # shiny::getDefaultReactiveDomain()$userData$tutorial_state
           state <- learnr:::get_tutorial_state()
           shiny::validate(shiny::need(length(state) > 0, "No progress yet."))
           shiny::validate(shiny::need(nchar(input$name) > 0, "No name entered."))
@@ -88,7 +81,7 @@ encoder_logic <- function(strip_output = FALSE) {
             answer = as.list(c(input$name, input$studentID)),
             timestamp = format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z", tz = "UTC")
           )
-          learnrhash::encode_obj(bind_rows(user_info, user_state))
+          learnrhash::encode_obj(dplyr::bind_rows(user_info, user_state))
         }
       )
       output$hash_output <- shiny::renderText(encoded_txt())
@@ -140,7 +133,7 @@ By the end of this tutorial, you will be able to:
    - Consider how outlier removal changes the scope of inference
    - Act with scientific integrity when handling unusual data points
 
-Let's get started! `r emo::ji("baseball")`
+Let's get started! ⚾
 
 ## Assessing model fit
 
@@ -535,7 +528,7 @@ mod_hr_sb <- lm(home_run ~ stolen_base, data = regulars)
 
 mod_hr_sb |>
   augment() |>
-  select(home_run, stolen_base, .hat) |>
+  dplyr::select(home_run, stolen_base, .hat) |>
   slice_max(order_by = .hat,
             n = 5)
 ```
@@ -550,13 +543,13 @@ However, suppose that there was a player with a similar number of stolen bases, 
 outlier <- Batting |>
   filter(SB > 60 & SB < 70 & HR > 20) |>
   arrange(desc(HR)) |>
-  select(playerID, yearID, teamID, SB, HR) |>
+  dplyr::select(playerID, yearID, teamID, SB, HR) |>
   head(1) |>
   rename(stolen_base = SB,
          home_run = HR)
 
 regulars_plus <- regulars |>
-  select(name, team, stolen_base, home_run) |>
+  dplyr::select(name, team, stolen_base, home_run) |>
   bind_rows(outlier)
 
 ggplot(data = regulars_plus, aes(x = stolen_base, y = home_run)) +
@@ -582,7 +575,7 @@ mod_hr_sb <- lm(home_run ~ stolen_base, data = regulars_plus)
 
 mod_hr_sb |>
   augment() |>
-  select(home_run, stolen_base, .fitted, .resid, .hat, .cooksd) |>
+  dplyr::select(home_run, stolen_base, .fitted, .resid, .hat, .cooksd) |>
   slice_max(order_by = .cooksd,
             n = 5)
 ```
@@ -676,11 +669,11 @@ regulars <- mlbbat10 |>
 
 outlier <- Batting |>
   filter(SB > 60 & SB < 70 & HR > 20) |>
-  select(name = playerID, team = teamID, stolen_base = SB, home_run = HR) |>
+  dplyr::select(name = playerID, team = teamID, stolen_base = SB, home_run = HR) |>
   slice_max(order_by = home_run, n = 1)
 
 regulars_plus <- regulars |>
-  select(name, team, stolen_base, home_run) |>
+  dplyr::select(name, team, stolen_base, home_run) |>
   bind_rows(outlier)
 ```
 

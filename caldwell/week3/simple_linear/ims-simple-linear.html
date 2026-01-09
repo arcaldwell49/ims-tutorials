@@ -600,13 +600,12 @@ bdims_summary |&gt;
 <h2>Quick Review</h2>
 <p>You’ve learned how to:</p>
 <p>✓ Visualize regression lines with
-<code>geom_smooth(method = "lm")</code><br />
-✓ Understand that the least squares line minimizes <span
-class="math inline">\(\sum e^2\)</span><br />
-✓ Calculate slope as <span class="math inline">\(r \cdot
-\frac{s_y}{s_x}\)</span><br />
-✓ Interpret fitted values (<span class="math inline">\(\hat{y}\)</span>)
-and residuals (<span class="math inline">\(e\)</span>)</p>
+<code>geom_smooth(method = "lm")</code> ✓ Understand that the least
+squares line minimizes <span class="math inline">\(\sum e^2\)</span> ✓
+Calculate slope as <span class="math inline">\(r \cdot
+\frac{s_y}{s_x}\)</span> ✓ Interpret fitted values (<span
+class="math inline">\(\hat{y}\)</span>) and residuals (<span
+class="math inline">\(e\)</span>)</p>
 <p>Next, we’ll explore a related but distinct concept: regression to the
 mean.</p>
 </div>
@@ -801,7 +800,7 @@ solutions, please enter your identifying information, then click the button belo
 <label class="control-label" id="studentID-label" for="studentID">What is your student ID?</label>
 <input id="studentID" type="text" class="shiny-input-text form-control" value="" data-update-on="change"/>
 </div>
-<div id="out4497de30c7dabc2e" class="shiny-text-output"></div>
+<div id="oute1fd5de4911f61e8" class="shiny-text-output"></div>
 </div>
 <div class="row" style="padding-bottom: 0.5em;">
 <div class="col-sm-3">
@@ -865,10 +864,9 @@ solutions, please enter your identifying information, then click the button belo
 </div>
 <p>
 <script type="application/shiny-prerendered" data-context="server-start">
-library(emo)
 library(learnr)
-library(tidyverse)
-library(openintro)
+library(dplyr)
+library(ggplot2)
 
 knitr::opts_chunk$set(echo = FALSE, 
                       fig.align = "center", 
@@ -879,17 +877,13 @@ knitr::opts_chunk$set(echo = FALSE,
 
 tutorial_options(exercise.eval = FALSE)
 
+# Load datasets from local RDS files
+possum <- readRDS("data/possum.rds")
+bdims <- readRDS("data/bdims.rds")
+Galton <- readRDS("data/Galton.rds")
+
 # Hash generation helpers
-# Should ideally be loaded from the imstutorials package when it exists
 is_server_context <- function(.envir) {
-  # We are in the server context if there are the follow:
-  # * input - input reactive values
-  # * output - shiny output
-  # * session - shiny session
-  #
-  # Check context by examining the class of each of these.
-  # If any is missing then it will be a NULL which will fail.
-  
   inherits(.envir$input, "reactivevalues") &
     inherits(.envir$output, "shinyoutput") &
     inherits(.envir$session, "ShinySession")
@@ -902,18 +896,16 @@ check_server_context <- function(.envir) {
     stop(err, call. = FALSE)
   }
 }
+
 encoder_logic <- function(strip_output = FALSE) {
   p <- parent.frame()
   check_server_context(p)
-  # Make this var available within the local context below
   assign("strip_output", strip_output, envir = p)
-  # Evaluate in parent frame to get input, output, and session
   local(
     {
       encoded_txt <- shiny::eventReactive(
         input$hash_generate,
         {
-          # shiny::getDefaultReactiveDomain()$userData$tutorial_state
           state <- learnr:::get_tutorial_state()
           shiny::validate(shiny::need(length(state) > 0, "No progress yet."))
           shiny::validate(shiny::need(nchar(input$name) > 0, "No name entered."))
@@ -933,7 +925,7 @@ encoder_logic <- function(strip_output = FALSE) {
             answer = as.list(c(input$name, input$studentID)),
             timestamp = format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z", tz = "UTC")
           )
-          learnrhash::encode_obj(bind_rows(user_info, user_state))
+          learnrhash::encode_obj(dplyr::bind_rows(user_info, user_state))
         }
       )
       output$hash_output <- shiny::renderText(encoded_txt())
@@ -978,27 +970,23 @@ output$`tutorial-exercise-ex1-output` <- renderUI({
 
 
 <script type="application/shiny-prerendered" data-context="server">
-learnr:::store_exercise_cache(structure(list(label = "ex1", global_setup = structure(c("library(emo)", 
-"library(learnr)", "library(tidyverse)", "library(openintro)", 
-"", "knitr::opts_chunk$set(echo = FALSE, ", "                      fig.align = \"center\", ", 
-"                      fig.height = 3, ", "                      fig.width = 5,", 
-"                      warning = FALSE, ", "                      message = FALSE)", 
-"", "tutorial_options(exercise.eval = FALSE)", "", "# Hash generation helpers", 
-"# Should ideally be loaded from the imstutorials package when it exists", 
-"is_server_context <- function(.envir) {", "  # We are in the server context if there are the follow:", 
-"  # * input - input reactive values", "  # * output - shiny output", 
-"  # * session - shiny session", "  #", "  # Check context by examining the class of each of these.", 
-"  # If any is missing then it will be a NULL which will fail.", 
-"  ", "  inherits(.envir$input, \"reactivevalues\") &", "    inherits(.envir$output, \"shinyoutput\") &", 
+learnr:::store_exercise_cache(structure(list(label = "ex1", global_setup = structure(c("library(learnr)", 
+"library(dplyr)", "library(ggplot2)", "", "knitr::opts_chunk$set(echo = FALSE, ", 
+"                      fig.align = \"center\", ", "                      fig.height = 3, ", 
+"                      fig.width = 5,", "                      warning = FALSE, ", 
+"                      message = FALSE)", "", "tutorial_options(exercise.eval = FALSE)", 
+"", "# Load datasets from local RDS files", "possum <- readRDS(\"data/possum.rds\")", 
+"bdims <- readRDS(\"data/bdims.rds\")", "Galton <- readRDS(\"data/Galton.rds\")", 
+"", "# Hash generation helpers", "is_server_context <- function(.envir) {", 
+"  inherits(.envir$input, \"reactivevalues\") &", "    inherits(.envir$output, \"shinyoutput\") &", 
 "    inherits(.envir$session, \"ShinySession\")", "}", "", "check_server_context <- function(.envir) {", 
 "  if (!is_server_context(.envir)) {", "    calling_func <- deparse(sys.calls()[[sys.nframe() - 1]])", 
 "    err <- paste0(\"Function `\", calling_func, \"`\", \" must be called from an Rmd chunk where `context = \\\"server\\\"`\")", 
-"    stop(err, call. = FALSE)", "  }", "}", "encoder_logic <- function(strip_output = FALSE) {", 
-"  p <- parent.frame()", "  check_server_context(p)", "  # Make this var available within the local context below", 
-"  assign(\"strip_output\", strip_output, envir = p)", "  # Evaluate in parent frame to get input, output, and session", 
+"    stop(err, call. = FALSE)", "  }", "}", "", "encoder_logic <- function(strip_output = FALSE) {", 
+"  p <- parent.frame()", "  check_server_context(p)", "  assign(\"strip_output\", strip_output, envir = p)", 
 "  local(", "    {", "      encoded_txt <- shiny::eventReactive(", 
-"        input$hash_generate,", "        {", "          # shiny::getDefaultReactiveDomain()$userData$tutorial_state", 
-"          state <- learnr:::get_tutorial_state()", "          shiny::validate(shiny::need(length(state) > 0, \"No progress yet.\"))", 
+"        input$hash_generate,", "        {", "          state <- learnr:::get_tutorial_state()", 
+"          shiny::validate(shiny::need(length(state) > 0, \"No progress yet.\"))", 
 "          shiny::validate(shiny::need(nchar(input$name) > 0, \"No name entered.\"))", 
 "          shiny::validate(shiny::need(nchar(input$studentID) > 0, \"Please enter your student ID\"))", 
 "          user_state <- purrr::map_dfr(state, identity, .id = \"label\")", 
@@ -1009,7 +997,7 @@ learnr:::store_exercise_cache(structure(list(label = "ex1", global_setup = struc
 "          user_info <- tibble(", "            label = c(\"student_name\", \"student_id\"),", 
 "            type = \"identifier\",", "            answer = as.list(c(input$name, input$studentID)),", 
 "            timestamp = format(Sys.time(), \"%Y-%m-%d %H:%M:%S %Z\", tz = \"UTC\")", 
-"          )", "          learnrhash::encode_obj(bind_rows(user_info, user_state))", 
+"          )", "          learnrhash::encode_obj(dplyr::bind_rows(user_info, user_state))", 
 "        }", "      )", "      output$hash_output <- shiny::renderText(encoded_txt())", 
 "    },", "    envir = p", "  )", "}", "", "hash_encoder_ui <- {", 
 "  shiny::div(\"If you have completed this tutorial and are happy with all of your\", \"solutions, please enter your identifying information, then click the button below to generate your hash\", textInput(\"name\", \"What's your name?\"), textInput(\"studentID\", \"What is your student ID?\"), renderText({", 
@@ -1054,27 +1042,23 @@ output$`tutorial-exercise-ex2-output` <- renderUI({
 
 
 <script type="application/shiny-prerendered" data-context="server">
-learnr:::store_exercise_cache(structure(list(label = "ex2", global_setup = structure(c("library(emo)", 
-"library(learnr)", "library(tidyverse)", "library(openintro)", 
-"", "knitr::opts_chunk$set(echo = FALSE, ", "                      fig.align = \"center\", ", 
-"                      fig.height = 3, ", "                      fig.width = 5,", 
-"                      warning = FALSE, ", "                      message = FALSE)", 
-"", "tutorial_options(exercise.eval = FALSE)", "", "# Hash generation helpers", 
-"# Should ideally be loaded from the imstutorials package when it exists", 
-"is_server_context <- function(.envir) {", "  # We are in the server context if there are the follow:", 
-"  # * input - input reactive values", "  # * output - shiny output", 
-"  # * session - shiny session", "  #", "  # Check context by examining the class of each of these.", 
-"  # If any is missing then it will be a NULL which will fail.", 
-"  ", "  inherits(.envir$input, \"reactivevalues\") &", "    inherits(.envir$output, \"shinyoutput\") &", 
+learnr:::store_exercise_cache(structure(list(label = "ex2", global_setup = structure(c("library(learnr)", 
+"library(dplyr)", "library(ggplot2)", "", "knitr::opts_chunk$set(echo = FALSE, ", 
+"                      fig.align = \"center\", ", "                      fig.height = 3, ", 
+"                      fig.width = 5,", "                      warning = FALSE, ", 
+"                      message = FALSE)", "", "tutorial_options(exercise.eval = FALSE)", 
+"", "# Load datasets from local RDS files", "possum <- readRDS(\"data/possum.rds\")", 
+"bdims <- readRDS(\"data/bdims.rds\")", "Galton <- readRDS(\"data/Galton.rds\")", 
+"", "# Hash generation helpers", "is_server_context <- function(.envir) {", 
+"  inherits(.envir$input, \"reactivevalues\") &", "    inherits(.envir$output, \"shinyoutput\") &", 
 "    inherits(.envir$session, \"ShinySession\")", "}", "", "check_server_context <- function(.envir) {", 
 "  if (!is_server_context(.envir)) {", "    calling_func <- deparse(sys.calls()[[sys.nframe() - 1]])", 
 "    err <- paste0(\"Function `\", calling_func, \"`\", \" must be called from an Rmd chunk where `context = \\\"server\\\"`\")", 
-"    stop(err, call. = FALSE)", "  }", "}", "encoder_logic <- function(strip_output = FALSE) {", 
-"  p <- parent.frame()", "  check_server_context(p)", "  # Make this var available within the local context below", 
-"  assign(\"strip_output\", strip_output, envir = p)", "  # Evaluate in parent frame to get input, output, and session", 
+"    stop(err, call. = FALSE)", "  }", "}", "", "encoder_logic <- function(strip_output = FALSE) {", 
+"  p <- parent.frame()", "  check_server_context(p)", "  assign(\"strip_output\", strip_output, envir = p)", 
 "  local(", "    {", "      encoded_txt <- shiny::eventReactive(", 
-"        input$hash_generate,", "        {", "          # shiny::getDefaultReactiveDomain()$userData$tutorial_state", 
-"          state <- learnr:::get_tutorial_state()", "          shiny::validate(shiny::need(length(state) > 0, \"No progress yet.\"))", 
+"        input$hash_generate,", "        {", "          state <- learnr:::get_tutorial_state()", 
+"          shiny::validate(shiny::need(length(state) > 0, \"No progress yet.\"))", 
 "          shiny::validate(shiny::need(nchar(input$name) > 0, \"No name entered.\"))", 
 "          shiny::validate(shiny::need(nchar(input$studentID) > 0, \"Please enter your student ID\"))", 
 "          user_state <- purrr::map_dfr(state, identity, .id = \"label\")", 
@@ -1085,7 +1069,7 @@ learnr:::store_exercise_cache(structure(list(label = "ex2", global_setup = struc
 "          user_info <- tibble(", "            label = c(\"student_name\", \"student_id\"),", 
 "            type = \"identifier\",", "            answer = as.list(c(input$name, input$studentID)),", 
 "            timestamp = format(Sys.time(), \"%Y-%m-%d %H:%M:%S %Z\", tz = \"UTC\")", 
-"          )", "          learnrhash::encode_obj(bind_rows(user_info, user_state))", 
+"          )", "          learnrhash::encode_obj(dplyr::bind_rows(user_info, user_state))", 
 "        }", "      )", "      output$hash_output <- shiny::renderText(encoded_txt())", 
 "    },", "    envir = p", "  )", "}", "", "hash_encoder_ui <- {", 
 "  shiny::div(\"If you have completed this tutorial and are happy with all of your\", \"solutions, please enter your identifying information, then click the button below to generate your hash\", textInput(\"name\", \"What's your name?\"), textInput(\"studentID\", \"What is your student ID?\"), renderText({", 
@@ -1124,19 +1108,19 @@ learnr:::store_exercise_cache(structure(list(label = "ex2", global_setup = struc
  
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label = "mc", question = structure("The slope coefficient in the regression model is:", html = TRUE, class = c("html", 
-"character")), answers = list(structure(list(id = "lnr_ans_8d00abf", 
+"character")), answers = list(structure(list(id = "lnr_ans_38c2ddc", 
     option = "Y", value = "Y", label = structure("Y", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = structure("Not quite! Y represents the response variable.", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_8a369f5", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_ff0bd", 
     option = "β₀", value = "β₀", label = structure("β₀", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = structure("Try again! β₀ represents the y-intercept.", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_f7d0220", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_e77fb4c", 
     option = "β₁", value = "β₁", label = structure("β₁", html = TRUE, class = c("html", 
     "character")), correct = TRUE, message = structure("Correct! β₁ represents the slope - how much Y changes for a one-unit change in X.", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_1fa0af", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_6cbe687", 
     option = "ε", value = "ε", label = structure("ε", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = structure("Not quite! ε represents the error term or noise.", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
@@ -1147,27 +1131,27 @@ learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label 
 "character")), incorrect = structure("Incorrect", html = TRUE, class = c("html", 
 "character")), message = NULL, post_message = NULL), ids = list(
     answer = "mc-answer", question = "mc"), loading = NULL, random_answer_order = FALSE, 
-    allow_retry = TRUE, seed = 1487852597.80716, options = list()), class = c("learnr_radio", 
+    allow_retry = TRUE, seed = 915202731.573825, options = list()), class = c("learnr_radio", 
 "tutorial_question")), session = session)
 </script>
 
 
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label = "mc1", question = structure("In Hampshire County in western Massachusetts, the high school graduation rate is 92.4%. These two facts imply that the mean poverty rate in Hampshire County is ___.", html = TRUE, class = c("html", 
-"character")), answers = list(structure(list(id = "lnr_ans_24c3141", 
+"character")), answers = list(structure(list(id = "lnr_ans_1129b9a", 
     option = "exactly 11.7%", value = "exactly 11.7%", label = structure("exactly 11.7%", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = structure("Incorrect, try again.", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_8b0956d", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_21ba5e2", 
     option = "exactly 10.0%", value = "exactly 10.0%", label = structure("exactly 10.0%", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = structure("Not quite!", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_e1ff94d", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_1ad63e6", 
     option = "expected to be about 10.0%", value = "expected to be about 10.0%", 
     label = structure("expected to be about 10.0%", html = TRUE, class = c("html", 
     "character")), correct = TRUE, message = structure("Solve for poverty by plugging in 92.4 as hs_grad in the equation!", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_dd40012", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_38f92f4", 
     option = "expected to be about 11.7%", value = "expected to be about 11.7%", 
     label = structure("expected to be about 11.7%", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = structure("Did you plug 92.4 into the equation?", html = TRUE, class = c("html", 
@@ -1179,7 +1163,7 @@ learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label 
 "character")), incorrect = structure("Incorrect", html = TRUE, class = c("html", 
 "character")), message = NULL, post_message = NULL), ids = list(
     answer = "mc1-answer", question = "mc1"), loading = NULL, 
-    random_answer_order = FALSE, allow_retry = TRUE, seed = 238318968.389024, 
+    random_answer_order = FALSE, allow_retry = TRUE, seed = 1990809844.57296, 
     options = list()), class = c("learnr_radio", "tutorial_question"
 )), session = session)
 </script>
@@ -1193,27 +1177,23 @@ output$`tutorial-exercise-preview-output` <- renderUI({
 
 
 <script type="application/shiny-prerendered" data-context="server">
-learnr:::store_exercise_cache(structure(list(label = "preview", global_setup = structure(c("library(emo)", 
-"library(learnr)", "library(tidyverse)", "library(openintro)", 
-"", "knitr::opts_chunk$set(echo = FALSE, ", "                      fig.align = \"center\", ", 
-"                      fig.height = 3, ", "                      fig.width = 5,", 
-"                      warning = FALSE, ", "                      message = FALSE)", 
-"", "tutorial_options(exercise.eval = FALSE)", "", "# Hash generation helpers", 
-"# Should ideally be loaded from the imstutorials package when it exists", 
-"is_server_context <- function(.envir) {", "  # We are in the server context if there are the follow:", 
-"  # * input - input reactive values", "  # * output - shiny output", 
-"  # * session - shiny session", "  #", "  # Check context by examining the class of each of these.", 
-"  # If any is missing then it will be a NULL which will fail.", 
-"  ", "  inherits(.envir$input, \"reactivevalues\") &", "    inherits(.envir$output, \"shinyoutput\") &", 
+learnr:::store_exercise_cache(structure(list(label = "preview", global_setup = structure(c("library(learnr)", 
+"library(dplyr)", "library(ggplot2)", "", "knitr::opts_chunk$set(echo = FALSE, ", 
+"                      fig.align = \"center\", ", "                      fig.height = 3, ", 
+"                      fig.width = 5,", "                      warning = FALSE, ", 
+"                      message = FALSE)", "", "tutorial_options(exercise.eval = FALSE)", 
+"", "# Load datasets from local RDS files", "possum <- readRDS(\"data/possum.rds\")", 
+"bdims <- readRDS(\"data/bdims.rds\")", "Galton <- readRDS(\"data/Galton.rds\")", 
+"", "# Hash generation helpers", "is_server_context <- function(.envir) {", 
+"  inherits(.envir$input, \"reactivevalues\") &", "    inherits(.envir$output, \"shinyoutput\") &", 
 "    inherits(.envir$session, \"ShinySession\")", "}", "", "check_server_context <- function(.envir) {", 
 "  if (!is_server_context(.envir)) {", "    calling_func <- deparse(sys.calls()[[sys.nframe() - 1]])", 
 "    err <- paste0(\"Function `\", calling_func, \"`\", \" must be called from an Rmd chunk where `context = \\\"server\\\"`\")", 
-"    stop(err, call. = FALSE)", "  }", "}", "encoder_logic <- function(strip_output = FALSE) {", 
-"  p <- parent.frame()", "  check_server_context(p)", "  # Make this var available within the local context below", 
-"  assign(\"strip_output\", strip_output, envir = p)", "  # Evaluate in parent frame to get input, output, and session", 
+"    stop(err, call. = FALSE)", "  }", "}", "", "encoder_logic <- function(strip_output = FALSE) {", 
+"  p <- parent.frame()", "  check_server_context(p)", "  assign(\"strip_output\", strip_output, envir = p)", 
 "  local(", "    {", "      encoded_txt <- shiny::eventReactive(", 
-"        input$hash_generate,", "        {", "          # shiny::getDefaultReactiveDomain()$userData$tutorial_state", 
-"          state <- learnr:::get_tutorial_state()", "          shiny::validate(shiny::need(length(state) > 0, \"No progress yet.\"))", 
+"        input$hash_generate,", "        {", "          state <- learnr:::get_tutorial_state()", 
+"          shiny::validate(shiny::need(length(state) > 0, \"No progress yet.\"))", 
 "          shiny::validate(shiny::need(nchar(input$name) > 0, \"No name entered.\"))", 
 "          shiny::validate(shiny::need(nchar(input$studentID) > 0, \"Please enter your student ID\"))", 
 "          user_state <- purrr::map_dfr(state, identity, .id = \"label\")", 
@@ -1224,7 +1204,7 @@ learnr:::store_exercise_cache(structure(list(label = "preview", global_setup = s
 "          user_info <- tibble(", "            label = c(\"student_name\", \"student_id\"),", 
 "            type = \"identifier\",", "            answer = as.list(c(input$name, input$studentID)),", 
 "            timestamp = format(Sys.time(), \"%Y-%m-%d %H:%M:%S %Z\", tz = \"UTC\")", 
-"          )", "          learnrhash::encode_obj(bind_rows(user_info, user_state))", 
+"          )", "          learnrhash::encode_obj(dplyr::bind_rows(user_info, user_state))", 
 "        }", "      )", "      output$hash_output <- shiny::renderText(encoded_txt())", 
 "    },", "    envir = p", "  )", "}", "", "hash_encoder_ui <- {", 
 "  shiny::div(\"If you have completed this tutorial and are happy with all of your\", \"solutions, please enter your identifying information, then click the button below to generate your hash\", textInput(\"name\", \"What's your name?\"), textInput(\"studentID\", \"What is your student ID?\"), renderText({", 
@@ -1268,27 +1248,23 @@ output$`tutorial-exercise-ex3-output` <- renderUI({
 
 
 <script type="application/shiny-prerendered" data-context="server">
-learnr:::store_exercise_cache(structure(list(label = "ex3", global_setup = structure(c("library(emo)", 
-"library(learnr)", "library(tidyverse)", "library(openintro)", 
-"", "knitr::opts_chunk$set(echo = FALSE, ", "                      fig.align = \"center\", ", 
-"                      fig.height = 3, ", "                      fig.width = 5,", 
-"                      warning = FALSE, ", "                      message = FALSE)", 
-"", "tutorial_options(exercise.eval = FALSE)", "", "# Hash generation helpers", 
-"# Should ideally be loaded from the imstutorials package when it exists", 
-"is_server_context <- function(.envir) {", "  # We are in the server context if there are the follow:", 
-"  # * input - input reactive values", "  # * output - shiny output", 
-"  # * session - shiny session", "  #", "  # Check context by examining the class of each of these.", 
-"  # If any is missing then it will be a NULL which will fail.", 
-"  ", "  inherits(.envir$input, \"reactivevalues\") &", "    inherits(.envir$output, \"shinyoutput\") &", 
+learnr:::store_exercise_cache(structure(list(label = "ex3", global_setup = structure(c("library(learnr)", 
+"library(dplyr)", "library(ggplot2)", "", "knitr::opts_chunk$set(echo = FALSE, ", 
+"                      fig.align = \"center\", ", "                      fig.height = 3, ", 
+"                      fig.width = 5,", "                      warning = FALSE, ", 
+"                      message = FALSE)", "", "tutorial_options(exercise.eval = FALSE)", 
+"", "# Load datasets from local RDS files", "possum <- readRDS(\"data/possum.rds\")", 
+"bdims <- readRDS(\"data/bdims.rds\")", "Galton <- readRDS(\"data/Galton.rds\")", 
+"", "# Hash generation helpers", "is_server_context <- function(.envir) {", 
+"  inherits(.envir$input, \"reactivevalues\") &", "    inherits(.envir$output, \"shinyoutput\") &", 
 "    inherits(.envir$session, \"ShinySession\")", "}", "", "check_server_context <- function(.envir) {", 
 "  if (!is_server_context(.envir)) {", "    calling_func <- deparse(sys.calls()[[sys.nframe() - 1]])", 
 "    err <- paste0(\"Function `\", calling_func, \"`\", \" must be called from an Rmd chunk where `context = \\\"server\\\"`\")", 
-"    stop(err, call. = FALSE)", "  }", "}", "encoder_logic <- function(strip_output = FALSE) {", 
-"  p <- parent.frame()", "  check_server_context(p)", "  # Make this var available within the local context below", 
-"  assign(\"strip_output\", strip_output, envir = p)", "  # Evaluate in parent frame to get input, output, and session", 
+"    stop(err, call. = FALSE)", "  }", "}", "", "encoder_logic <- function(strip_output = FALSE) {", 
+"  p <- parent.frame()", "  check_server_context(p)", "  assign(\"strip_output\", strip_output, envir = p)", 
 "  local(", "    {", "      encoded_txt <- shiny::eventReactive(", 
-"        input$hash_generate,", "        {", "          # shiny::getDefaultReactiveDomain()$userData$tutorial_state", 
-"          state <- learnr:::get_tutorial_state()", "          shiny::validate(shiny::need(length(state) > 0, \"No progress yet.\"))", 
+"        input$hash_generate,", "        {", "          state <- learnr:::get_tutorial_state()", 
+"          shiny::validate(shiny::need(length(state) > 0, \"No progress yet.\"))", 
 "          shiny::validate(shiny::need(nchar(input$name) > 0, \"No name entered.\"))", 
 "          shiny::validate(shiny::need(nchar(input$studentID) > 0, \"Please enter your student ID\"))", 
 "          user_state <- purrr::map_dfr(state, identity, .id = \"label\")", 
@@ -1299,7 +1275,7 @@ learnr:::store_exercise_cache(structure(list(label = "ex3", global_setup = struc
 "          user_info <- tibble(", "            label = c(\"student_name\", \"student_id\"),", 
 "            type = \"identifier\",", "            answer = as.list(c(input$name, input$studentID)),", 
 "            timestamp = format(Sys.time(), \"%Y-%m-%d %H:%M:%S %Z\", tz = \"UTC\")", 
-"          )", "          learnrhash::encode_obj(bind_rows(user_info, user_state))", 
+"          )", "          learnrhash::encode_obj(dplyr::bind_rows(user_info, user_state))", 
 "        }", "      )", "      output$hash_output <- shiny::renderText(encoded_txt())", 
 "    },", "    envir = p", "  )", "}", "", "hash_encoder_ui <- {", 
 "  shiny::div(\"If you have completed this tutorial and are happy with all of your\", \"solutions, please enter your identifying information, then click the button below to generate your hash\", textInput(\"name\", \"What's your name?\"), textInput(\"studentID\", \"What is your student ID?\"), renderText({", 
@@ -1347,27 +1323,23 @@ output$`tutorial-exercise-ex4-output` <- renderUI({
 
 
 <script type="application/shiny-prerendered" data-context="server">
-learnr:::store_exercise_cache(structure(list(label = "ex4", global_setup = structure(c("library(emo)", 
-"library(learnr)", "library(tidyverse)", "library(openintro)", 
-"", "knitr::opts_chunk$set(echo = FALSE, ", "                      fig.align = \"center\", ", 
-"                      fig.height = 3, ", "                      fig.width = 5,", 
-"                      warning = FALSE, ", "                      message = FALSE)", 
-"", "tutorial_options(exercise.eval = FALSE)", "", "# Hash generation helpers", 
-"# Should ideally be loaded from the imstutorials package when it exists", 
-"is_server_context <- function(.envir) {", "  # We are in the server context if there are the follow:", 
-"  # * input - input reactive values", "  # * output - shiny output", 
-"  # * session - shiny session", "  #", "  # Check context by examining the class of each of these.", 
-"  # If any is missing then it will be a NULL which will fail.", 
-"  ", "  inherits(.envir$input, \"reactivevalues\") &", "    inherits(.envir$output, \"shinyoutput\") &", 
+learnr:::store_exercise_cache(structure(list(label = "ex4", global_setup = structure(c("library(learnr)", 
+"library(dplyr)", "library(ggplot2)", "", "knitr::opts_chunk$set(echo = FALSE, ", 
+"                      fig.align = \"center\", ", "                      fig.height = 3, ", 
+"                      fig.width = 5,", "                      warning = FALSE, ", 
+"                      message = FALSE)", "", "tutorial_options(exercise.eval = FALSE)", 
+"", "# Load datasets from local RDS files", "possum <- readRDS(\"data/possum.rds\")", 
+"bdims <- readRDS(\"data/bdims.rds\")", "Galton <- readRDS(\"data/Galton.rds\")", 
+"", "# Hash generation helpers", "is_server_context <- function(.envir) {", 
+"  inherits(.envir$input, \"reactivevalues\") &", "    inherits(.envir$output, \"shinyoutput\") &", 
 "    inherits(.envir$session, \"ShinySession\")", "}", "", "check_server_context <- function(.envir) {", 
 "  if (!is_server_context(.envir)) {", "    calling_func <- deparse(sys.calls()[[sys.nframe() - 1]])", 
 "    err <- paste0(\"Function `\", calling_func, \"`\", \" must be called from an Rmd chunk where `context = \\\"server\\\"`\")", 
-"    stop(err, call. = FALSE)", "  }", "}", "encoder_logic <- function(strip_output = FALSE) {", 
-"  p <- parent.frame()", "  check_server_context(p)", "  # Make this var available within the local context below", 
-"  assign(\"strip_output\", strip_output, envir = p)", "  # Evaluate in parent frame to get input, output, and session", 
+"    stop(err, call. = FALSE)", "  }", "}", "", "encoder_logic <- function(strip_output = FALSE) {", 
+"  p <- parent.frame()", "  check_server_context(p)", "  assign(\"strip_output\", strip_output, envir = p)", 
 "  local(", "    {", "      encoded_txt <- shiny::eventReactive(", 
-"        input$hash_generate,", "        {", "          # shiny::getDefaultReactiveDomain()$userData$tutorial_state", 
-"          state <- learnr:::get_tutorial_state()", "          shiny::validate(shiny::need(length(state) > 0, \"No progress yet.\"))", 
+"        input$hash_generate,", "        {", "          state <- learnr:::get_tutorial_state()", 
+"          shiny::validate(shiny::need(length(state) > 0, \"No progress yet.\"))", 
 "          shiny::validate(shiny::need(nchar(input$name) > 0, \"No name entered.\"))", 
 "          shiny::validate(shiny::need(nchar(input$studentID) > 0, \"Please enter your student ID\"))", 
 "          user_state <- purrr::map_dfr(state, identity, .id = \"label\")", 
@@ -1378,7 +1350,7 @@ learnr:::store_exercise_cache(structure(list(label = "ex4", global_setup = struc
 "          user_info <- tibble(", "            label = c(\"student_name\", \"student_id\"),", 
 "            type = \"identifier\",", "            answer = as.list(c(input$name, input$studentID)),", 
 "            timestamp = format(Sys.time(), \"%Y-%m-%d %H:%M:%S %Z\", tz = \"UTC\")", 
-"          )", "          learnrhash::encode_obj(bind_rows(user_info, user_state))", 
+"          )", "          learnrhash::encode_obj(dplyr::bind_rows(user_info, user_state))", 
 "        }", "      )", "      output$hash_output <- shiny::renderText(encoded_txt())", 
 "    },", "    envir = p", "  )", "}", "", "hash_encoder_ui <- {", 
 "  shiny::div(\"If you have completed this tutorial and are happy with all of your\", \"solutions, please enter your identifying information, then click the button below to generate your hash\", textInput(\"name\", \"What's your name?\"), textInput(\"studentID\", \"What is your student ID?\"), renderText({", 
@@ -1425,25 +1397,25 @@ learnr:::store_exercise_cache(structure(list(label = "ex4", global_setup = struc
  
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label = "mc2", question = structure("The author is arguing that…", html = TRUE, class = c("html", 
-"character")), answers = list(structure(list(id = "lnr_ans_e82057c", 
+"character")), answers = list(structure(list(id = "lnr_ans_7d7e1fb", 
     option = "Because of regression to the mean, an outstanding basketball player is likely to have sons that are as good at basketball as him.", 
     value = "Because of regression to the mean, an outstanding basketball player is likely to have sons that are as good at basketball as him.", 
     label = structure("Because of regression to the mean, an outstanding basketball player is likely to have sons that are as good at basketball as him.", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = structure("False, think about the previous example concerning the children of very tall parents.", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_ae17e8a", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_4423d16", 
     option = "Because of regression to the mean, an outstanding basketball player is likely to have sons that are not good at basketball.", 
     value = "Because of regression to the mean, an outstanding basketball player is likely to have sons that are not good at basketball.", 
     label = structure("Because of regression to the mean, an outstanding basketball player is likely to have sons that are not good at basketball.", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = structure("Not quite!  Think about the previous example concerning the children of very tall parents.", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_5a11c6f", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_45a6fb6", 
     option = "Because of regression to the mean, an outstanding basketball player is likely to have sons that are good at basketball, but not as good as him.", 
     value = "Because of regression to the mean, an outstanding basketball player is likely to have sons that are good at basketball, but not as good as him.", 
     label = structure("Because of regression to the mean, an outstanding basketball player is likely to have sons that are good at basketball, but not as good as him.", html = TRUE, class = c("html", 
     "character")), correct = TRUE, message = structure("That’s right!  Basketball skill is likely similar to the previous example concerning the children of very tall parents.", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_c4714ac", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_ce1c716", 
     option = "Linear regression is incapable of evaluating musical or athletic talent.", 
     value = "Linear regression is incapable of evaluating musical or athletic talent.", 
     label = structure("Linear regression is incapable of evaluating musical or athletic talent.", html = TRUE, class = c("html", 
@@ -1456,7 +1428,7 @@ learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label 
 "character")), incorrect = structure("Incorrect", html = TRUE, class = c("html", 
 "character")), message = NULL, post_message = NULL), ids = list(
     answer = "mc2-answer", question = "mc2"), loading = NULL, 
-    random_answer_order = FALSE, allow_retry = TRUE, seed = 83712871.9610182, 
+    random_answer_order = FALSE, allow_retry = TRUE, seed = 325572781.848393, 
     options = list()), class = c("learnr_radio", "tutorial_question"
 )), session = session)
 </script>
@@ -1473,7 +1445,7 @@ encoder_logic()
 <!--/html_preserve-->
 <!--html_preserve-->
 <script type="application/shiny-prerendered" data-context="execution_dependencies">
-{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages","version"]},"class":{"type":"character","attributes":{},"value":["data.frame"]},"row.names":{"type":"integer","attributes":{},"value":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87]}},"value":[{"type":"character","attributes":{},"value":["airports","assertthat","backports","base","bslib","cachem","checkmate","cherryblossom","cli","commonmark","compiler","crayon","datasets","digest","dplyr","ellipsis","emo","evaluate","farver","fastmap","fontawesome","forcats","generics","ggplot2","glue","graphics","grDevices","grid","gtable","hms","htmltools","htmlwidgets","httpuv","jquerylib","jsonlite","knitr","labeling","later","lattice","learnr","learnrhash","lifecycle","litedown","lubridate","magrittr","markdown","Matrix","methods","mgcv","mime","mosaicData","nlme","openintro","pillar","pkgconfig","promises","purrr","R6","RColorBrewer","Rcpp","readr","rlang","rmarkdown","rprojroot","rstudioapi","S7","sass","scales","shiny","splines","stats","stringi","stringr","tibble","tidyr","tidyselect","tidyverse","timechange","tools","tzdb","usdata","utils","vctrs","withr","xfun","xtable","yaml"]},{"type":"character","attributes":{},"value":["0.1.0","0.2.1","1.5.0","4.5.1","0.9.0","1.1.0","2.3.3","0.1.0","3.6.5","2.0.0","4.5.1","1.5.3","4.5.1","0.6.37","1.1.4","0.3.2","0.0.0.9000","1.0.5","2.1.2","1.2.0","0.5.3","1.0.1","0.1.4","4.0.0","1.8.0","4.5.1","4.5.1","4.5.1","0.3.6","1.1.3","0.5.8.1","1.6.4","1.6.16","0.1.4","2.0.0","1.50","0.4.3","1.4.2","0.22-7","0.11.5","0.2.0","1.0.4","0.7","1.9.4","2.0.3","2.0","1.7-3","4.5.1","1.9-3","0.13","0.20.4","3.1-168","2.5.0","1.11.1","2.0.3","1.3.3","1.1.0","2.6.1","1.1-3","1.1.0","2.1.5","1.1.6","2.30","2.1.1","0.17.1","0.2.0","0.4.10","1.4.0","1.11.1","4.5.1","4.5.1","1.8.7","1.5.2","3.3.0","1.3.1","1.2.1","2.0.0","0.3.0","4.5.1","0.5.0","0.3.1","4.5.1","0.6.5","3.0.2","0.52","1.8-4","2.3.10"]}]}]}
+{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages","version"]},"class":{"type":"character","attributes":{},"value":["data.frame"]},"row.names":{"type":"integer","attributes":{},"value":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68]}},"value":[{"type":"character","attributes":{},"value":["backports","base","bslib","cachem","checkmate","cli","commonmark","compiler","datasets","digest","dplyr","ellipsis","evaluate","farver","fastmap","fontawesome","generics","ggplot2","glue","graphics","grDevices","grid","gtable","htmltools","htmlwidgets","httpuv","jquerylib","jsonlite","knitr","labeling","later","lattice","learnr","learnrhash","lifecycle","litedown","magrittr","markdown","Matrix","methods","mgcv","mime","nlme","pillar","pkgconfig","promises","R6","RColorBrewer","Rcpp","rlang","rmarkdown","rprojroot","rstudioapi","S7","sass","scales","shiny","splines","stats","tibble","tidyselect","tools","utils","vctrs","withr","xfun","xtable","yaml"]},{"type":"character","attributes":{},"value":["1.5.0","4.5.1","0.9.0","1.1.0","2.3.3","3.6.5","2.0.0","4.5.1","4.5.1","0.6.37","1.1.4","0.3.2","1.0.5","2.1.2","1.2.0","0.5.3","0.1.4","4.0.0","1.8.0","4.5.1","4.5.1","4.5.1","0.3.6","0.5.8.1","1.6.4","1.6.16","0.1.4","2.0.0","1.50","0.4.3","1.4.2","0.22-7","0.11.5","0.2.0","1.0.4","0.7","2.0.3","2.0","1.7-3","4.5.1","1.9-3","0.13","3.1-168","1.11.1","2.0.3","1.3.3","2.6.1","1.1-3","1.1.0","1.1.6","2.30","2.1.1","0.17.1","0.2.0","0.4.10","1.4.0","1.11.1","4.5.1","4.5.1","3.3.0","1.2.1","4.5.1","4.5.1","0.6.5","3.0.2","0.52","1.8-4","2.3.10"]}]}]}
 </script>
 <!--/html_preserve-->
 </div>
