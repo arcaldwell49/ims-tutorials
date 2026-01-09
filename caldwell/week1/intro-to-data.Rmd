@@ -9,11 +9,14 @@ runtime: shiny_prerendered
 
 ```{r setup, include=FALSE}
 library(learnr)
-library(tidyverse)
-library(openintro)
-library(emo)
+library(dplyr)
+library(ggplot2)
 
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+
+# Load datasets from local RDS files instead of openintro package
+hsb2 <- readRDS("hsb2.rds")
+email50 <- readRDS("email50.rds")
 
 # Setup for in some exercise chunks
 hsb2_public <- hsb2 |> 
@@ -75,7 +78,7 @@ encoder_logic <- function(strip_output = FALSE) {
             answer = as.list(c(input$name, input$studentID)),
             timestamp = format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z", tz = "UTC")
           )
-          learnrhash::encode_obj(bind_rows(user_info, user_state))
+          learnrhash::encode_obj(dplyr::bind_rows(user_info, user_state))
         }
       )
       output$hash_output <- shiny::renderText(encoded_txt())
@@ -119,8 +122,8 @@ Packages are the fundamental units of reproducible R code.
 They include reusable functions, the documentation that describes how to use them, and sample data.
 In this lesson we will make use of two packages:
 
-- **tidyverse**: Tidyverse is a collection of R packages for data science that adhere to a common philosophy of data and R programming syntax, and are designed to work together naturally. You can learn more about tidyverse [here](https://tidyverse.org/). But no need to go digging through the package documentation, we will walk you through what you need to know about these packages as they become relevant. 
-- **openintro**: The openintro package contains datasets used in openintro resources. You can find out more about the package [here](http://openintrostat.github.io/openintro).
+- **dplyr**: Part of the tidyverse, dplyr provides functions for data manipulation like filtering, selecting, and summarizing data. 
+- **ggplot2**: Also part of the tidyverse, ggplot2 is a powerful package for creating visualizations.
 
 Once we have installed the packages, we use the `library()` function to load 
 packages into R. 
@@ -128,8 +131,8 @@ packages into R.
 Let's load these two packages to be used in the remainder of this lesson.
 
 ```{r load-packages, exercise=TRUE}
-library(tidyverse)
-library(openintro)
+library(dplyr)
+library(ggplot2)
 ```
 
 ## Data in R 
@@ -140,7 +143,7 @@ One of the datasets that we will work with in this tutorial comes from the High 
 
 The data are organized in what we call a *data frame*, where each row represents an *observation* or a *case* and each column represents a *variable*. If you ever use spreadsheets, such as a Google sheet or Excel, this representation should be familiar to you.
 
-In this lesson we'll work with the High School and Beyond dataset, stored in the openintro package. The data are stored in a **data frame** called `hsb2`. You can read more about this dataset [here](http://openintrostat.github.io/openintro/reference/hsb2.html). Below is a 
+In this lesson we'll work with the High School and Beyond dataset, stored in a **data frame** called `hsb2`. You can read more about this dataset [here](http://openintrostat.github.io/openintro/reference/hsb2.html). Below is a 
 preview of the dataset. You can use the arrow on the right hand side to scroll 
 through the variables, and the numbers on the bottom to see different rows in 
 the dataset.
@@ -772,10 +775,10 @@ You have successfully completed Lesson 1 in Tutorial 1: Introduction to data. If
 
 This tutorial was created on templates provided by OpenIntro:
 
-`r emo::ji("ledger")` [Full list of tutorials supporting OpenIntro::Introduction to Modern Statistics](https://openintrostat.github.io/ims-tutorials/)
+&#128210; [Full list of tutorials supporting OpenIntro::Introduction to Modern Statistics](https://openintrostat.github.io/ims-tutorials/)
 
 
-`r emo::ji("open_book")` [Learn more at Introduction to Modern Statistics](http://openintro-ims.netlify.app/)
+&#128214; [Learn more at Introduction to Modern Statistics](http://openintro-ims.netlify.app/)
 
 ## Submit
 
