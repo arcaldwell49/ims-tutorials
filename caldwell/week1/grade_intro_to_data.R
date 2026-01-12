@@ -33,22 +33,22 @@ decode_submission <- function(hash_string) {
   if (is.na(hash_string) || hash_string == "") {
     return(NULL)
   }
-  
+
   tryCatch({
     decoded <- learnrhash::decode_obj(hash_string)
-    
+
     # Extract student identifiers
     student_info <- decoded |>
       filter(type == "identifier") |>
       select(label, answer) |>
       mutate(answer = as.character(answer)) |>
       pivot_wider(names_from = label, values_from = answer)
-    
+
     # Extract exercise submissions (type == "exercise")
     exercises <- decoded |>
       filter(type == "exercise") |>
       pull(label)
-    
+
     list(
       student_name = student_info$student_name %||% NA_character_,
       student_id = student_info$student_id %||% NA_character_,
@@ -64,42 +64,43 @@ decode_submission <- function(hash_string) {
 #' @param expected_exercises Vector of expected exercise chunk names (defaults to EXPECTED_EXERCISES)
 #' @param hash_column Name of the column containing the hash (default: "Answer 5")
 #' @return A tibble with grading results
-grade_submissions <- function(csv_path, 
+grade_submissions <- function(csv_path,
                                expected_exercises = EXPECTED_EXERCISES,
-                               hash_column = "Answer 5") {
-  
+                               hash_column = "answer_5") {
+
   # Read Blackboard export
 
   submissions <- read_csv(csv_path, show_col_types = FALSE)
-  
+
   # Process each submission
   results <- submissions |>
+    janitor::clean_names() |>
     rowwise() |>
     mutate(
       decoded = list(decode_submission(.data[[hash_column]]))
     ) |>
     ungroup()
-  
+
   # Build grading output
   graded <- results |>
     mutate(
       # From Blackboard
-      bb_username = Username,
-      bb_last_name = `Last Name`,
-      bb_first_name = `First Name`,
-      
+      bb_username = username,
+      bb_last_name = `last_name`,
+      bb_first_name = `first_name`,
+
 
       # From decoded hash
       hash_student_name = map_chr(decoded, ~ .x$student_name %||% NA_character_),
       hash_student_id = map_chr(decoded, ~ .x$student_id %||% NA_character_),
-      
+
       # Grading
       decode_success = map_lgl(decoded, ~ !is.null(.x)),
       exercises_completed = map(decoded, ~ .x$exercises_completed %||% character(0)),
       n_completed = map_int(exercises_completed, length),
       n_expected = length(expected_exercises),
       pct_complete = round(100 * n_completed / n_expected, 1),
-      
+
       # Which exercises are missing?
       missing_exercises = map_chr(exercises_completed, function(completed) {
         missing <- setdiff(expected_exercises, completed)
@@ -118,7 +119,7 @@ grade_submissions <- function(csv_path,
       pct_complete,
       missing_exercises
     )
-  
+
   graded
 }
 
@@ -130,10 +131,10 @@ grade_and_save <- function(csv_path, output_path = NULL) {
   if (is.null(output_path)) {
     output_path <- str_replace(csv_path, "\\.csv$", "_graded.csv")
   }
-  
+
   graded <- grade_submissions(csv_path)
   write_csv(graded, output_path)
-  
+
   # Print summary
 
   cat("\n=== Grading Summary ===\n")
@@ -143,7 +144,7 @@ grade_and_save <- function(csv_path, output_path = NULL) {
   cat("\nScore distribution:\n")
   print(summary(graded$pct_complete))
   cat("\nResults saved to:", output_path, "\n")
-  
+
   invisible(graded)
 }
 
