@@ -20,6 +20,14 @@ library(ggfortify)
 
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 
+REQUIRED_EXERCISES <- c(
+  "ex41",
+  "ex42",
+  "ex43", "ex45",
+  "ex415",
+  "ex417"
+)
+
 # Load data from local files
 hypdata_nonequalvar <- readRDS("data/movies03.rds") |>
   dplyr::select(response = box.office, explanatory = score)
@@ -209,6 +217,79 @@ encoder_logic <- function(strip_output = FALSE) {
         }
       )
       output$hash_output <- shiny::renderText(encoded_txt())
+    },
+    envir = p
+  )
+}
+
+# Progress checker logic
+progress_checker_logic <- function() {
+  p <- parent.frame()
+  check_server_context(p)
+  local(
+    {
+      # Reactive to check progress when button is clicked
+      progress_info <- shiny::eventReactive(
+        input$check_progress,
+        {
+          state <- learnr:::get_tutorial_state()
+          
+          # Get labels of completed exercises (any submission counts)
+          completed_labels <- names(state)
+          
+          # Check which required exercises are completed
+          completed_required <- REQUIRED_EXERCISES %in% completed_labels
+          n_completed <- sum(completed_required)
+          n_total <- length(REQUIRED_EXERCISES)
+          pct <- round(100 * n_completed / n_total)
+          
+          # Find missing exercises
+          missing <- REQUIRED_EXERCISES[!completed_required]
+          
+          list(
+            n_completed = n_completed,
+            n_total = n_total,
+            pct = pct,
+            missing = missing
+          )
+        }
+      )
+      
+      # Render progress output
+      output$progress_output <- shiny::renderUI({
+        info <- progress_info()
+        
+        # Color based on completion
+        bar_color <- if (info$pct == 100) "#28a745" else if (info$pct >= 50) "#ffc107" else "#dc3545"
+        
+        # Build missing exercises message
+        if (length(info$missing) == 0) {
+          missing_msg <- shiny::p(shiny::strong("All required exercises completed!"),
+                                  style = "color: #28a745;")
+        } else {
+          missing_msg <- shiny::tagList(
+            shiny::p(shiny::strong("Missing exercises:"), style = "margin-bottom: 5px;"),
+            shiny::tags$ul(
+              lapply(info$missing, function(x) shiny::tags$li(shiny::code(x)))
+            )
+          )
+        }
+        
+        shiny::tagList(
+          shiny::p(
+            sprintf("Progress: %d / %d required exercises completed (%d%%)",
+                    info$n_completed, info$n_total, info$pct)
+          ),
+          shiny::div(
+            style = "background-color: #e9ecef; border-radius: 4px; height: 20px; margin-bottom: 10px;",
+            shiny::div(
+              style = sprintf("background-color: %s; width: %d%%; height: 100%%; border-radius: 4px; transition: width 0.3s;",
+                              bar_color, info$pct)
+            )
+          ),
+          missing_msg
+        )
+      })
     },
     envir = p
   )
@@ -555,7 +636,7 @@ Using `hypdata_nice`, draw a scatter plot of `response` versus `explanatory`.
 
 
 
-```{r ex41, exercise=TRUE}
+```{r ex41, exercise=TRUE, exercise.cap = "ex41"}
 # Using hypdata_nice, draw a scatter plot of response vs. explanatory
 ___
 ```
@@ -583,7 +664,7 @@ ggplot(hypdata_nice, aes(x = explanatory, y = response)) +
 - Using `modeled_observations`, plot `.resid` vs. `.fitted` and add a point layer.
 
 
-```{r ex42, exercise=TRUE}
+```{r ex42, exercise=TRUE, exercise.cap = "ex42"}
 # Run a linear regression of response vs. explanatory
 model <- ___
 
@@ -637,7 +718,7 @@ Using `hypdata_poor`, draw a scatter plot of `response` versus `explanatory`.
 
 
 
-```{r ex43, exercise=TRUE}
+```{r ex43, exercise=TRUE, exercise.cap = "ex43"}
 # Using hypdata_poor, draw a scatter plot of response vs. explanatory
 ___
 ```
@@ -668,7 +749,7 @@ ggplot(hypdata_poor, aes(x = explanatory, y = response)) +
 
 
 
-```{r ex45, exercise=TRUE}
+```{r ex45, exercise=TRUE, exercise.cap = "ex45"}
 # Run a linear regression of response vs. explanatory
 model <- ___
 
@@ -795,7 +876,7 @@ R provides several packages that automate the process of checking regression ass
 
 The `check_model()` function creates a comprehensive set of diagnostic plots:
 
-```{r ex415, exercise=TRUE}
+```{r ex415, exercise=TRUE, exercise.cap = "ex415"}
 library(performance)
 library(ggfortify)
 
@@ -852,7 +933,7 @@ Practice the complete workflow with a dataset that has violations.
 - Apply an appropriate transformation
 - Check diagnostics again to confirm improvement
 
-```{r ex417, exercise=TRUE}
+```{r ex417, exercise=TRUE, exercise.cap = "ex417"}
 library(performance)
 
 # Step 1: Fit original model
@@ -945,6 +1026,17 @@ You need to generate a hash for submission, click "Next Topic", generate the has
 
 ```{r, echo=FALSE, context="server"}
 encoder_logic()
+progress_checker_logic()
+```
+
+```{r progress-check, echo=FALSE}
+shiny::div(
+  style = "margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background-color: #f8f9fa;",
+  shiny::h4("Check Your Progress", style = "margin-top: 0;"),
+  shiny::p("Click the button below to see how many required exercises you have completed."),
+  shiny::actionButton("check_progress", "Check My Progress", class = "btn-primary"),
+  shiny::uiOutput("progress_output")
+)
 ```
 
 ```{r encode, echo=FALSE}
