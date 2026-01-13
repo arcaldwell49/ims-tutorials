@@ -21,6 +21,14 @@ knitr::opts_chunk$set(echo = FALSE,
 
 tutorial_options(exercise.eval = FALSE)
 
+REQUIRED_EXERCISES <- c(
+  "ex1",
+  "ex2",
+  "ex3",
+  "ex4"
+)
+
+
 # Load datasets from local RDS files
 possum <- readRDS("data/possum.rds")
 bdims <- readRDS("data/bdims.rds")
@@ -73,6 +81,79 @@ encoder_logic <- function(strip_output = FALSE) {
         }
       )
       output$hash_output <- shiny::renderText(encoded_txt())
+    },
+    envir = p
+  )
+}
+
+# Progress checker logic
+progress_checker_logic <- function() {
+  p <- parent.frame()
+  check_server_context(p)
+  local(
+    {
+      # Reactive to check progress when button is clicked
+      progress_info <- shiny::eventReactive(
+        input$check_progress,
+        {
+          state <- learnr:::get_tutorial_state()
+          
+          # Get labels of completed exercises (any submission counts)
+          completed_labels <- names(state)
+          
+          # Check which required exercises are completed
+          completed_required <- REQUIRED_EXERCISES %in% completed_labels
+          n_completed <- sum(completed_required)
+          n_total <- length(REQUIRED_EXERCISES)
+          pct <- round(100 * n_completed / n_total)
+          
+          # Find missing exercises
+          missing <- REQUIRED_EXERCISES[!completed_required]
+          
+          list(
+            n_completed = n_completed,
+            n_total = n_total,
+            pct = pct,
+            missing = missing
+          )
+        }
+      )
+      
+      # Render progress output
+      output$progress_output <- shiny::renderUI({
+        info <- progress_info()
+        
+        # Color based on completion
+        bar_color <- if (info$pct == 100) "#28a745" else if (info$pct >= 50) "#ffc107" else "#dc3545"
+        
+        # Build missing exercises message
+        if (length(info$missing) == 0) {
+          missing_msg <- shiny::p(shiny::strong("All required exercises completed!"),
+                                  style = "color: #28a745;")
+        } else {
+          missing_msg <- shiny::tagList(
+            shiny::p(shiny::strong("Missing exercises:"), style = "margin-bottom: 5px;"),
+            shiny::tags$ul(
+              lapply(info$missing, function(x) shiny::tags$li(shiny::code(x)))
+            )
+          )
+        }
+        
+        shiny::tagList(
+          shiny::p(
+            sprintf("Progress: %d / %d required exercises completed (%d%%)",
+                    info$n_completed, info$n_total, info$pct)
+          ),
+          shiny::div(
+            style = "background-color: #e9ecef; border-radius: 4px; height: 20px; margin-bottom: 10px;",
+            shiny::div(
+              style = sprintf("background-color: %s; width: %d%%; height: 100%%; border-radius: 4px; transition: width 0.3s;",
+                              bar_color, info$pct)
+            )
+          ),
+          missing_msg
+        )
+      })
     },
     envir = p
   )
@@ -187,7 +268,7 @@ Using the `bdims` dataset, create a scatterplot of body weight (`wgt`) as a func
 Then, add a linear regression line on top of the scatterplot. 
 
 
-```{r ex1, exercise = TRUE}
+```{r ex1, exercise = TRUE, exercise.cap = "ex1"}
  ggplot(data = ___, aes(x = ___, y = ___)) + 
   ___ + 
   ___(method = ___, se = FALSE)
@@ -246,7 +327,7 @@ ggplot(data = bdims, aes(x = hgt, y = wgt)) +
   geom_point()
 ```
 
-```{r ex2, exercise = TRUE}
+```{r ex2, exercise = TRUE, exercise.cap = "ex2"}
  add_line(my_slope = ___)
 ```
 
@@ -457,7 +538,7 @@ bdims_summary <- bdims |>
             mean_wgt = mean(wgt), sd_wgt = sd(wgt))
 ```
 
-```{r ex3, exercise = TRUE}
+```{r ex3, exercise = TRUE, exercise.cap = "ex3"}
 bdims_summary |>
   mutate(slope = ___, 
          intercept = ___)
@@ -577,7 +658,7 @@ Galton_men <- filter(Galton, sex == "M")
 Galton_women <- filter(Galton, sex == "F")
 ```
 
-```{r ex4, exercise = TRUE}
+```{r ex4, exercise = TRUE, exercise.cap = "ex4"}
 # Height of children vs. height of father
 ggplot(data = ___, aes(x = ___, y = ___)) +
   geom_point() + 
@@ -646,6 +727,17 @@ You need to generate a hash for submission, click "Next Topic", generate the has
 
 ```{r, echo=FALSE, context="server"}
 encoder_logic()
+progress_checker_logic()
+```
+
+```{r progress-check, echo=FALSE}
+shiny::div(
+  style = "margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background-color: #f8f9fa;",
+  shiny::h4("Check Your Progress", style = "margin-top: 0;"),
+  shiny::p("Click the button below to see how many required exercises you have completed."),
+  shiny::actionButton("check_progress", "Check My Progress", class = "btn-primary"),
+  shiny::uiOutput("progress_output")
+)
 ```
 
 ```{r encode, echo=FALSE}

@@ -21,6 +21,16 @@ knitr::opts_chunk$set(echo = FALSE,
                       fig.width = 5,
                       message = FALSE, 
                       warning = FALSE)
+REQUIRED_EXERCISES <- c(
+  "ex1",
+  "ex2",
+  "ex3a",
+  "ex3b",
+  "ex4a", 
+  "ex4b",
+  "ex5",
+  "ex6", "ex7", "ex8", "ex9"
+)
 
 # Load datasets from local RDS files (extracted from openintro)
 run09 <- readRDS("data/run09.rds")
@@ -91,6 +101,79 @@ encoder_logic <- function(strip_output = FALSE) {
         }
       )
       output$hash_output <- shiny::renderText(encoded_txt())
+    },
+    envir = p
+  )
+}
+
+# Progress checker logic
+progress_checker_logic <- function() {
+  p <- parent.frame()
+  check_server_context(p)
+  local(
+    {
+      # Reactive to check progress when button is clicked
+      progress_info <- shiny::eventReactive(
+        input$check_progress,
+        {
+          state <- learnr:::get_tutorial_state()
+          
+          # Get labels of completed exercises (any submission counts)
+          completed_labels <- names(state)
+          
+          # Check which required exercises are completed
+          completed_required <- REQUIRED_EXERCISES %in% completed_labels
+          n_completed <- sum(completed_required)
+          n_total <- length(REQUIRED_EXERCISES)
+          pct <- round(100 * n_completed / n_total)
+          
+          # Find missing exercises
+          missing <- REQUIRED_EXERCISES[!completed_required]
+          
+          list(
+            n_completed = n_completed,
+            n_total = n_total,
+            pct = pct,
+            missing = missing
+          )
+        }
+      )
+      
+      # Render progress output
+      output$progress_output <- shiny::renderUI({
+        info <- progress_info()
+        
+        # Color based on completion
+        bar_color <- if (info$pct == 100) "#28a745" else if (info$pct >= 50) "#ffc107" else "#dc3545"
+        
+        # Build missing exercises message
+        if (length(info$missing) == 0) {
+          missing_msg <- shiny::p(shiny::strong("All required exercises completed!"),
+                                  style = "color: #28a745;")
+        } else {
+          missing_msg <- shiny::tagList(
+            shiny::p(shiny::strong("Missing exercises:"), style = "margin-bottom: 5px;"),
+            shiny::tags$ul(
+              lapply(info$missing, function(x) shiny::tags$li(shiny::code(x)))
+            )
+          )
+        }
+        
+        shiny::tagList(
+          shiny::p(
+            sprintf("Progress: %d / %d required exercises completed (%d%%)",
+                    info$n_completed, info$n_total, info$pct)
+          ),
+          shiny::div(
+            style = "background-color: #e9ecef; border-radius: 4px; height: 20px; margin-bottom: 10px;",
+            shiny::div(
+              style = sprintf("background-color: %s; width: %d%%; height: 100%%; border-radius: 4px; transition: width 0.3s;",
+                              bar_color, info$pct)
+            )
+          ),
+          missing_msg
+        )
+      })
     },
     envir = p
   )
@@ -322,7 +405,7 @@ In this exercise, you will use `cor()` to compute the correlation between the bi
 
 Then, you will use `cor()` to compute the correlation between the birthweight (`weight`) and the number of weeks of gestation (`weeks`) for all non-missing pairs of observations
 
-```{r ex1, exercise = TRUE}
+```{r ex1, exercise = TRUE, exercise.cap = "ex1"}
 # Compute correlation of birthweight and mother's age
 ncbirths |>
   summarize(N = n(), 
@@ -771,7 +854,7 @@ For each of the four `set`s of data points in the `anscombe` dataset, compute th
 - Standard deviation of `y`
 - Correlation coefficient between `x` and `y`
 
-```{r ex2, exercise = TRUE}
+```{r ex2, exercise = TRUE, exercise.cap = "ex2"}
 # Compute properties of anscombe
  anscombe |>
   group_by(___) |>
@@ -941,7 +1024,7 @@ mlbbat10 |>
 
 Next, using the `bdims` dataset, draw the plot then calculate the correlation between height (`hgt`) and weight (`wgt`) *separately for each sex*. 
 
-```{r ex5, exercise = TRUE}
+```{r ex5, exercise = TRUE, exercise.cap = "ex5"}
 # Run this and look at the plot
 ggplot(data = bdims, aes(x = hgt, y = wgt, color = as.factor(sex))) +
   geom_point() 
@@ -985,7 +1068,7 @@ bdims |>
 
 Finally, draw the plot then calculate the correlation between body weight (`body_wt`) and brain weight (`brain_wt`) for all species of `mammals`. Alongside this computation, compute the correlation between the same two quantities after taking their natural logarithms (using the `log()` function).
 
-```{r ex6, exercise = TRUE}
+```{r ex6, exercise = TRUE, exercise.cap = "ex6"}
 # Run this and look at the plot
 ggplot(data = mammals, aes(x = body_wt, y = brain_wt)) +
   geom_point() + 
@@ -1226,7 +1309,7 @@ We will use these simulated data to explore if any pairs of variables might be m
 1. Create a scatterplot that shows the relationship between `x` and `y`, faceted by the set (`z`). 
 
 
-```{r ex7, exercise = TRUE, fig.height=5, fig.width=7, exercise.setup="prepare-noise"}
+```{r ex7, exercise = TRUE, exercise.cap = "ex7", fig.height=5, fig.width=7, exercise.setup="prepare-noise"}
 # Create faceted scatterplot
 ggplot(data = noise, aes(x = x, y = y)) + 
   geom_point() + 
@@ -1241,7 +1324,7 @@ ggplot(data = noise, aes(x = x, y = y)) +
 
 2. Compute the correlation between each set of `x` and `y`.  
 
-```{r ex8, exercise = TRUE, exercise.setup="prepare-noise"}
+```{r ex8, exercise = TRUE, exercise.cap = "ex8", exercise.setup="prepare-noise"}
 # Compute correlations for each dataset
 noise_summary <- noise |>
   group_by(___) |>
@@ -1274,7 +1357,7 @@ noise_summary <- noise |>
             spurious_cor = cor(x, y))
 ```
 
-```{r ex9, exercise = TRUE, exercise.setup="prepare-noise-summary"}
+```{r ex9, exercise = TRUE, exercise.cap = "ex9", exercise.setup="prepare-noise-summary"}
 # Isolate sets with correlations above 0.2 in absolute strength
 noise_summary |>
   filter(abs(___) > ___)
@@ -1459,6 +1542,17 @@ You need to generate a hash for submission, click "Next Topic", generate the has
 
 ```{r, echo=FALSE, context="server"}
 encoder_logic()
+progress_checker_logic()
+```
+
+```{r progress-check, echo=FALSE}
+shiny::div(
+  style = "margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background-color: #f8f9fa;",
+  shiny::h4("Check Your Progress", style = "margin-top: 0;"),
+  shiny::p("Click the button below to see how many required exercises you have completed."),
+  shiny::actionButton("check_progress", "Check My Progress", class = "btn-primary"),
+  shiny::uiOutput("progress_output")
+)
 ```
 
 ```{r encode, echo=FALSE}

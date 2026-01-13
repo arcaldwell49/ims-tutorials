@@ -24,6 +24,26 @@ hsb2_public <- hsb2 |>
 
 avg_read <- mean(hsb2$read)
 
+# Required exercises for progress tracking
+REQUIRED_EXERCISES <- c(
+  "load-packages",
+  "glimpse-hsb2",
+  "glimpse-email50",
+  "hsb2-count-schtyp",
+  "hsb2-filter-schtyp-public",
+  "hsb2-count-schtyp-again",
+  "email50-filter-number-big",
+  "hsb2-mean-read",
+  "hsb2-mean-read-assign",
+  "hsb2-mean-read-assign-show",
+  "hsb2-mutate-read-cat",
+  "hsb2-mutate-num-char-cat",
+  "email50-fortified",
+  "hsb2-science-math",
+  "hsb2-science-math-prog",
+  "email50-plot"
+)
+
 # Hash generation helpers
 # Should ideally be loaded from the imstutorials package when it exists
 is_server_context <- function(.envir) {
@@ -87,6 +107,91 @@ encoder_logic <- function(strip_output = FALSE) {
   )
 }
 
+# Progress checker logic
+progress_checker_logic <- function() {
+  p <- parent.frame()
+  check_server_context(p)
+  local(
+    {
+      # Reactive to check progress when button is clicked
+      progress_info <- shiny::eventReactive(
+        input$check_progress,
+        {
+          state <- learnr:::get_tutorial_state()
+          
+          # Get labels of completed exercises (any submission counts)
+          completed_labels <- names(state)
+          
+          # Check which required exercises are completed
+          completed_required <- REQUIRED_EXERCISES %in% completed_labels
+          n_completed <- sum(completed_required)
+          n_total <- length(REQUIRED_EXERCISES)
+          pct <- round(100 * n_completed / n_total)
+          
+          # Build detailed status
+          missing <- REQUIRED_EXERCISES[!completed_required]
+          
+          list(
+            n_completed = n_completed,
+            n_total = n_total,
+            pct = pct,
+            missing = missing
+          )
+        }
+      )
+      
+      # Render the progress output
+      output$progress_output <- shiny::renderUI({
+        info <- progress_info()
+        
+        # Color based on completion
+        bar_color <- if (info$pct == 100) {
+          "#28a745"  # green
+        } else if (info$pct >= 75) {
+          "#ffc107"  # yellow
+        } else {
+          "#dc3545"  # red
+        }
+        
+        # Build the UI
+        shiny::tagList(
+          shiny::tags$div(
+            style = "margin-bottom: 10px; font-weight: bold;",
+            sprintf("Progress: %d / %d exercises completed (%d%%)", 
+                    info$n_completed, info$n_total, info$pct)
+          ),
+          # Progress bar
+          shiny::tags$div(
+            style = "background-color: #e9ecef; border-radius: 4px; height: 24px; margin-bottom: 15px;",
+            shiny::tags$div(
+              style = sprintf(
+                "background-color: %s; width: %d%%; height: 100%%; border-radius: 4px; transition: width 0.3s;",
+                bar_color, info$pct
+              )
+            )
+          ),
+          # Show missing exercises if any
+          if (length(info$missing) > 0) {
+            shiny::tags$div(
+              style = "color: #856404; background-color: #fff3cd; border: 1px solid #ffeeba; padding: 10px; border-radius: 4px;",
+              shiny::tags$strong("Missing exercises:"),
+              shiny::tags$ul(
+                lapply(info$missing, function(x) shiny::tags$li(x))
+              )
+            )
+          } else {
+            shiny::tags$div(
+              style = "color: #155724; background-color: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 4px;",
+              shiny::tags$strong("All required exercises completed! You're ready to generate your hash.")
+            )
+          }
+        )
+      })
+    },
+    envir = p
+  )
+}
+
 hash_encoder_ui <- {
   shiny::div("If you have completed this tutorial and are happy with all of your", "solutions, please enter your identifying information, then click the button below to generate your hash", textInput("name", "What's your name?"), textInput("studentID", "What is your student ID?"), renderText({
     input$caption
@@ -130,7 +235,7 @@ packages into R.
 
 Let's load these two packages to be used in the remainder of this lesson.
 
-```{r load-packages, exercise=TRUE}
+```{r load-packages, exercise=TRUE, exercise.cap="load-packages"}
 library(dplyr)
 library(ggplot2)
 ```
@@ -165,7 +270,7 @@ the data look like. The `glimpse()` function is one good way of doing this. Clic
 on the blue "Run Code" button to run the code below, and take a look at the 
 output of the `glimpse()` function. 
 
-```{r glimpse-hsb2, exercise=TRUE}
+```{r glimpse-hsb2, exercise=TRUE, exercise.cap="glimpse-hsb2"}
 glimpse(hsb2)
 ```
 
@@ -181,7 +286,7 @@ Take a peek at the `email50` dataset using the `glimpse()` function.
 
 *How many observations and variables are there?*
 
-```{r glimpse-email50, exercise=TRUE}
+```{r glimpse-email50, exercise=TRUE, exercise.cap="glimpse-email50"}
 
 ```
 
@@ -292,7 +397,7 @@ dataset) in the code box and running it.
 
 *Review the output to identify each variable as either numerical or categorical, and further as discrete or continuous (if numerical) or ordinal or not ordinal (if categorical).*
 
-```{r glimpse-data, exercise=TRUE}
+```{r glimpse-data, exercise=TRUE, exercise.cap="glimpse-data"}
 
 ```
 
@@ -323,7 +428,7 @@ Suppose we want to do an analysis of only the students in public schools in the 
 
 One option for obtaining this information in R uses the `count()` function from the **dplyr** package, one of the packages included in the tidyverse. This package provides a variety of functions for wrangling and summarizing data. Once such function is `count()` which gives the frequencies of occurrence of the unique values in a given column. In this case we're interested in the number of students for each level of the `schtyp` (school type) column.
 
-```{r hsb2-count-schtyp, exercise=TRUE}
+```{r hsb2-count-schtyp, exercise=TRUE, exercise.cap="hsb2-count-schtyp"}
 hsb2 |> 
   count(schtyp)
 ```
@@ -381,7 +486,7 @@ longer pipes that perform multiple operations.
 Next, let's use the `filter()` function to filter the data to only include
 public school students. 
 
-```{r hsb2-filter-schtyp-public, exercise=TRUE}
+```{r hsb2-filter-schtyp-public, exercise=TRUE, exercise.cap="hsb2-filter-schtyp-public"}
 hsb2_public <- hsb2 |>
   filter(schtyp == "public")
 ```
@@ -408,7 +513,7 @@ an error message!
 Now, if we make another frequency table of school type in the filtered dataset,
 we should only see public school in the output.
 
-```{r hsb2-count-schtyp-again, exercise=TRUE}
+```{r hsb2-count-schtyp-again, exercise=TRUE, exercise.cap="hsb2-count-schtyp-again"}
 hsb2_public |>
   count(schtyp)
 ```
@@ -424,7 +529,7 @@ Modify the code below to:
 - Create a new dataset called `email50_big` that is a subset of the original `email50` dataset containing only emails with `"big"` numbers. This information is stored in the `number` variable.
 - Report the dimensions of `email50_big` using the `glimpse()` function again. *How many emails contain big numbers?*
 
-```{r email50-filter-number-big, exercise=TRUE}
+```{r email50-filter-number-big, exercise=TRUE, exercise.cap="email50-filter-number-big"}
 # Subset of emails with big numbers: email50_big
 email50_big <- ___ |>
   filter(___)
@@ -459,13 +564,13 @@ A common way of creating a new variable from an existing variable is discretizin
 
 For example, suppose we are not interested in the actual reading score of students, but instead whether their reading score is below average or at or above average. First, we need to calculate the average reading score with the `mean()` function. This will give us the mean value, 52.23. 
 
-```{r hsb2-mean-read, exercise=TRUE}
+```{r hsb2-mean-read, exercise=TRUE, exercise.cap="hsb2-mean-read"}
 # Calculate average reading score and show the value
 mean(hsb2$read)
 ```
 However, in order to be able to refer back to this value later on, we might want to store it as an object that we can refer to by name. So instead of just printing the result, let's save it as a new object called **avg underscore read**.
 
-```{r hsb2-mean-read-assign, exercise=TRUE}
+```{r hsb2-mean-read-assign, exercise=TRUE, exercise.cap="hsb2-mean-read-assign"}
 # Calculate average reading score and store as avg_read
 avg_read <- mean(hsb2$read)
 ```
@@ -474,7 +579,7 @@ Before we move on, a quick tip: most often we want to do both; see the value and
 way to accomplish this task is to wrap your assignment code in parentheses so that R will both assign the average value of reading test scores to `avg_read`, and print out the value assigned to 
 `avg_read`. 
 
-```{r hsb2-mean-read-assign-show, exercise=TRUE}
+```{r hsb2-mean-read-assign-show, exercise=TRUE, exercise.cap="hsb2-mean-read-assign-show"}
 (avg_read <- mean(hsb2$read))
 ```
 
@@ -488,7 +593,7 @@ let's explore another option!
 Instead we can create a new variable, named `read_cat`, with the `mutate()`
 function and the helpful `if_else()` function. 
 
-```{r hsb2-mutate-read-cat, exercise=TRUE}
+```{r hsb2-mutate-read-cat, exercise=TRUE, exercise.cap="hsb2-mutate-read-cat"}
 hsb2 <- hsb2 |>
   mutate(read_cat = if_else(read < avg_read,
                             "below average",
@@ -526,7 +631,7 @@ The `email50` dataset is available in your workspace. Modify the code below to:
 - Assign the resulting data frame to a new data frame named `email50_updated`.
 - Then, using `count()`, determine the number of emails in each level of `num_char_cat`. Evaluate whether these counts match the expected numbers.
 
-```{r hsb2-mutate-num-char-cat, exercise=TRUE}
+```{r hsb2-mutate-num-char-cat, exercise=TRUE, exercise.cap="hsb2-mutate-num-char-cat"}
 # Calculate median number of characters: med_num_char
 med_num_char <- median(___)
 
@@ -609,7 +714,7 @@ Use what you know about the `mutate` and `if_else()` functions to:
 - Assign the resulting data frame to a new data frame named `email50_updated`.
 - Run the code provided to visualize the distribution of the `number_cat` variable.
 
-```{r email50-fortified, exercise=TRUE}
+```{r email50-fortified, exercise=TRUE, exercise.cap="email50-fortified"}
 # Create number_cat column in email50
 email50_updated <- email50 |>
   mutate(___ = if_else(___, 
@@ -674,7 +779,7 @@ Another attractive feature of ggplot2 is that you can build your plots in layers
 
 We'll visualize the relationship between the math and science scores of the students in the High School and Beyond dataset.
 
-```{r hsb2-science-math, exercise=TRUE}
+```{r hsb2-science-math, exercise=TRUE, exercise.cap="hsb2-science-math"}
 ggplot(data = hsb2, aes(x = science, y = math)) + 
   geom_point()
 ```
@@ -709,7 +814,7 @@ We also mentioned earlier that extending from bivariate to multivariate plots is
 
 Let's plot the same math and science test scores, but this time let's also consider the program that the student is in: general, academic, or vocational. 
 
-```{r hsb2-science-math-prog, exercise=TRUE}
+```{r hsb2-science-math-prog, exercise=TRUE, exercise.cap="hsb2-science-math-prog"}
 ggplot(data = hsb2, aes(x = science, y = math, color = prog)) +
   geom_point()
 ```
@@ -742,7 +847,7 @@ Then, we will make a scatterplot by adding a `geom_point()` layer to the `ggplot
 - Create a scatterplot of number of exclamation points (`exclaim_mess`) on the y-axis vs. number of characters (`num_char`) on the x-axis.
 - Color points by whether or not the email is `spam`.
 
-```{r email50-plot, exercise=TRUE}
+```{r email50-plot, exercise=TRUE, exercise.cap="email50-plot"}
 ggplot(email50, aes(x = ___, y = ___, color = ___)) +
   [GEOM]
 ```
@@ -781,6 +886,17 @@ This tutorial was created on templates provided by OpenIntro:
 &#128214; [Learn more at Introduction to Modern Statistics](http://openintro-ims.netlify.app/)
 
 ## Submit
+
+```{r progress-check, echo=FALSE, context="server"}
+progress_checker_logic()
+```
+
+```{r progress-ui, echo=FALSE}
+shiny::actionButton("check_progress", "Check My Progress", 
+                    style = "margin-bottom: 15px; background-color: #007bff; color: white;")
+shiny::uiOutput("progress_output")
+shiny::tags$hr()
+```
 
 ```{r, echo=FALSE, context="server"}
 encoder_logic()

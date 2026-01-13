@@ -21,6 +21,16 @@ knitr::opts_chunk$set(echo = FALSE,
 
 tutorial_options(exercise.eval = FALSE)
 
+# Required exercises for progress tracking
+REQUIRED_EXERCISES <- c(
+  "ex1",
+  "cut-ex",
+  "ex2",
+  "ex3", "ex4", "ex5",
+  "ex6", "ex7", "ex8",
+  "ex10"
+)
+
 # Load datasets from local RDS files (extracted from openintro)
 possum <- readRDS("data/possum.rds")
 ncbirths <- readRDS("data/ncbirths.rds")
@@ -77,6 +87,79 @@ encoder_logic <- function(strip_output = FALSE) {
         }
       )
       output$hash_output <- shiny::renderText(encoded_txt())
+    },
+    envir = p
+  )
+}
+
+# Progress checker logic
+progress_checker_logic <- function() {
+  p <- parent.frame()
+  check_server_context(p)
+  local(
+    {
+      # Reactive to check progress when button is clicked
+      progress_info <- shiny::eventReactive(
+        input$check_progress,
+        {
+          state <- learnr:::get_tutorial_state()
+          
+          # Get labels of completed exercises (any submission counts)
+          completed_labels <- names(state)
+          
+          # Check which required exercises are completed
+          completed_required <- REQUIRED_EXERCISES %in% completed_labels
+          n_completed <- sum(completed_required)
+          n_total <- length(REQUIRED_EXERCISES)
+          pct <- round(100 * n_completed / n_total)
+          
+          # Find missing exercises
+          missing <- REQUIRED_EXERCISES[!completed_required]
+          
+          list(
+            n_completed = n_completed,
+            n_total = n_total,
+            pct = pct,
+            missing = missing
+          )
+        }
+      )
+      
+      # Render progress output
+      output$progress_output <- shiny::renderUI({
+        info <- progress_info()
+        
+        # Color based on completion
+        bar_color <- if (info$pct == 100) "#28a745" else if (info$pct >= 50) "#ffc107" else "#dc3545"
+        
+        # Build missing exercises message
+        if (length(info$missing) == 0) {
+          missing_msg <- shiny::p(shiny::strong("All required exercises completed!"),
+                                  style = "color: #28a745;")
+        } else {
+          missing_msg <- shiny::tagList(
+            shiny::p(shiny::strong("Missing exercises:"), style = "margin-bottom: 5px;"),
+            shiny::tags$ul(
+              lapply(info$missing, function(x) shiny::tags$li(shiny::code(x)))
+            )
+          )
+        }
+        
+        shiny::tagList(
+          shiny::p(
+            sprintf("Progress: %d / %d required exercises completed (%d%%)",
+                    info$n_completed, info$n_total, info$pct)
+          ),
+          shiny::div(
+            style = "background-color: #e9ecef; border-radius: 4px; height: 20px; margin-bottom: 10px;",
+            shiny::div(
+              style = sprintf("background-color: %s; width: %d%%; height: 100%%; border-radius: 4px; transition: width 0.3s;",
+                              bar_color, info$pct)
+            )
+          ),
+          missing_msg
+        )
+      })
     },
     envir = p
   )
@@ -254,7 +337,7 @@ The `ncbirths` dataset is a random sample of 1,000 cases taken from a larger dat
 
 Using the `ncbirths` dataset, use `ggplot()` to make a scatterplot visualizing the relationship between birth weight and length of gestation of these babies.
 
-```{r ex1, exercise = TRUE}
+```{r ex1, exercise = TRUE, exercise.cap = "ex1"}
 # Scatterplot of weight vs. weeks
 
 ```
@@ -279,7 +362,7 @@ First, we will make a new variable, named `weeks_cut`, which discretizes the ori
 
 **What you should see**: A new column in your dataset with 4 different category levels.
 
-```{r cut-ex, exercise = TRUE}
+```{r cut-ex, exercise = TRUE, exercise.cap = "cut-ex"}
 ncbirths <- ncbirths |>
   mutate(weeks_cut = cut(___, breaks = ___))
 ```
@@ -295,7 +378,7 @@ ncbirths <- ncbirths |>
   mutate(weeks_cut = cut(weeks, breaks = 4))
 ```
 
-```{r ex2, exercise = TRUE}
+```{r ex2, exercise = TRUE, exercise.cap = "ex2"}
 ggplot(data = ___,
        aes(x = ___, y = ___)) +
   ___
@@ -397,7 +480,7 @@ To see more thorough documentation on any of these datasets, use the `?` or `hel
 
 First, using the `mammals` dataset, create a scatterplot illustrating how the brain weight (`brain_wt`) of a mammal varies as a function of its body weight (`body_wt`).
 
-```{r ex3, exercise = TRUE}
+```{r ex3, exercise = TRUE, exercise.cap = "ex3"}
 # Mammals scatterplot
 
 ```
@@ -422,7 +505,7 @@ ggplot(data = mammals, aes(x = body_wt, y = brain_wt)) +
 Next, using the `mlbbat10` dataset, create a scatterplot illustrating how the slugging percentage (`slg`) of a player varies as a function of his on-base percentage (`obp`).
 
 
-```{r ex4, exercise = TRUE}
+```{r ex4, exercise = TRUE, exercise.cap = "ex4"}
 
 ```
 
@@ -448,7 +531,7 @@ Next, using the `bdims` dataset, create a scatterplot illustrating how a person'
 
 *Hint*: You'll need to coerce `sex` into a factor using the `as.factor()` function.
 
-```{r ex5, exercise = TRUE}
+```{r ex5, exercise = TRUE, exercise.cap = "ex5"}
 
 ```
 
@@ -476,7 +559,7 @@ ggplot(data = bdims, aes(x = hgt, y = wgt, color = as.factor(sex))) +
 
 Finally, using the `smoking` dataset, create a scatterplot illustrating how the amount that a person smokes on weekdays (`amt_weekdays`) varies as a function of their age (`age`).
 
-```{r ex6, exercise = TRUE}
+```{r ex6, exercise = TRUE, exercise.cap = "ex6"}
 
 ```
 
@@ -528,7 +611,7 @@ Let's practice using both methods to transform our previous scatterplot by takin
 
 Fist, let's use the `coord_trans()` function to modify our original scatterplot, so that both the x- and y-axis is on a `"log10"` scale.
 
-```{r ex7, exercise = TRUE}
+```{r ex7, exercise = TRUE, exercise.cap = "ex7"}
  ggplot(data = mammals, aes(x = body_wt, y = brain_wt)) +
   geom_point() +
   ___(x = "log10", y = "log10")
@@ -548,7 +631,7 @@ ggplot(data = mammals, aes(x = body_wt, y = brain_wt)) +
 
 Now, let's use the `scale_x_log10()` and `scale_y_log10()` functions to achieve the same effect but with different axis labels and grid lines.
 
-```{r ex8, exercise = TRUE}
+```{r ex8, exercise = TRUE, exercise.cap = "ex8"}
 ggplot(data = mammals, aes(x = body_wt, y = brain_wt)) +
   geom_point() +
   ___ +
@@ -687,7 +770,7 @@ ab_gt_200 <- mlbbat10 |>
   filter(at_bat >= 200)
 ```
 
-```{r ex10, exercise = TRUE}
+```{r ex10, exercise = TRUE, exercise.cap = "ex10"}
 ab_gt_200 |>
   filter(___)
 ```
@@ -711,6 +794,18 @@ You need to generate a hash for submission, click "Next Topic", generate the has
 
 ```{r, echo=FALSE, context="server"}
 encoder_logic()
+progress_checker_logic()
+```
+
+```{r progress-check, echo=FALSE}
+shiny::div(
+
+  style = "margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background-color: #f8f9fa;",
+  shiny::h4("Check Your Progress", style = "margin-top: 0;"),
+  shiny::p("Click the button below to see how many required exercises you have completed."),
+  shiny::actionButton("check_progress", "Check My Progress", class = "btn-primary"),
+  shiny::uiOutput("progress_output")
+)
 ```
 
 ```{r encode, echo=FALSE}

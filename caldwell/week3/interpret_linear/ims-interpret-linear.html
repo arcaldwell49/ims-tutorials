@@ -339,7 +339,7 @@ data-pipe="|&gt;">
 lm(___ ~ ___, data = ___)
 # Linear model for &#39;slg&#39; as a function of &#39;obp&#39;
 # Log-linear model for body weight as a function of brain weight</code></pre>
-<script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
+<script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"ex1"}</script>
 </div>
 <div class="tutorial-exercise-support" data-label="ex1-hint-1"
 data-completion="1" data-diagnostics="1" data-startover="1"
@@ -609,7 +609,7 @@ data-diagnostics="1" data-startover="1" data-lines="0"
 data-pipe="|&gt;">
 <pre class="text"><code># Show the coefficients
 # Show the full model output</code></pre>
-<script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
+<script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"ex2"}</script>
 </div>
 <div class="tutorial-exercise-support" data-label="ex2-hint"
 data-completion="1" data-diagnostics="1" data-startover="1"
@@ -659,7 +659,7 @@ data-pipe="|&gt;">
 all.equal(___, ___) 
 # Mean of the residuals
 ___(residuals(___))</code></pre>
-<script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
+<script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"ex4"}</script>
 </div>
 <div class="tutorial-exercise-support" data-label="ex4-hint-1"
 data-completion="1" data-diagnostics="1" data-startover="1"
@@ -703,7 +703,7 @@ data-diagnostics="1" data-startover="1" data-lines="0"
 data-pipe="|&gt;">
 <pre class="text"><code># Create hgt_wgt_tidy
 # Glimpse the resulting data frame</code></pre>
-<script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
+<script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"ex5"}</script>
 </div>
 <div class="tutorial-exercise-support" data-label="ex5-hint-1"
 data-completion="1" data-diagnostics="1" data-startover="1"
@@ -854,7 +854,7 @@ data-diagnostics="1" data-startover="1" data-lines="0"
 data-pipe="|&gt;">
 <pre class="text"><code># Print ben
 # Predict the weight of ben</code></pre>
-<script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
+<script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"ex6"}</script>
 </div>
 <div class="tutorial-exercise-support" data-label="ex6-hint"
 data-completion="1" data-diagnostics="1" data-startover="1"
@@ -898,7 +898,7 @@ ggplot(data = bdims, aes(x = hgt, y = wgt)) +
   geom_abline(data = ___, 
               aes(intercept = `(Intercept)`, slope = ___),  
               color = &quot;dodgerblue&quot;)</code></pre>
-<script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
+<script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"ex7"}</script>
 </div>
 <div class="tutorial-exercise-support" data-label="ex7-hint"
 data-completion="1" data-diagnostics="1" data-startover="1"
@@ -970,6 +970,12 @@ it on Blackboard.</p>
 </div>
 <div id="section-submit" class="section level2">
 <h2>Submit</h2>
+<div style="margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background-color: #f8f9fa;">
+<h4 style="margin-top: 0;">Check Your Progress</h4>
+<p>Click the button below to see how many required exercises you have completed.</p>
+<button class="btn btn-default action-button btn-primary" id="check_progress" type="button">Check My Progress</button>
+<div id="progress_output" class="shiny-html-output"></div>
+</div>
 <div class="encoder_ui">
 <div>
 If you have completed this tutorial and are happy with all of your
@@ -982,7 +988,7 @@ solutions, please enter your identifying information, then click the button belo
 <label class="control-label" id="studentID-label" for="studentID">What is your student ID?</label>
 <input id="studentID" type="text" class="shiny-input-text form-control" value="" data-update-on="change"/>
 </div>
-<div id="outdcac813f74a9373d" class="shiny-text-output"></div>
+<div id="out9a31084fa3abb863" class="shiny-text-output"></div>
 </div>
 <div class="row" style="padding-bottom: 0.5em;">
 <div class="col-sm-3">
@@ -1061,6 +1067,15 @@ knitr::opts_chunk$set(echo = FALSE,
                       message = FALSE)
 tutorial_options(exercise.eval = FALSE)
 
+REQUIRED_EXERCISES <- c(
+  "ex1",
+  "ex2",
+  "ex4",
+  "ex5",
+  "ex6",
+  "ex7"
+)
+
 # Load datasets from local RDS files (extracted from openintro)
 textbooks <- readRDS("data/textbooks.rds")
 bdims <- readRDS("data/bdims.rds")
@@ -1122,6 +1137,79 @@ encoder_logic <- function(strip_output = FALSE) {
   )
 }
 
+# Progress checker logic
+progress_checker_logic <- function() {
+  p <- parent.frame()
+  check_server_context(p)
+  local(
+    {
+      # Reactive to check progress when button is clicked
+      progress_info <- shiny::eventReactive(
+        input$check_progress,
+        {
+          state <- learnr:::get_tutorial_state()
+          
+          # Get labels of completed exercises (any submission counts)
+          completed_labels <- names(state)
+          
+          # Check which required exercises are completed
+          completed_required <- REQUIRED_EXERCISES %in% completed_labels
+          n_completed <- sum(completed_required)
+          n_total <- length(REQUIRED_EXERCISES)
+          pct <- round(100 * n_completed / n_total)
+          
+          # Find missing exercises
+          missing <- REQUIRED_EXERCISES[!completed_required]
+          
+          list(
+            n_completed = n_completed,
+            n_total = n_total,
+            pct = pct,
+            missing = missing
+          )
+        }
+      )
+      
+      # Render progress output
+      output$progress_output <- shiny::renderUI({
+        info <- progress_info()
+        
+        # Color based on completion
+        bar_color <- if (info$pct == 100) "#28a745" else if (info$pct >= 50) "#ffc107" else "#dc3545"
+        
+        # Build missing exercises message
+        if (length(info$missing) == 0) {
+          missing_msg <- shiny::p(shiny::strong("All required exercises completed!"),
+                                  style = "color: #28a745;")
+        } else {
+          missing_msg <- shiny::tagList(
+            shiny::p(shiny::strong("Missing exercises:"), style = "margin-bottom: 5px;"),
+            shiny::tags$ul(
+              lapply(info$missing, function(x) shiny::tags$li(shiny::code(x)))
+            )
+          )
+        }
+        
+        shiny::tagList(
+          shiny::p(
+            sprintf("Progress: %d / %d required exercises completed (%d%%)",
+                    info$n_completed, info$n_total, info$pct)
+          ),
+          shiny::div(
+            style = "background-color: #e9ecef; border-radius: 4px; height: 20px; margin-bottom: 10px;",
+            shiny::div(
+              style = sprintf("background-color: %s; width: %d%%; height: 100%%; border-radius: 4px; transition: width 0.3s;",
+                              bar_color, info$pct)
+            )
+          ),
+          missing_msg
+        )
+      })
+    },
+    envir = p
+  )
+}
+
 hash_encoder_ui <- {
   shiny::div("If you have completed this tutorial and are happy with all of your", "solutions, please enter your identifying information, then click the button below to generate your hash", textInput("name", "What's your name?"), textInput("studentID", "What is your student ID?"), renderText({
     input$caption
@@ -1151,24 +1239,24 @@ session$onSessionEnded(function() {
  
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label = "mc1", question = structure("Which of the following is the correct interpretation of the slope coefficient?", html = TRUE, class = c("html", 
-"character")), answers = list(structure(list(id = "lnr_ans_3bf4ac2", 
+"character")), answers = list(structure(list(id = "lnr_ans_62e12f5", 
     option = "Among U.S. counties, each additional percentage point increase in the poverty rate is associated with about a 0.591 percentage point decrease in the mean high school graduation rate. ", 
     value = "Among U.S. counties, each additional percentage point increase in the poverty rate is associated with about a 0.591 percentage point decrease in the mean high school graduation rate. ", 
     label = structure("Among U.S. counties, each additional percentage point increase in the poverty rate is associated with about a 0.591 percentage point decrease in the mean high school graduation rate.", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = NULL, type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_b273e99", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_c77af91", 
     option = "Among U.S. counties, each additional percentage point increase in the high school graduation rate is associated with about a 0.591 percentage point decrease in the mean poverty rate.", 
     value = "Among U.S. counties, each additional percentage point increase in the high school graduation rate is associated with about a 0.591 percentage point decrease in the mean poverty rate.", 
     label = structure("Among U.S. counties, each additional percentage point increase in the high school graduation rate is associated with about a 0.591 percentage point decrease in the mean poverty rate.", html = TRUE, class = c("html", 
     "character")), correct = TRUE, message = structure("Remember that the slope represents the estimated change in the response variable for a one unit change in the explanatory variable.", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_be220c", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_db9c455", 
     option = "Among U.S. counties, each additional percentage point increase in the high school graduation rate is associated with a 0.591 percentage point decrease in the poverty rate for each school.", 
     value = "Among U.S. counties, each additional percentage point increase in the high school graduation rate is associated with a 0.591 percentage point decrease in the poverty rate for each school.", 
     label = structure("Among U.S. counties, each additional percentage point increase in the high school graduation rate is associated with a 0.591 percentage point decrease in the poverty rate for each school.", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = structure("Remember when we are discussing the change in the response variable, we are talking about the mean!", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_c4df0a", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_d0a2515", 
     option = "Among U.S. counties, a 1% increase in the high school graduation rate is associated with about a 0.591% decrease in the poverty rate.", 
     value = "Among U.S. counties, a 1% increase in the high school graduation rate is associated with about a 0.591% decrease in the poverty rate.", 
     label = structure("Among U.S. counties, a 1% increase in the high school graduation rate is associated with about a 0.591% decrease in the poverty rate.", html = TRUE, class = c("html", 
@@ -1180,7 +1268,7 @@ learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label 
 "character")), incorrect = structure("Incorrect", html = TRUE, class = c("html", 
 "character")), message = NULL, post_message = NULL), ids = list(
     answer = "mc1-answer", question = "mc1"), loading = NULL, 
-    random_answer_order = FALSE, allow_retry = TRUE, seed = 1740032402.18973, 
+    random_answer_order = FALSE, allow_retry = TRUE, seed = 342175973.840662, 
     options = list()), class = c("learnr_radio", "tutorial_question"
 )), session = session)
 </script>
@@ -1188,22 +1276,22 @@ learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label 
 
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label = "mc2", question = structure("Which of the following mistakes in interpretation has the politician made?", html = TRUE, class = c("html", 
-"character")), answers = list(structure(list(id = "lnr_ans_21764e", 
+"character")), answers = list(structure(list(id = "lnr_ans_8fb87aa", 
     option = "Implying that the regression model establishes a cause-and-effect relationship.", 
     value = "Implying that the regression model establishes a cause-and-effect relationship.", 
     label = structure("Implying that the regression model establishes a cause-and-effect relationship.", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = NULL, type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_e91973f", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_3ac5354", 
     option = "Switching the role of the response and explanatory variables.", 
     value = "Switching the role of the response and explanatory variables.", 
     label = structure("Switching the role of the response and explanatory variables.", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = NULL, type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_c12d0a6", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_32805", 
     option = "Confusing percentage change with percentage point change.", 
     value = "Confusing percentage change with percentage point change.", 
     label = structure("Confusing percentage change with percentage point change.", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = NULL, type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_51fa7be", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_85c6fad", 
     option = "All of the above.", value = "All of the above.", 
     label = structure("All of the above.", html = TRUE, class = c("html", 
     "character")), correct = TRUE, message = NULL, type = "literal"), class = c("tutorial_question_answer", 
@@ -1214,7 +1302,7 @@ learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label 
 "character")), incorrect = structure("Only partly correct: The politician has made more mistakes in interpreting the relationship.", html = TRUE, class = c("html", 
 "character")), message = NULL, post_message = NULL), ids = list(
     answer = "mc2-answer", question = "mc2"), loading = NULL, 
-    random_answer_order = FALSE, allow_retry = TRUE, seed = 863364515.097965, 
+    random_answer_order = FALSE, allow_retry = TRUE, seed = 892668629.584319, 
     options = list()), class = c("learnr_radio", "tutorial_question"
 )), session = session)
 </script>
@@ -1234,7 +1322,9 @@ learnr:::store_exercise_cache(structure(list(label = "ex1", global_setup = struc
 "knitr::opts_chunk$set(echo = FALSE, ", "                      fig.align = \"center\", ", 
 "                      fig.height = 3, ", "                      fig.width = 5,", 
 "                      warning = FALSE, ", "                      message = FALSE)", 
-"tutorial_options(exercise.eval = FALSE)", "", "# Load datasets from local RDS files (extracted from openintro)", 
+"tutorial_options(exercise.eval = FALSE)", "", "REQUIRED_EXERCISES <- c(", 
+"  \"ex1\",", "  \"ex2\",", "  \"ex4\",", "  \"ex5\",", "  \"ex6\",", 
+"  \"ex7\"", ")", "", "# Load datasets from local RDS files (extracted from openintro)", 
 "textbooks <- readRDS(\"data/textbooks.rds\")", "bdims <- readRDS(\"data/bdims.rds\")", 
 "mlbbat10 <- readRDS(\"data/mlbbat10.rds\")", "mammals <- readRDS(\"data/mammals.rds\")", 
 "", "# Data prep", "textbooks$course <- as.character(textbooks$course) ", 
@@ -1260,21 +1350,50 @@ learnr:::store_exercise_cache(structure(list(label = "ex1", global_setup = struc
 "            timestamp = format(Sys.time(), \"%Y-%m-%d %H:%M:%S %Z\", tz = \"UTC\")", 
 "          )", "          learnrhash::encode_obj(dplyr::bind_rows(user_info, user_state))", 
 "        }", "      )", "      output$hash_output <- shiny::renderText(encoded_txt())", 
+"    },", "    envir = p", "  )", "}", "", "# Progress checker logic", 
+"progress_checker_logic <- function() {", "  p <- parent.frame()", 
+"  check_server_context(p)", "  local(", "    {", "      # Reactive to check progress when button is clicked", 
+"      progress_info <- shiny::eventReactive(", "        input$check_progress,", 
+"        {", "          state <- learnr:::get_tutorial_state()", 
+"          ", "          # Get labels of completed exercises (any submission counts)", 
+"          completed_labels <- names(state)", "          ", "          # Check which required exercises are completed", 
+"          completed_required <- REQUIRED_EXERCISES %in% completed_labels", 
+"          n_completed <- sum(completed_required)", "          n_total <- length(REQUIRED_EXERCISES)", 
+"          pct <- round(100 * n_completed / n_total)", "          ", 
+"          # Find missing exercises", "          missing <- REQUIRED_EXERCISES[!completed_required]", 
+"          ", "          list(", "            n_completed = n_completed,", 
+"            n_total = n_total,", "            pct = pct,", "            missing = missing", 
+"          )", "        }", "      )", "      ", "      # Render progress output", 
+"      output$progress_output <- shiny::renderUI({", "        info <- progress_info()", 
+"        ", "        # Color based on completion", "        bar_color <- if (info$pct == 100) \"#28a745\" else if (info$pct >= 50) \"#ffc107\" else \"#dc3545\"", 
+"        ", "        # Build missing exercises message", "        if (length(info$missing) == 0) {", 
+"          missing_msg <- shiny::p(shiny::strong(\"All required exercises completed!\"),", 
+"                                  style = \"color: #28a745;\")", 
+"        } else {", "          missing_msg <- shiny::tagList(", 
+"            shiny::p(shiny::strong(\"Missing exercises:\"), style = \"margin-bottom: 5px;\"),", 
+"            shiny::tags$ul(", "              lapply(info$missing, function(x) shiny::tags$li(shiny::code(x)))", 
+"            )", "          )", "        }", "        ", "        shiny::tagList(", 
+"          shiny::p(", "            sprintf(\"Progress: %d / %d required exercises completed (%d%%)\",", 
+"                    info$n_completed, info$n_total, info$pct)", 
+"          ),", "          shiny::div(", "            style = \"background-color: #e9ecef; border-radius: 4px; height: 20px; margin-bottom: 10px;\",", 
+"            shiny::div(", "              style = sprintf(\"background-color: %s; width: %d%%; height: 100%%; border-radius: 4px; transition: width 0.3s;\",", 
+"                              bar_color, info$pct)", "            )", 
+"          ),", "          missing_msg", "        )", "      })", 
 "    },", "    envir = p", "  )", "}", "", "hash_encoder_ui <- {", 
 "  shiny::div(\"If you have completed this tutorial and are happy with all of your\", \"solutions, please enter your identifying information, then click the button below to generate your hash\", textInput(\"name\", \"What's your name?\"), textInput(\"studentID\", \"What is your student ID?\"), renderText({", 
 "    input$caption", "  }), )", "}"), chunk_opts = list(label = "setup", 
     message = FALSE, warning = FALSE, include = FALSE)), setup = NULL, 
     chunks = list(list(label = "ex1", code = "# Linear model for weight as a function of height\nlm(___ ~ ___, data = ___)\n# Linear model for 'slg' as a function of 'obp'\n# Log-linear model for body weight as a function of brain weight", 
-        opts = list(label = "\"ex1\"", exercise = "TRUE"), engine = "r")), 
-    code_check = NULL, error_check = NULL, check = NULL, solution = NULL, 
-    tests = NULL, options = list(eval = FALSE, echo = TRUE, results = "markup", 
-        tidy = FALSE, tidy.opts = NULL, collapse = FALSE, prompt = FALSE, 
-        comment = NA, highlight = FALSE, size = "normalsize", 
-        background = "#F7F7F7", strip.white = TRUE, cache = 0, 
-        cache.path = "ims-interpret-linear_cache/html/", cache.vars = NULL, 
-        cache.lazy = TRUE, dependson = NULL, autodep = FALSE, 
-        cache.rebuild = FALSE, fig.keep = "high", fig.show = "asis", 
-        fig.align = "center", fig.path = "ims-interpret-linear_files/figure-html/", 
+        opts = list(label = "\"ex1\"", exercise = "TRUE", exercise.cap = "\"ex1\""), 
+        engine = "r")), code_check = NULL, error_check = NULL, 
+    check = NULL, solution = NULL, tests = NULL, options = list(
+        eval = FALSE, echo = TRUE, results = "markup", tidy = FALSE, 
+        tidy.opts = NULL, collapse = FALSE, prompt = FALSE, comment = NA, 
+        highlight = FALSE, size = "normalsize", background = "#F7F7F7", 
+        strip.white = TRUE, cache = 0, cache.path = "ims-interpret-linear_cache/html/", 
+        cache.vars = NULL, cache.lazy = TRUE, dependson = NULL, 
+        autodep = FALSE, cache.rebuild = FALSE, fig.keep = "high", 
+        fig.show = "asis", fig.align = "center", fig.path = "ims-interpret-linear_files/figure-html/", 
         dev = "png", dev.args = NULL, dpi = 192, fig.ext = "png", 
         fig.width = 5, fig.height = 3, fig.env = "figure", fig.cap = NULL, 
         fig.scap = NULL, fig.lp = "fig:", fig.subcap = NULL, 
@@ -1284,10 +1403,10 @@ learnr:::store_exercise_cache(structure(list(label = "ex1", global_setup = struc
         message = FALSE, render = NULL, ref.label = NULL, child = NULL, 
         engine = "r", split = FALSE, include = TRUE, purl = TRUE, 
         max.print = 1000, exercise.eval = FALSE, label = "ex1", 
-        exercise = TRUE, code = c("# Linear model for weight as a function of height", 
+        exercise = TRUE, exercise.cap = "ex1", code = c("# Linear model for weight as a function of height", 
         "lm(___ ~ ___, data = ___)", "# Linear model for 'slg' as a function of 'obp'", 
         "# Log-linear model for body weight as a function of brain weight"
-        ), out.width.px = 480, out.height.px = 288, params.src = "ex1, exercise = TRUE", 
+        ), out.width.px = 480, out.height.px = 288, params.src = "ex1, exercise = TRUE, exercise.cap = \"ex1\"", 
         fig.num = 0, exercise.df_print = "paged", exercise.checker = "NULL"), 
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
@@ -1295,17 +1414,17 @@ learnr:::store_exercise_cache(structure(list(label = "ex1", global_setup = struc
  
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::question_prerendered_chunk(structure(list(type = "learnr_checkbox", label = "mc3", question = structure("Which of the following statements is <strong>correct<\u002fstrong>?", html = TRUE, class = c("html", 
-"character")), answers = list(structure(list(id = "lnr_ans_a721eb3", 
+"character")), answers = list(structure(list(id = "lnr_ans_514660b", 
     option = "A person who is 170 cm tall is expected to weigh about 68 kg.", 
     value = "A person who is 170 cm tall is expected to weigh about 68 kg.", 
     label = structure("A person who is 170 cm tall is expected to weigh about 68 kg.", html = TRUE, class = c("html", 
     "character")), correct = TRUE, message = NULL, type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_ded5930", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_bd8d1ae", 
     option = "Because the slope coefficient for `obp` is larger (1.110) than the slope coefficient for `hgt` (1.018), we can conclude that the association between `obp` and `slg` is stronger than the association between height and weight.", 
     value = "Because the slope coefficient for `obp` is larger (1.110) than the slope coefficient for `hgt` (1.018), we can conclude that the association between `obp` and `slg` is stronger than the association between height and weight.", 
     label = structure("Because the slope coefficient for <code>obp<\u002fcode> is larger (1.110) than the slope coefficient for <code>hgt<\u002fcode> (1.018), we can conclude that the association between <code>obp<\u002fcode> and <code>slg<\u002fcode> is stronger than the association between height and weight.", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = NULL, type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_9e484c0", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_99cc0d5", 
     option = "Both of the above.", value = "Both of the above.", 
     label = structure("Both of the above.", html = TRUE, class = c("html", 
     "character")), correct = TRUE, message = NULL, type = "literal"), class = c("tutorial_question_answer", 
@@ -1316,7 +1435,7 @@ learnr:::question_prerendered_chunk(structure(list(type = "learnr_checkbox", lab
 "character")), incorrect = structure("Incorrect", html = TRUE, class = c("html", 
 "character")), message = NULL, post_message = NULL), ids = list(
     answer = "mc3-answer", question = "mc3"), loading = NULL, 
-    random_answer_order = FALSE, allow_retry = TRUE, seed = 831218816.612934, 
+    random_answer_order = FALSE, allow_retry = TRUE, seed = 1436721937.33097, 
     options = list()), class = c("learnr_checkbox", "tutorial_question"
 )), session = session)
 </script>
@@ -1336,7 +1455,9 @@ learnr:::store_exercise_cache(structure(list(label = "ex2", global_setup = struc
 "knitr::opts_chunk$set(echo = FALSE, ", "                      fig.align = \"center\", ", 
 "                      fig.height = 3, ", "                      fig.width = 5,", 
 "                      warning = FALSE, ", "                      message = FALSE)", 
-"tutorial_options(exercise.eval = FALSE)", "", "# Load datasets from local RDS files (extracted from openintro)", 
+"tutorial_options(exercise.eval = FALSE)", "", "REQUIRED_EXERCISES <- c(", 
+"  \"ex1\",", "  \"ex2\",", "  \"ex4\",", "  \"ex5\",", "  \"ex6\",", 
+"  \"ex7\"", ")", "", "# Load datasets from local RDS files (extracted from openintro)", 
 "textbooks <- readRDS(\"data/textbooks.rds\")", "bdims <- readRDS(\"data/bdims.rds\")", 
 "mlbbat10 <- readRDS(\"data/mlbbat10.rds\")", "mammals <- readRDS(\"data/mammals.rds\")", 
 "", "# Data prep", "textbooks$course <- as.character(textbooks$course) ", 
@@ -1362,6 +1483,35 @@ learnr:::store_exercise_cache(structure(list(label = "ex2", global_setup = struc
 "            timestamp = format(Sys.time(), \"%Y-%m-%d %H:%M:%S %Z\", tz = \"UTC\")", 
 "          )", "          learnrhash::encode_obj(dplyr::bind_rows(user_info, user_state))", 
 "        }", "      )", "      output$hash_output <- shiny::renderText(encoded_txt())", 
+"    },", "    envir = p", "  )", "}", "", "# Progress checker logic", 
+"progress_checker_logic <- function() {", "  p <- parent.frame()", 
+"  check_server_context(p)", "  local(", "    {", "      # Reactive to check progress when button is clicked", 
+"      progress_info <- shiny::eventReactive(", "        input$check_progress,", 
+"        {", "          state <- learnr:::get_tutorial_state()", 
+"          ", "          # Get labels of completed exercises (any submission counts)", 
+"          completed_labels <- names(state)", "          ", "          # Check which required exercises are completed", 
+"          completed_required <- REQUIRED_EXERCISES %in% completed_labels", 
+"          n_completed <- sum(completed_required)", "          n_total <- length(REQUIRED_EXERCISES)", 
+"          pct <- round(100 * n_completed / n_total)", "          ", 
+"          # Find missing exercises", "          missing <- REQUIRED_EXERCISES[!completed_required]", 
+"          ", "          list(", "            n_completed = n_completed,", 
+"            n_total = n_total,", "            pct = pct,", "            missing = missing", 
+"          )", "        }", "      )", "      ", "      # Render progress output", 
+"      output$progress_output <- shiny::renderUI({", "        info <- progress_info()", 
+"        ", "        # Color based on completion", "        bar_color <- if (info$pct == 100) \"#28a745\" else if (info$pct >= 50) \"#ffc107\" else \"#dc3545\"", 
+"        ", "        # Build missing exercises message", "        if (length(info$missing) == 0) {", 
+"          missing_msg <- shiny::p(shiny::strong(\"All required exercises completed!\"),", 
+"                                  style = \"color: #28a745;\")", 
+"        } else {", "          missing_msg <- shiny::tagList(", 
+"            shiny::p(shiny::strong(\"Missing exercises:\"), style = \"margin-bottom: 5px;\"),", 
+"            shiny::tags$ul(", "              lapply(info$missing, function(x) shiny::tags$li(shiny::code(x)))", 
+"            )", "          )", "        }", "        ", "        shiny::tagList(", 
+"          shiny::p(", "            sprintf(\"Progress: %d / %d required exercises completed (%d%%)\",", 
+"                    info$n_completed, info$n_total, info$pct)", 
+"          ),", "          shiny::div(", "            style = \"background-color: #e9ecef; border-radius: 4px; height: 20px; margin-bottom: 10px;\",", 
+"            shiny::div(", "              style = sprintf(\"background-color: %s; width: %d%%; height: 100%%; border-radius: 4px; transition: width 0.3s;\",", 
+"                              bar_color, info$pct)", "            )", 
+"          ),", "          missing_msg", "        )", "      })", 
 "    },", "    envir = p", "  )", "}", "", "hash_encoder_ui <- {", 
 "  shiny::div(\"If you have completed this tutorial and are happy with all of your\", \"solutions, please enter your identifying information, then click the button below to generate your hash\", textInput(\"name\", \"What's your name?\"), textInput(\"studentID\", \"What is your student ID?\"), renderText({", 
 "    input$caption", "  }), )", "}"), chunk_opts = list(label = "setup", 
@@ -1369,9 +1519,9 @@ learnr:::store_exercise_cache(structure(list(label = "ex2", global_setup = struc
     chunks = list(list(label = "ex2-setup", code = "hgt_wgt_mod <- lm(wgt ~ hgt, data = bdims)", 
         opts = list(label = "\"ex2-setup\""), engine = "r"), 
         list(label = "ex2", code = "# Show the coefficients\n# Show the full model output", 
-            opts = list(label = "\"ex2\"", exercise = "TRUE"), 
-            engine = "r")), code_check = NULL, error_check = NULL, 
-    check = NULL, solution = structure(c("# Show the coefficients", 
+            opts = list(label = "\"ex2\"", exercise = "TRUE", 
+                exercise.cap = "\"ex2\""), engine = "r")), code_check = NULL, 
+    error_check = NULL, check = NULL, solution = structure(c("# Show the coefficients", 
     "coef(hgt_wgt_mod)", "# Show the full model output", "summary(hgt_wgt_mod)"
     ), chunk_opts = list(label = "ex2-solution")), tests = NULL, 
     options = list(eval = FALSE, echo = TRUE, results = "markup", 
@@ -1391,9 +1541,9 @@ learnr:::store_exercise_cache(structure(list(label = "ex2", global_setup = struc
         message = FALSE, render = NULL, ref.label = NULL, child = NULL, 
         engine = "r", split = FALSE, include = TRUE, purl = TRUE, 
         max.print = 1000, exercise.eval = FALSE, label = "ex2", 
-        exercise = TRUE, code = c("# Show the coefficients", 
+        exercise = TRUE, exercise.cap = "ex2", code = c("# Show the coefficients", 
         "# Show the full model output"), out.width.px = 480, 
-        out.height.px = 288, params.src = "ex2, exercise = TRUE", 
+        out.height.px = 288, params.src = "ex2, exercise = TRUE, exercise.cap = \"ex2\"", 
         fig.num = 0, exercise.df_print = "paged", exercise.checker = "NULL"), 
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
@@ -1414,7 +1564,9 @@ learnr:::store_exercise_cache(structure(list(label = "ex4", global_setup = struc
 "knitr::opts_chunk$set(echo = FALSE, ", "                      fig.align = \"center\", ", 
 "                      fig.height = 3, ", "                      fig.width = 5,", 
 "                      warning = FALSE, ", "                      message = FALSE)", 
-"tutorial_options(exercise.eval = FALSE)", "", "# Load datasets from local RDS files (extracted from openintro)", 
+"tutorial_options(exercise.eval = FALSE)", "", "REQUIRED_EXERCISES <- c(", 
+"  \"ex1\",", "  \"ex2\",", "  \"ex4\",", "  \"ex5\",", "  \"ex6\",", 
+"  \"ex7\"", ")", "", "# Load datasets from local RDS files (extracted from openintro)", 
 "textbooks <- readRDS(\"data/textbooks.rds\")", "bdims <- readRDS(\"data/bdims.rds\")", 
 "mlbbat10 <- readRDS(\"data/mlbbat10.rds\")", "mammals <- readRDS(\"data/mammals.rds\")", 
 "", "# Data prep", "textbooks$course <- as.character(textbooks$course) ", 
@@ -1440,6 +1592,35 @@ learnr:::store_exercise_cache(structure(list(label = "ex4", global_setup = struc
 "            timestamp = format(Sys.time(), \"%Y-%m-%d %H:%M:%S %Z\", tz = \"UTC\")", 
 "          )", "          learnrhash::encode_obj(dplyr::bind_rows(user_info, user_state))", 
 "        }", "      )", "      output$hash_output <- shiny::renderText(encoded_txt())", 
+"    },", "    envir = p", "  )", "}", "", "# Progress checker logic", 
+"progress_checker_logic <- function() {", "  p <- parent.frame()", 
+"  check_server_context(p)", "  local(", "    {", "      # Reactive to check progress when button is clicked", 
+"      progress_info <- shiny::eventReactive(", "        input$check_progress,", 
+"        {", "          state <- learnr:::get_tutorial_state()", 
+"          ", "          # Get labels of completed exercises (any submission counts)", 
+"          completed_labels <- names(state)", "          ", "          # Check which required exercises are completed", 
+"          completed_required <- REQUIRED_EXERCISES %in% completed_labels", 
+"          n_completed <- sum(completed_required)", "          n_total <- length(REQUIRED_EXERCISES)", 
+"          pct <- round(100 * n_completed / n_total)", "          ", 
+"          # Find missing exercises", "          missing <- REQUIRED_EXERCISES[!completed_required]", 
+"          ", "          list(", "            n_completed = n_completed,", 
+"            n_total = n_total,", "            pct = pct,", "            missing = missing", 
+"          )", "        }", "      )", "      ", "      # Render progress output", 
+"      output$progress_output <- shiny::renderUI({", "        info <- progress_info()", 
+"        ", "        # Color based on completion", "        bar_color <- if (info$pct == 100) \"#28a745\" else if (info$pct >= 50) \"#ffc107\" else \"#dc3545\"", 
+"        ", "        # Build missing exercises message", "        if (length(info$missing) == 0) {", 
+"          missing_msg <- shiny::p(shiny::strong(\"All required exercises completed!\"),", 
+"                                  style = \"color: #28a745;\")", 
+"        } else {", "          missing_msg <- shiny::tagList(", 
+"            shiny::p(shiny::strong(\"Missing exercises:\"), style = \"margin-bottom: 5px;\"),", 
+"            shiny::tags$ul(", "              lapply(info$missing, function(x) shiny::tags$li(shiny::code(x)))", 
+"            )", "          )", "        }", "        ", "        shiny::tagList(", 
+"          shiny::p(", "            sprintf(\"Progress: %d / %d required exercises completed (%d%%)\",", 
+"                    info$n_completed, info$n_total, info$pct)", 
+"          ),", "          shiny::div(", "            style = \"background-color: #e9ecef; border-radius: 4px; height: 20px; margin-bottom: 10px;\",", 
+"            shiny::div(", "              style = sprintf(\"background-color: %s; width: %d%%; height: 100%%; border-radius: 4px; transition: width 0.3s;\",", 
+"                              bar_color, info$pct)", "            )", 
+"          ),", "          missing_msg", "        )", "      })", 
 "    },", "    envir = p", "  )", "}", "", "hash_encoder_ui <- {", 
 "  shiny::div(\"If you have completed this tutorial and are happy with all of your\", \"solutions, please enter your identifying information, then click the button below to generate your hash\", textInput(\"name\", \"What's your name?\"), textInput(\"studentID\", \"What is your student ID?\"), renderText({", 
 "    input$caption", "  }), )", "}"), chunk_opts = list(label = "setup", 
@@ -1447,9 +1628,9 @@ learnr:::store_exercise_cache(structure(list(label = "ex4", global_setup = struc
     chunks = list(list(label = "ex4-setup", code = "hgt_wgt_mod <- lm(wgt ~ hgt, data = bdims)", 
         opts = list(label = "\"ex4-setup\""), engine = "r"), 
         list(label = "ex4", code = "# Mean of weights equal to mean of fitted values?\nall.equal(___, ___) \n# Mean of the residuals\n___(residuals(___))", 
-            opts = list(label = "\"ex4\"", exercise = "TRUE"), 
-            engine = "r")), code_check = NULL, error_check = NULL, 
-    check = NULL, solution = structure(c("# Mean of weights equal to mean of fitted values?", 
+            opts = list(label = "\"ex4\"", exercise = "TRUE", 
+                exercise.cap = "\"ex4\""), engine = "r")), code_check = NULL, 
+    error_check = NULL, check = NULL, solution = structure(c("# Mean of weights equal to mean of fitted values?", 
     "all.equal(mean(bdims$wgt), mean(fitted.values(hgt_wgt_mod)))", 
     "# Mean of the residuals", "mean(residuals(hgt_wgt_mod))"
     ), chunk_opts = list(label = "ex4-solution")), tests = NULL, 
@@ -1470,9 +1651,9 @@ learnr:::store_exercise_cache(structure(list(label = "ex4", global_setup = struc
         message = FALSE, render = NULL, ref.label = NULL, child = NULL, 
         engine = "r", split = FALSE, include = TRUE, purl = TRUE, 
         max.print = 1000, exercise.eval = FALSE, label = "ex4", 
-        exercise = TRUE, code = c("# Mean of weights equal to mean of fitted values?", 
+        exercise = TRUE, exercise.cap = "ex4", code = c("# Mean of weights equal to mean of fitted values?", 
         "all.equal(___, ___) ", "# Mean of the residuals", "___(residuals(___))"
-        ), out.width.px = 480, out.height.px = 288, params.src = "ex4, exercise = TRUE", 
+        ), out.width.px = 480, out.height.px = 288, params.src = "ex4, exercise = TRUE, exercise.cap = \"ex4\"", 
         fig.num = 0, exercise.df_print = "paged", exercise.checker = "NULL"), 
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
@@ -1493,7 +1674,9 @@ learnr:::store_exercise_cache(structure(list(label = "ex5", global_setup = struc
 "knitr::opts_chunk$set(echo = FALSE, ", "                      fig.align = \"center\", ", 
 "                      fig.height = 3, ", "                      fig.width = 5,", 
 "                      warning = FALSE, ", "                      message = FALSE)", 
-"tutorial_options(exercise.eval = FALSE)", "", "# Load datasets from local RDS files (extracted from openintro)", 
+"tutorial_options(exercise.eval = FALSE)", "", "REQUIRED_EXERCISES <- c(", 
+"  \"ex1\",", "  \"ex2\",", "  \"ex4\",", "  \"ex5\",", "  \"ex6\",", 
+"  \"ex7\"", ")", "", "# Load datasets from local RDS files (extracted from openintro)", 
 "textbooks <- readRDS(\"data/textbooks.rds\")", "bdims <- readRDS(\"data/bdims.rds\")", 
 "mlbbat10 <- readRDS(\"data/mlbbat10.rds\")", "mammals <- readRDS(\"data/mammals.rds\")", 
 "", "# Data prep", "textbooks$course <- as.character(textbooks$course) ", 
@@ -1519,6 +1702,35 @@ learnr:::store_exercise_cache(structure(list(label = "ex5", global_setup = struc
 "            timestamp = format(Sys.time(), \"%Y-%m-%d %H:%M:%S %Z\", tz = \"UTC\")", 
 "          )", "          learnrhash::encode_obj(dplyr::bind_rows(user_info, user_state))", 
 "        }", "      )", "      output$hash_output <- shiny::renderText(encoded_txt())", 
+"    },", "    envir = p", "  )", "}", "", "# Progress checker logic", 
+"progress_checker_logic <- function() {", "  p <- parent.frame()", 
+"  check_server_context(p)", "  local(", "    {", "      # Reactive to check progress when button is clicked", 
+"      progress_info <- shiny::eventReactive(", "        input$check_progress,", 
+"        {", "          state <- learnr:::get_tutorial_state()", 
+"          ", "          # Get labels of completed exercises (any submission counts)", 
+"          completed_labels <- names(state)", "          ", "          # Check which required exercises are completed", 
+"          completed_required <- REQUIRED_EXERCISES %in% completed_labels", 
+"          n_completed <- sum(completed_required)", "          n_total <- length(REQUIRED_EXERCISES)", 
+"          pct <- round(100 * n_completed / n_total)", "          ", 
+"          # Find missing exercises", "          missing <- REQUIRED_EXERCISES[!completed_required]", 
+"          ", "          list(", "            n_completed = n_completed,", 
+"            n_total = n_total,", "            pct = pct,", "            missing = missing", 
+"          )", "        }", "      )", "      ", "      # Render progress output", 
+"      output$progress_output <- shiny::renderUI({", "        info <- progress_info()", 
+"        ", "        # Color based on completion", "        bar_color <- if (info$pct == 100) \"#28a745\" else if (info$pct >= 50) \"#ffc107\" else \"#dc3545\"", 
+"        ", "        # Build missing exercises message", "        if (length(info$missing) == 0) {", 
+"          missing_msg <- shiny::p(shiny::strong(\"All required exercises completed!\"),", 
+"                                  style = \"color: #28a745;\")", 
+"        } else {", "          missing_msg <- shiny::tagList(", 
+"            shiny::p(shiny::strong(\"Missing exercises:\"), style = \"margin-bottom: 5px;\"),", 
+"            shiny::tags$ul(", "              lapply(info$missing, function(x) shiny::tags$li(shiny::code(x)))", 
+"            )", "          )", "        }", "        ", "        shiny::tagList(", 
+"          shiny::p(", "            sprintf(\"Progress: %d / %d required exercises completed (%d%%)\",", 
+"                    info$n_completed, info$n_total, info$pct)", 
+"          ),", "          shiny::div(", "            style = \"background-color: #e9ecef; border-radius: 4px; height: 20px; margin-bottom: 10px;\",", 
+"            shiny::div(", "              style = sprintf(\"background-color: %s; width: %d%%; height: 100%%; border-radius: 4px; transition: width 0.3s;\",", 
+"                              bar_color, info$pct)", "            )", 
+"          ),", "          missing_msg", "        )", "      })", 
 "    },", "    envir = p", "  )", "}", "", "hash_encoder_ui <- {", 
 "  shiny::div(\"If you have completed this tutorial and are happy with all of your\", \"solutions, please enter your identifying information, then click the button below to generate your hash\", textInput(\"name\", \"What's your name?\"), textInput(\"studentID\", \"What is your student ID?\"), renderText({", 
 "    input$caption", "  }), )", "}"), chunk_opts = list(label = "setup", 
@@ -1526,9 +1738,9 @@ learnr:::store_exercise_cache(structure(list(label = "ex5", global_setup = struc
     chunks = list(list(label = "ex5-setup", code = "hgt_wgt_mod <- lm(wgt ~ hgt, data = bdims)", 
         opts = list(label = "\"ex5-setup\""), engine = "r"), 
         list(label = "ex5", code = "# Create hgt_wgt_tidy\n# Glimpse the resulting data frame", 
-            opts = list(label = "\"ex5\"", exercise = "TRUE"), 
-            engine = "r")), code_check = NULL, error_check = NULL, 
-    check = NULL, solution = structure(c("# Create hgt_wgt_tidy", 
+            opts = list(label = "\"ex5\"", exercise = "TRUE", 
+                exercise.cap = "\"ex5\""), engine = "r")), code_check = NULL, 
+    error_check = NULL, check = NULL, solution = structure(c("# Create hgt_wgt_tidy", 
     "hgt_wgt_tidy <- augment(hgt_wgt_mod)", "# Glimpse the resulting data frame", 
     "glimpse(hgt_wgt_tidy)"), chunk_opts = list(label = "ex5-solution")), 
     tests = NULL, options = list(eval = FALSE, echo = TRUE, results = "markup", 
@@ -1548,8 +1760,9 @@ learnr:::store_exercise_cache(structure(list(label = "ex5", global_setup = struc
         message = FALSE, render = NULL, ref.label = NULL, child = NULL, 
         engine = "r", split = FALSE, include = TRUE, purl = TRUE, 
         max.print = 1000, exercise.eval = FALSE, label = "ex5", 
-        exercise = TRUE, code = c("# Create hgt_wgt_tidy", "# Glimpse the resulting data frame"
-        ), out.width.px = 480, out.height.px = 288, params.src = "ex5, exercise = TRUE", 
+        exercise = TRUE, exercise.cap = "ex5", code = c("# Create hgt_wgt_tidy", 
+        "# Glimpse the resulting data frame"), out.width.px = 480, 
+        out.height.px = 288, params.src = "ex5, exercise = TRUE, exercise.cap = \"ex5\"", 
         fig.num = 0, exercise.df_print = "paged", exercise.checker = "NULL"), 
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
@@ -1570,7 +1783,9 @@ learnr:::store_exercise_cache(structure(list(label = "ex6", global_setup = struc
 "knitr::opts_chunk$set(echo = FALSE, ", "                      fig.align = \"center\", ", 
 "                      fig.height = 3, ", "                      fig.width = 5,", 
 "                      warning = FALSE, ", "                      message = FALSE)", 
-"tutorial_options(exercise.eval = FALSE)", "", "# Load datasets from local RDS files (extracted from openintro)", 
+"tutorial_options(exercise.eval = FALSE)", "", "REQUIRED_EXERCISES <- c(", 
+"  \"ex1\",", "  \"ex2\",", "  \"ex4\",", "  \"ex5\",", "  \"ex6\",", 
+"  \"ex7\"", ")", "", "# Load datasets from local RDS files (extracted from openintro)", 
 "textbooks <- readRDS(\"data/textbooks.rds\")", "bdims <- readRDS(\"data/bdims.rds\")", 
 "mlbbat10 <- readRDS(\"data/mlbbat10.rds\")", "mammals <- readRDS(\"data/mammals.rds\")", 
 "", "# Data prep", "textbooks$course <- as.character(textbooks$course) ", 
@@ -1596,6 +1811,35 @@ learnr:::store_exercise_cache(structure(list(label = "ex6", global_setup = struc
 "            timestamp = format(Sys.time(), \"%Y-%m-%d %H:%M:%S %Z\", tz = \"UTC\")", 
 "          )", "          learnrhash::encode_obj(dplyr::bind_rows(user_info, user_state))", 
 "        }", "      )", "      output$hash_output <- shiny::renderText(encoded_txt())", 
+"    },", "    envir = p", "  )", "}", "", "# Progress checker logic", 
+"progress_checker_logic <- function() {", "  p <- parent.frame()", 
+"  check_server_context(p)", "  local(", "    {", "      # Reactive to check progress when button is clicked", 
+"      progress_info <- shiny::eventReactive(", "        input$check_progress,", 
+"        {", "          state <- learnr:::get_tutorial_state()", 
+"          ", "          # Get labels of completed exercises (any submission counts)", 
+"          completed_labels <- names(state)", "          ", "          # Check which required exercises are completed", 
+"          completed_required <- REQUIRED_EXERCISES %in% completed_labels", 
+"          n_completed <- sum(completed_required)", "          n_total <- length(REQUIRED_EXERCISES)", 
+"          pct <- round(100 * n_completed / n_total)", "          ", 
+"          # Find missing exercises", "          missing <- REQUIRED_EXERCISES[!completed_required]", 
+"          ", "          list(", "            n_completed = n_completed,", 
+"            n_total = n_total,", "            pct = pct,", "            missing = missing", 
+"          )", "        }", "      )", "      ", "      # Render progress output", 
+"      output$progress_output <- shiny::renderUI({", "        info <- progress_info()", 
+"        ", "        # Color based on completion", "        bar_color <- if (info$pct == 100) \"#28a745\" else if (info$pct >= 50) \"#ffc107\" else \"#dc3545\"", 
+"        ", "        # Build missing exercises message", "        if (length(info$missing) == 0) {", 
+"          missing_msg <- shiny::p(shiny::strong(\"All required exercises completed!\"),", 
+"                                  style = \"color: #28a745;\")", 
+"        } else {", "          missing_msg <- shiny::tagList(", 
+"            shiny::p(shiny::strong(\"Missing exercises:\"), style = \"margin-bottom: 5px;\"),", 
+"            shiny::tags$ul(", "              lapply(info$missing, function(x) shiny::tags$li(shiny::code(x)))", 
+"            )", "          )", "        }", "        ", "        shiny::tagList(", 
+"          shiny::p(", "            sprintf(\"Progress: %d / %d required exercises completed (%d%%)\",", 
+"                    info$n_completed, info$n_total, info$pct)", 
+"          ),", "          shiny::div(", "            style = \"background-color: #e9ecef; border-radius: 4px; height: 20px; margin-bottom: 10px;\",", 
+"            shiny::div(", "              style = sprintf(\"background-color: %s; width: %d%%; height: 100%%; border-radius: 4px; transition: width 0.3s;\",", 
+"                              bar_color, info$pct)", "            )", 
+"          ),", "          missing_msg", "        )", "      })", 
 "    },", "    envir = p", "  )", "}", "", "hash_encoder_ui <- {", 
 "  shiny::div(\"If you have completed this tutorial and are happy with all of your\", \"solutions, please enter your identifying information, then click the button below to generate your hash\", textInput(\"name\", \"What's your name?\"), textInput(\"studentID\", \"What is your student ID?\"), renderText({", 
 "    input$caption", "  }), )", "}"), chunk_opts = list(label = "setup", 
@@ -1603,10 +1847,10 @@ learnr:::store_exercise_cache(structure(list(label = "ex6", global_setup = struc
     chunks = list(list(label = "ex6-setup", code = "hgt_wgt_mod <- lm(wgt ~ hgt, data = bdims)\nben <- data.frame(wgt = 74.8, hgt = 182.8)", 
         opts = list(label = "\"ex6-setup\""), engine = "r"), 
         list(label = "ex6", code = "# Print ben\n# Predict the weight of ben", 
-            opts = list(label = "\"ex6\"", exercise = "TRUE"), 
-            engine = "r")), code_check = NULL, error_check = NULL, 
-    check = NULL, solution = structure(c("# Print ben", "ben", 
-    "# Predict the weight of ben", "predict(hgt_wgt_mod, newdata = ben)"
+            opts = list(label = "\"ex6\"", exercise = "TRUE", 
+                exercise.cap = "\"ex6\""), engine = "r")), code_check = NULL, 
+    error_check = NULL, check = NULL, solution = structure(c("# Print ben", 
+    "ben", "# Predict the weight of ben", "predict(hgt_wgt_mod, newdata = ben)"
     ), chunk_opts = list(label = "ex6-solution")), tests = NULL, 
     options = list(eval = FALSE, echo = TRUE, results = "markup", 
         tidy = FALSE, tidy.opts = NULL, collapse = FALSE, prompt = FALSE, 
@@ -1625,8 +1869,9 @@ learnr:::store_exercise_cache(structure(list(label = "ex6", global_setup = struc
         message = FALSE, render = NULL, ref.label = NULL, child = NULL, 
         engine = "r", split = FALSE, include = TRUE, purl = TRUE, 
         max.print = 1000, exercise.eval = FALSE, label = "ex6", 
-        exercise = TRUE, code = c("# Print ben", "# Predict the weight of ben"
-        ), out.width.px = 480, out.height.px = 288, params.src = "ex6, exercise = TRUE", 
+        exercise = TRUE, exercise.cap = "ex6", code = c("# Print ben", 
+        "# Predict the weight of ben"), out.width.px = 480, out.height.px = 288, 
+        params.src = "ex6, exercise = TRUE, exercise.cap = \"ex6\"", 
         fig.num = 0, exercise.df_print = "paged", exercise.checker = "NULL"), 
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
@@ -1647,7 +1892,9 @@ learnr:::store_exercise_cache(structure(list(label = "ex7", global_setup = struc
 "knitr::opts_chunk$set(echo = FALSE, ", "                      fig.align = \"center\", ", 
 "                      fig.height = 3, ", "                      fig.width = 5,", 
 "                      warning = FALSE, ", "                      message = FALSE)", 
-"tutorial_options(exercise.eval = FALSE)", "", "# Load datasets from local RDS files (extracted from openintro)", 
+"tutorial_options(exercise.eval = FALSE)", "", "REQUIRED_EXERCISES <- c(", 
+"  \"ex1\",", "  \"ex2\",", "  \"ex4\",", "  \"ex5\",", "  \"ex6\",", 
+"  \"ex7\"", ")", "", "# Load datasets from local RDS files (extracted from openintro)", 
 "textbooks <- readRDS(\"data/textbooks.rds\")", "bdims <- readRDS(\"data/bdims.rds\")", 
 "mlbbat10 <- readRDS(\"data/mlbbat10.rds\")", "mammals <- readRDS(\"data/mammals.rds\")", 
 "", "# Data prep", "textbooks$course <- as.character(textbooks$course) ", 
@@ -1673,6 +1920,35 @@ learnr:::store_exercise_cache(structure(list(label = "ex7", global_setup = struc
 "            timestamp = format(Sys.time(), \"%Y-%m-%d %H:%M:%S %Z\", tz = \"UTC\")", 
 "          )", "          learnrhash::encode_obj(dplyr::bind_rows(user_info, user_state))", 
 "        }", "      )", "      output$hash_output <- shiny::renderText(encoded_txt())", 
+"    },", "    envir = p", "  )", "}", "", "# Progress checker logic", 
+"progress_checker_logic <- function() {", "  p <- parent.frame()", 
+"  check_server_context(p)", "  local(", "    {", "      # Reactive to check progress when button is clicked", 
+"      progress_info <- shiny::eventReactive(", "        input$check_progress,", 
+"        {", "          state <- learnr:::get_tutorial_state()", 
+"          ", "          # Get labels of completed exercises (any submission counts)", 
+"          completed_labels <- names(state)", "          ", "          # Check which required exercises are completed", 
+"          completed_required <- REQUIRED_EXERCISES %in% completed_labels", 
+"          n_completed <- sum(completed_required)", "          n_total <- length(REQUIRED_EXERCISES)", 
+"          pct <- round(100 * n_completed / n_total)", "          ", 
+"          # Find missing exercises", "          missing <- REQUIRED_EXERCISES[!completed_required]", 
+"          ", "          list(", "            n_completed = n_completed,", 
+"            n_total = n_total,", "            pct = pct,", "            missing = missing", 
+"          )", "        }", "      )", "      ", "      # Render progress output", 
+"      output$progress_output <- shiny::renderUI({", "        info <- progress_info()", 
+"        ", "        # Color based on completion", "        bar_color <- if (info$pct == 100) \"#28a745\" else if (info$pct >= 50) \"#ffc107\" else \"#dc3545\"", 
+"        ", "        # Build missing exercises message", "        if (length(info$missing) == 0) {", 
+"          missing_msg <- shiny::p(shiny::strong(\"All required exercises completed!\"),", 
+"                                  style = \"color: #28a745;\")", 
+"        } else {", "          missing_msg <- shiny::tagList(", 
+"            shiny::p(shiny::strong(\"Missing exercises:\"), style = \"margin-bottom: 5px;\"),", 
+"            shiny::tags$ul(", "              lapply(info$missing, function(x) shiny::tags$li(shiny::code(x)))", 
+"            )", "          )", "        }", "        ", "        shiny::tagList(", 
+"          shiny::p(", "            sprintf(\"Progress: %d / %d required exercises completed (%d%%)\",", 
+"                    info$n_completed, info$n_total, info$pct)", 
+"          ),", "          shiny::div(", "            style = \"background-color: #e9ecef; border-radius: 4px; height: 20px; margin-bottom: 10px;\",", 
+"            shiny::div(", "              style = sprintf(\"background-color: %s; width: %d%%; height: 100%%; border-radius: 4px; transition: width 0.3s;\",", 
+"                              bar_color, info$pct)", "            )", 
+"          ),", "          missing_msg", "        )", "      })", 
 "    },", "    envir = p", "  )", "}", "", "hash_encoder_ui <- {", 
 "  shiny::div(\"If you have completed this tutorial and are happy with all of your\", \"solutions, please enter your identifying information, then click the button below to generate your hash\", textInput(\"name\", \"What's your name?\"), textInput(\"studentID\", \"What is your student ID?\"), renderText({", 
 "    input$caption", "  }), )", "}"), chunk_opts = list(label = "setup", 
@@ -1680,9 +1956,9 @@ learnr:::store_exercise_cache(structure(list(label = "ex7", global_setup = struc
     chunks = list(list(label = "ex7-setup", code = "hgt_wgt_mod <- lm(wgt ~ hgt, data = bdims)\nhgt_wgt_coefs <- coef(hgt_wgt_mod) |>\n  t() |>\n  as.data.frame()", 
         opts = list(label = "\"ex7-setup\""), engine = "r"), 
         list(label = "ex7", code = "# Add the line to the scatterplot\nggplot(data = bdims, aes(x = hgt, y = wgt)) + \n  geom_point() + \n  geom_abline(data = ___, \n              aes(intercept = `(Intercept)`, slope = ___),  \n              color = \"dodgerblue\")", 
-            opts = list(label = "\"ex7\"", exercise = "TRUE"), 
-            engine = "r")), code_check = NULL, error_check = NULL, 
-    check = NULL, solution = structure(c("# Add the line to the scatterplot", 
+            opts = list(label = "\"ex7\"", exercise = "TRUE", 
+                exercise.cap = "\"ex7\""), engine = "r")), code_check = NULL, 
+    error_check = NULL, check = NULL, solution = structure(c("# Add the line to the scatterplot", 
     "ggplot(data = bdims, aes(x = hgt, y = wgt)) + ", "  geom_point() + ", 
     "  geom_abline(data = hgt_wgt_coefs, ", "              aes(intercept = `(Intercept)`, slope = hgt),  ", 
     "              color = \"dodgerblue\")"), chunk_opts = list(
@@ -1703,11 +1979,11 @@ learnr:::store_exercise_cache(structure(list(label = "ex7", global_setup = struc
         message = FALSE, render = NULL, ref.label = NULL, child = NULL, 
         engine = "r", split = FALSE, include = TRUE, purl = TRUE, 
         max.print = 1000, exercise.eval = FALSE, label = "ex7", 
-        exercise = TRUE, code = c("# Add the line to the scatterplot", 
+        exercise = TRUE, exercise.cap = "ex7", code = c("# Add the line to the scatterplot", 
         "ggplot(data = bdims, aes(x = hgt, y = wgt)) + ", "  geom_point() + ", 
         "  geom_abline(data = ___, ", "              aes(intercept = `(Intercept)`, slope = ___),  ", 
         "              color = \"dodgerblue\")"), out.width.px = 480, 
-        out.height.px = 288, params.src = "ex7, exercise = TRUE", 
+        out.height.px = 288, params.src = "ex7, exercise = TRUE, exercise.cap = \"ex7\"", 
         fig.num = 0, exercise.df_print = "paged", exercise.checker = "NULL"), 
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
@@ -1716,6 +1992,7 @@ learnr:::store_exercise_cache(structure(list(label = "ex7", global_setup = struc
 
 <script type="application/shiny-prerendered" data-context="server">
 encoder_logic()
+progress_checker_logic()
 </script>
 </p>
 <!--html_preserve-->
