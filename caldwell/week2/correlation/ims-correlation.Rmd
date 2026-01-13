@@ -101,6 +101,13 @@ hash_encoder_ui <- {
     input$caption
   }), )
 }
+
+# Create hypothetical survey data
+set.seed(123)
+survey <- data.frame(
+  satisfaction = sample(1:5, 50, replace = TRUE),
+  grade_code = sample(1:5, 50, replace = TRUE)  # 5=A, 4=B, 3=C, 2=D, 1=F
+)
 ```
 
 
@@ -583,12 +590,7 @@ question("Why is the Spearman correlation higher than the Pearson correlation fo
 Rank-based correlations are especially useful for ordinal (ordered categorical) data. Imagine a survey where students rate their satisfaction with a course (1 = Very Unsatisfied to 5 = Very Satisfied) and their expected grade (A, B, C, D, F).
 
 ```{r ordinal-data}
-# Create hypothetical survey data
-set.seed(123)
-survey <- data.frame(
-  satisfaction = sample(1:5, 50, replace = TRUE),
-  grade_code = sample(1:5, 50, replace = TRUE)  # 5=A, 4=B, 3=C, 2=D, 1=F
-)
+
 
 # Visualize with jitter since data is discrete
 ggplot(survey, aes(x = satisfaction, y = grade_code)) +
