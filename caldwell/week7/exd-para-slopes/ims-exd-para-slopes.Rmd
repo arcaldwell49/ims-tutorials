@@ -12,11 +12,9 @@ runtime: shiny_prerendered
 # load packages ----------------------------------------------------------------
 
 library(learnr)
-library(openintro)
-library(tidyverse)
+library(dplyr)
+library(ggplot2)
 library(broom)
-library(emo)
-library(mosaicData)
 
 # knitr options ----------------------------------------------------------------
 
@@ -30,13 +28,31 @@ knitr::opts_chunk$set(
   fig.align = "center"
   )
 
+# Load datasets from local RDS files instead of openintro/mosaicData packages
+# Note: mpg comes from ggplot2 and is loaded automatically
+mariokart <- readRDS("data/mariokart.rds")
+babies <- readRDS("data/babies.rds")
+SAT <- readRDS("data/SAT.rds")
+
 # data prep --------------------------------------------------------------------
 
-SAT <- mosaicData::SAT |>
+SAT <- SAT |>
   rename(total = sat)
 
 mariokart <- mariokart |>
   filter(total_pr < 100) # This removes outliers with prices >= $100
+
+# Required exercises for progress tracking
+REQUIRED_EXERCISES <- c(
+  "ex1",
+  "ex2",
+  "ex-pred-r2-1",
+  "ex-pred-r2-3",
+  "ex-ic-1",
+  "ex3",
+  "ex4",
+  "ex5"
+)
 
 # Hash generation helpers
 # Should ideally be loaded from the imstutorials package when it exists
@@ -105,6 +121,91 @@ hash_encoder_ui <- {
   shiny::div("If you have completed this tutorial and are happy with all of your", "solutions, please enter your identifying information, then click the button below to generate your hash", textInput("name", "What's your name?"), textInput("studentID", "What is your student ID?"), renderText({
     input$caption
   }), )
+}
+
+# Progress checker logic
+progress_checker_logic <- function() {
+  p <- parent.frame()
+  check_server_context(p)
+  local(
+    {
+      # Reactive to check progress when button is clicked
+      progress_info <- shiny::eventReactive(
+        input$check_progress,
+        {
+          state <- learnr:::get_tutorial_state()
+          
+          # Get labels of completed exercises (any submission counts)
+          completed_labels <- names(state)
+          
+          # Check which required exercises are completed
+          completed_required <- REQUIRED_EXERCISES %in% completed_labels
+          n_completed <- sum(completed_required)
+          n_total <- length(REQUIRED_EXERCISES)
+          pct <- round(100 * n_completed / n_total)
+          
+          # Build detailed status
+          missing <- REQUIRED_EXERCISES[!completed_required]
+          
+          list(
+            n_completed = n_completed,
+            n_total = n_total,
+            pct = pct,
+            missing = missing
+          )
+        }
+      )
+      
+      # Render the progress output
+      output$progress_output <- shiny::renderUI({
+        info <- progress_info()
+        
+        # Color based on completion
+        bar_color <- if (info$pct == 100) {
+          "#28a745"  # green
+        } else if (info$pct >= 75) {
+          "#ffc107"  # yellow
+        } else {
+          "#dc3545"  # red
+        }
+        
+        # Build the UI
+        shiny::tagList(
+          shiny::tags$div(
+            style = "margin-bottom: 10px; font-weight: bold;",
+            sprintf("Progress: %d / %d exercises completed (%d%%)", 
+                    info$n_completed, info$n_total, info$pct)
+          ),
+          # Progress bar
+          shiny::tags$div(
+            style = "background-color: #e9ecef; border-radius: 4px; height: 24px; margin-bottom: 15px;",
+            shiny::tags$div(
+              style = sprintf(
+                "background-color: %s; width: %d%%; height: 100%%; border-radius: 4px; transition: width 0.3s;",
+                bar_color, info$pct
+              )
+            )
+          ),
+          # Show missing exercises if any
+          if (length(info$missing) > 0) {
+            shiny::tags$div(
+              style = "color: #856404; background-color: #fff3cd; border: 1px solid #ffeeba; padding: 10px; border-radius: 4px;",
+              shiny::tags$strong("Missing exercises:"),
+              shiny::tags$ul(
+                lapply(info$missing, function(x) shiny::tags$li(x))
+              )
+            )
+          } else {
+            shiny::tags$div(
+              style = "color: #155724; background-color: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 4px;",
+              shiny::tags$strong("All required exercises completed! You're ready to generate your hash.")
+            )
+          }
+        )
+      })
+    },
+    envir = p
+  )
 }
 ```
 
@@ -250,7 +351,7 @@ mod <- lm(total_pr ~ wheels + cond, data = mariokart)
 set.seed(1)
 ```
 
-```{r ex1, exercise=TRUE}
+```{r ex1, exercise=TRUE, exercise.cap="ex1"}
 # R^2 and adjusted R^2
 
 # add random noise
@@ -312,7 +413,7 @@ The fitted model `mod` is already in your environment.
 mod <- lm(total_pr ~ wheels + cond, data = mariokart)
 ```
 
-```{r ex2, exercise=TRUE}
+```{r ex2, exercise=TRUE, exercise.cap="ex2"}
 # return a vector
 
 
@@ -668,7 +769,7 @@ Using the `babies` dataset, fit two models and compare their predicted R-squared
 - Model A: Predict birthweight from gestation only
 - Model B: Predict birthweight from gestation, smoke, and age
 
-```{r ex-pred-r2-1, exercise=TRUE}
+```{r ex-pred-r2-1, exercise=TRUE, exercise.cap="ex-pred-r2-1"}
 # Fit Model A
 
 
@@ -725,7 +826,7 @@ question("If Model A has Predicted R² = 0.45 and Model B has Predicted R² = 0.
 
 Create a complete comparison table for three babies models:
 
-```{r ex-pred-r2-3, exercise=TRUE}
+```{r ex-pred-r2-3, exercise=TRUE, exercise.cap="ex-pred-r2-3"}
 # Model 1: gestation only
 # Model 2: gestation + smoke
 # Model 3: gestation + smoke + age + height + weight
@@ -1389,7 +1490,7 @@ Always run diagnostics before trusting information criteria!
 
 Using the `mariokart` dataset, fit three models and identify the best one using AIC and BIC:
 
-```{r ex-ic-1, exercise=TRUE}
+```{r ex-ic-1, exercise=TRUE, exercise.cap="ex-ic-1"}
 # Model 1: wheels only
 # Model 2: wheels + cond
 # Model 3: wheels + cond + start_pr
@@ -1655,7 +1756,7 @@ The data frame `mariokart` is already loaded in your workspace.
 
 Include the term `cond:duration` in your formula to model the interaction of condition and duration.
 
-```{r ex3, exercise=TRUE}
+```{r ex3, exercise=TRUE, exercise.cap="ex3"}
 # include interaction
 
 ```
@@ -1681,7 +1782,7 @@ The dataset `mariokart` is already loaded in your workspace.
 - Use the `color` aesthetic and the `geom_smooth()` function to plot the interaction model between duration and condition in the data space. 
 - Make sure you set the `method` and `se` arguments of `geom_smooth()`.
 
-```{r ex4, exercise=TRUE}
+```{r ex4, exercise=TRUE, exercise.cap="ex4"}
 # interaction plot
 # interaction plot
 ggplot(data = ___, aes(x = ___, y = ___, color = ___)) + 
@@ -1812,7 +1913,7 @@ The object `slr` is already defined for you.
 - Fit a simple linear regression model for final auction price (`total_pr`) as a function of duration (`duration`).
 - Use `aes()` to add a color aesthetic that's mapped to the condition variable to the `slr` object, which is the plot shown below.
 
-```{r ex5, exercise=TRUE}
+```{r ex5, exercise=TRUE, exercise.cap="ex5"}
 # model with one slope
 ___
 
@@ -1852,6 +1953,17 @@ You're now ready to generate your submission hash. Click "Next Topic" to proceed
 
 
 ## Submit
+
+```{r progress-check, echo=FALSE, context="server"}
+progress_checker_logic()
+```
+
+```{r progress-ui, echo=FALSE}
+shiny::actionButton("check_progress", "Check My Progress", 
+                    style = "margin-bottom: 15px; background-color: #007bff; color: white;")
+shiny::uiOutput("progress_output")
+shiny::tags$hr()
+```
 
 ```{r, echo=FALSE, context="server"}
 encoder_logic()

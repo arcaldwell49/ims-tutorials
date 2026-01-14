@@ -9,20 +9,25 @@ runtime: shiny_prerendered
 
 ```{r setup, include=FALSE}
 library(learnr)
-library(openintro)
+library(dplyr)
+library(ggplot2)
+library(readr)
 library(broom)
 library(knitr)
 library(infer)
-library(tidyverse)
 library(GGally)
-library(emo)
 
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 
+# Load CSV data files
 # http://andrewpbray.github.io/data/LA.csv
 LAhomes <- read_csv("data/LAhomes.csv")
 restNYC <- read_csv("data/restNYC.csv")
 change <- read_csv("data/coins.csv")
+
+# Load RDS data files (from openintro package)
+mariokart <- readRDS("data/mariokart.rds")
+babies <- readRDS("data/babies.rds")
 
 change <- change |>
   mutate(Small= Dimes + Nickels + Pennies) |>
@@ -32,6 +37,19 @@ change <- change |>
 
 LAhomes <- LAhomes |>
    filter(bed > 0)
+
+# Required exercises for progress tracking
+REQUIRED_EXERCISES <- c(
+  "ex51",
+  "ex1",
+  "ex52",
+  "ex53",
+  "ex54",
+  "ex55",
+  "ex56",
+  "ex-diagnostics-1",
+  "ex-vif-check"
+)
 
 
 
@@ -102,6 +120,91 @@ hash_encoder_ui <- {
   shiny::div("If you have completed this tutorial and are happy with all of your", "solutions, please enter your identifying information, then click the button below to generate your hash", textInput("name", "What's your name?"), textInput("studentID", "What is your student ID?"), renderText({
     input$caption
   }), )
+}
+
+# Progress checker logic
+progress_checker_logic <- function() {
+  p <- parent.frame()
+  check_server_context(p)
+  local(
+    {
+      # Reactive to check progress when button is clicked
+      progress_info <- shiny::eventReactive(
+        input$check_progress,
+        {
+          state <- learnr:::get_tutorial_state()
+          
+          # Get labels of completed exercises (any submission counts)
+          completed_labels <- names(state)
+          
+          # Check which required exercises are completed
+          completed_required <- REQUIRED_EXERCISES %in% completed_labels
+          n_completed <- sum(completed_required)
+          n_total <- length(REQUIRED_EXERCISES)
+          pct <- round(100 * n_completed / n_total)
+          
+          # Build detailed status
+          missing <- REQUIRED_EXERCISES[!completed_required]
+          
+          list(
+            n_completed = n_completed,
+            n_total = n_total,
+            pct = pct,
+            missing = missing
+          )
+        }
+      )
+      
+      # Render the progress output
+      output$progress_output <- shiny::renderUI({
+        info <- progress_info()
+        
+        # Color based on completion
+        bar_color <- if (info$pct == 100) {
+          "#28a745"  # green
+        } else if (info$pct >= 75) {
+          "#ffc107"  # yellow
+        } else {
+          "#dc3545"  # red
+        }
+        
+        # Build the UI
+        shiny::tagList(
+          shiny::tags$div(
+            style = "margin-bottom: 10px; font-weight: bold;",
+            sprintf("Progress: %d / %d exercises completed (%d%%)", 
+                    info$n_completed, info$n_total, info$pct)
+          ),
+          # Progress bar
+          shiny::tags$div(
+            style = "background-color: #e9ecef; border-radius: 4px; height: 24px; margin-bottom: 15px;",
+            shiny::tags$div(
+              style = sprintf(
+                "background-color: %s; width: %d%%; height: 100%%; border-radius: 4px; transition: width 0.3s;",
+                bar_color, info$pct
+              )
+            )
+          ),
+          # Show missing exercises if any
+          if (length(info$missing) > 0) {
+            shiny::tags$div(
+              style = "color: #856404; background-color: #fff3cd; border: 1px solid #ffeeba; padding: 10px; border-radius: 4px;",
+              shiny::tags$strong("Missing exercises:"),
+              shiny::tags$ul(
+                lapply(info$missing, function(x) shiny::tags$li(x))
+              )
+            )
+          } else {
+            shiny::tags$div(
+              style = "color: #155724; background-color: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 4px;",
+              shiny::tags$strong("All required exercises completed! You're ready to generate your hash.")
+            )
+          }
+        )
+      })
+    },
+    envir = p
+  )
 }
 ```
 
@@ -248,7 +351,7 @@ ggplot(LAhomes, aes(bed, price)) +
 ```
 
 
-```{r ex51, exercise=TRUE}
+```{r ex51, exercise=TRUE, exercise.cap="ex51"}
 # Create a tidy model
 
 
@@ -285,7 +388,7 @@ You will need to run the linear model before answering the question:
 
 `lm(log(price) ~ log(sqft), data = LAhomes) |> tidy()`
 
-```{r ex1, exercise=TRUE}
+```{r ex1, exercise=TRUE, exercise.cap="ex1"}
 
 ```
 
@@ -429,7 +532,7 @@ ggplot(LAhomes, aes(sqft, price)) +
 ```
 
 
-```{r ex52, exercise=TRUE}
+```{r ex52, exercise=TRUE, exercise.cap="ex52"}
 # Output the tidy model
 
 ```
@@ -467,7 +570,7 @@ ggplot(LAhomes, aes(bath, price)) +
 ```
 
 
-```{r ex53, exercise=TRUE}
+```{r ex53, exercise=TRUE, exercise.cap="ex53"}
 # Output the tidy model
 
 ```
@@ -506,7 +609,7 @@ ggpairs(LAhomes, columns = c("price", "sqft", "bath"))
 - The lower triangle shows scatter plots of variable relationships
 - Strong correlations between predictors (not involving the response) signal potential multicollinearity
 
-```{r ex54, exercise=TRUE}
+```{r ex54, exercise=TRUE, exercise.cap="ex54"}
 # Output the tidy model
 
 ```
@@ -641,7 +744,7 @@ ggpairs(restNYC, columns = c("Price", "Service", "Food", "Decor"))
 
 
 
-```{r ex55, exercise=TRUE}
+```{r ex55, exercise=TRUE, exercise.cap="ex55"}
 # Output the first model
 
 
@@ -675,7 +778,7 @@ You will need to run the linear model before answering the question:
 
 
 
-```{r ex56, exercise=TRUE}
+```{r ex56, exercise=TRUE, exercise.cap="ex56"}
 lm(Price ~ Service + Food + Decor, data=restNYC) |> tidy()
 ```
 
@@ -1135,7 +1238,7 @@ Now it's your turn to practice!
 
 Using the `babies` dataset, fit a model predicting birthweight (`bwt`) from gestational age (`gestation`), maternal smoking status (`smoke`), and maternal age (`age`). Then run complete diagnostics.
 
-```{r ex-diagnostics-1, exercise=TRUE}
+```{r ex-diagnostics-1, exercise=TRUE, exercise.cap="ex-diagnostics-1"}
 # Fit the model
 
 
@@ -1190,7 +1293,7 @@ question("What is the most concerning diagnostic issue for the babies model?",
 
 Check the VIF values for the babies model specifically:
 
-```{r ex-vif-check, exercise=TRUE}
+```{r ex-vif-check, exercise=TRUE, exercise.cap="ex-vif-check"}
 # Check VIF for the babies model
 model_babies <- lm(bwt ~ gestation + smoke + age, data = babies)
 
@@ -1305,6 +1408,17 @@ You have successfully completed this activity.
 You need to generate a hash for submission, click "Next Topic", generate the hash, and submit it on Blackboard.
 
 ## Submit
+
+```{r progress-check, echo=FALSE, context="server"}
+progress_checker_logic()
+```
+
+```{r progress-ui, echo=FALSE}
+shiny::actionButton("check_progress", "Check My Progress", 
+                    style = "margin-bottom: 15px; background-color: #007bff; color: white;")
+shiny::uiOutput("progress_output")
+shiny::tags$hr()
+```
 
 ```{r, echo=FALSE, context="server"}
 encoder_logic()
