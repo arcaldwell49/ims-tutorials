@@ -11,10 +11,9 @@ runtime: shiny_prerendered
 # load packages ----------------------------------------------------------------
 
 library(learnr)
-library(openintro)
-library(tidyverse)
+library(dplyr)
+library(ggplot2)
 library(broom)
-library(emo)
 
 # knitr options ----------------------------------------------------------------
 
@@ -25,12 +24,25 @@ knitr::opts_chunk$set(fig.align = "center",
                       message = FALSE, 
                       warning = FALSE)
 
+# Load datasets from local RDS files instead of openintro package
+# Note: mpg comes from ggplot2 and is loaded automatically
+mariokart <- readRDS("data/mariokart.rds")
+babies <- readRDS("data/babies.rds")
+
 # data prep --------------------------------------------------------------------
 
 mpg_manuals <- mpg |>
   filter(grepl("manual", trans))
 
 mariokart <- filter(mariokart, total_pr < 100)
+
+# Required exercises for progress tracking
+REQUIRED_EXERCISES <- c(
+  "ex1",
+  "ex2",
+  "ex3",
+  "ex4"
+)
 
 # Hash generation helpers
 # Should ideally be loaded from the imstutorials package when it exists
@@ -99,6 +111,91 @@ hash_encoder_ui <- {
   shiny::div("If you have completed this tutorial and are happy with all of your", "solutions, please enter your identifying information, then click the button below to generate your hash", textInput("name", "What's your name?"), textInput("studentID", "What is your student ID?"), renderText({
     input$caption
   }), )
+}
+
+# Progress checker logic
+progress_checker_logic <- function() {
+  p <- parent.frame()
+  check_server_context(p)
+  local(
+    {
+      # Reactive to check progress when button is clicked
+      progress_info <- shiny::eventReactive(
+        input$check_progress,
+        {
+          state <- learnr:::get_tutorial_state()
+          
+          # Get labels of completed exercises (any submission counts)
+          completed_labels <- names(state)
+          
+          # Check which required exercises are completed
+          completed_required <- REQUIRED_EXERCISES %in% completed_labels
+          n_completed <- sum(completed_required)
+          n_total <- length(REQUIRED_EXERCISES)
+          pct <- round(100 * n_completed / n_total)
+          
+          # Build detailed status
+          missing <- REQUIRED_EXERCISES[!completed_required]
+          
+          list(
+            n_completed = n_completed,
+            n_total = n_total,
+            pct = pct,
+            missing = missing
+          )
+        }
+      )
+      
+      # Render the progress output
+      output$progress_output <- shiny::renderUI({
+        info <- progress_info()
+        
+        # Color based on completion
+        bar_color <- if (info$pct == 100) {
+          "#28a745"  # green
+        } else if (info$pct >= 75) {
+          "#ffc107"  # yellow
+        } else {
+          "#dc3545"  # red
+        }
+        
+        # Build the UI
+        shiny::tagList(
+          shiny::tags$div(
+            style = "margin-bottom: 10px; font-weight: bold;",
+            sprintf("Progress: %d / %d exercises completed (%d%%)", 
+                    info$n_completed, info$n_total, info$pct)
+          ),
+          # Progress bar
+          shiny::tags$div(
+            style = "background-color: #e9ecef; border-radius: 4px; height: 24px; margin-bottom: 15px;",
+            shiny::tags$div(
+              style = sprintf(
+                "background-color: %s; width: %d%%; height: 100%%; border-radius: 4px; transition: width 0.3s;",
+                bar_color, info$pct
+              )
+            )
+          ),
+          # Show missing exercises if any
+          if (length(info$missing) > 0) {
+            shiny::tags$div(
+              style = "color: #856404; background-color: #fff3cd; border: 1px solid #ffeeba; padding: 10px; border-radius: 4px;",
+              shiny::tags$strong("Missing exercises:"),
+              shiny::tags$ul(
+                lapply(info$missing, function(x) shiny::tags$li(x))
+              )
+            )
+          } else {
+            shiny::tags$div(
+              style = "color: #155724; background-color: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 4px;",
+              shiny::tags$strong("All required exercises completed! You're ready to generate your hash.")
+            )
+          }
+        )
+      })
+    },
+    envir = p
+  )
 }
 ```
 
@@ -206,7 +303,7 @@ The output from `lm()` is a model object, which when printed, will show the fitt
 - The dataset `mariokart` is already loaded for you. Take a peek at the data using `glimpse()`. (See also the details of the [`mariokart` data set](https://www.openintro.org/data/index.php?data=mariokart) on our data set page.)
 - Use `lm()` to fit a parallel slopes model for total price as a function of the number of wheels and the condition of the item. Use the argument `data` to specify the dataset you're using.
 
-```{r ex1, exercise=TRUE}
+```{r ex1, exercise=TRUE, exercise.cap="ex1"}
 # Explore the data
 
 
@@ -394,7 +491,7 @@ The parallel slopes model `mod` relating total price (`total_pr`) to the number 
 mod <- lm(total_pr ~ wheels + cond, data = mariokart)
 ```
 
-```{r ex2, exercise=TRUE}
+```{r ex2, exercise=TRUE, exercise.cap="ex2"}
 # Augment the model
 augmented_mod <-___
 glimpse(___)
@@ -600,6 +697,7 @@ The `babies` data set contains observations about the birthweight and other char
 **Your Task:** Build a model for birthweight as a function of the mother's `age` and whether this child was her first birth (`parity == 0` means first birth).
 
 **Mathematical Model:**
+
 $$
 birthweight = \beta_0 + \beta_1 \cdot age + \beta_2 \cdot parity + \epsilon
 $$
@@ -607,6 +705,7 @@ $$
 **Note:** The birthweight variable is recorded in the column `bwt`.
 
 **Instructions:**
+
 - Use `lm()` to build the parallel slopes model specified above
 - The `parity` variable is already coded as binary numeric values (0 or 1), so you don't need to use `factor()`
 - Remember that the formula syntax mirrors the mathematical equation: `y ~ x1 + x2`
@@ -625,7 +724,7 @@ The birthweight variable is recorded in the column `bwt`.
 $y = \beta_0 + \beta_1 \cdot x + \beta_2 \cdot z$, the corresponding formula is `y ~ x + z`.
 
 
-```{r ex3, exercise=TRUE}
+```{r ex3, exercise=TRUE, exercise.cap="ex3"}
 # build model
 
 ```
@@ -651,7 +750,7 @@ ggplot(data = babies, aes(x = gestation, y = bwt, color = factor(smoke))) +
 
 Use `lm()` to build a parallel slopes model implied by the plot. It's not necessary to use `factor()` in this case either.
 
-```{r ex4, exercise=TRUE}
+```{r ex4, exercise=TRUE, exercise.cap="ex4"}
 # build model
 
 ```
@@ -674,6 +773,17 @@ You need to generate a hash for submission, click "Next Topic", generate the has
 
 
 ## Submit
+
+```{r progress-check, echo=FALSE, context="server"}
+progress_checker_logic()
+```
+
+```{r progress-ui, echo=FALSE}
+shiny::actionButton("check_progress", "Check My Progress", 
+                    style = "margin-bottom: 15px; background-color: #007bff; color: white;")
+shiny::uiOutput("progress_output")
+shiny::tags$hr()
+```
 
 ```{r, echo=FALSE, context="server"}
 encoder_logic()
