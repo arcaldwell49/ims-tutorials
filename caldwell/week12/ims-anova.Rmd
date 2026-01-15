@@ -10,13 +10,14 @@ runtime: shiny_prerendered
 ```{r setup, include=FALSE}
 # load packages ----------------------------------------------------------------
 library(learnr)
-library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(readr)
+library(purrr)
+library(tidyr)
 library(infer)
 library(broom)
-library(emo)
-library(openintro)
 library(ggridges)
-library(magrittr)
 library(ggfortify)
 library(emmeans)
 
@@ -32,6 +33,15 @@ knitr::opts_chunk$set(fig.align = "center",
 # data prep --------------------------------------------------------------------
 
 gss <- read_csv("data/gss_wordsum_class.csv")
+
+# Required exercises for progress tracking
+REQUIRED_EXERCISES <- c(
+  "vocabulary",
+  "vocabulary_2",
+  "vocabulary_3",
+  "vocabulary_4",
+  "vocabulary_5"
+)
 
 # Hash generation helpers
 # Should ideally be loaded from the imstutorials package when it exists
@@ -100,6 +110,91 @@ hash_encoder_ui <- {
   shiny::div("If you have completed this tutorial and are happy with all of your", "solutions, please enter your identifying information, then click the button below to generate your hash", textInput("name", "What's your name?"), textInput("studentID", "What is your student ID?"), renderText({
     input$caption
   }), )
+}
+
+# Progress checker logic
+progress_checker_logic <- function() {
+  p <- parent.frame()
+  check_server_context(p)
+  local(
+    {
+      # Reactive to check progress when button is clicked
+      progress_info <- shiny::eventReactive(
+        input$check_progress,
+        {
+          state <- learnr:::get_tutorial_state()
+          
+          # Get labels of completed exercises (any submission counts)
+          completed_labels <- names(state)
+          
+          # Check which required exercises are completed
+          completed_required <- REQUIRED_EXERCISES %in% completed_labels
+          n_completed <- sum(completed_required)
+          n_total <- length(REQUIRED_EXERCISES)
+          pct <- round(100 * n_completed / n_total)
+          
+          # Build detailed status
+          missing <- REQUIRED_EXERCISES[!completed_required]
+          
+          list(
+            n_completed = n_completed,
+            n_total = n_total,
+            pct = pct,
+            missing = missing
+          )
+        }
+      )
+      
+      # Render the progress output
+      output$progress_output <- shiny::renderUI({
+        info <- progress_info()
+        
+        # Color based on completion
+        bar_color <- if (info$pct == 100) {
+          "#28a745"  # green
+        } else if (info$pct >= 75) {
+          "#ffc107"  # yellow
+        } else {
+          "#dc3545"  # red
+        }
+        
+        # Build the UI
+        shiny::tagList(
+          shiny::tags$div(
+            style = "margin-bottom: 10px; font-weight: bold;",
+            sprintf("Progress: %d / %d exercises completed (%d%%)", 
+                    info$n_completed, info$n_total, info$pct)
+          ),
+          # Progress bar
+          shiny::tags$div(
+            style = "background-color: #e9ecef; border-radius: 4px; height: 24px; margin-bottom: 15px;",
+            shiny::tags$div(
+              style = sprintf(
+                "background-color: %s; width: %d%%; height: 100%%; border-radius: 4px; transition: width 0.3s;",
+                bar_color, info$pct
+              )
+            )
+          ),
+          # Show missing exercises if any
+          if (length(info$missing) > 0) {
+            shiny::tags$div(
+              style = "color: #856404; background-color: #fff3cd; border: 1px solid #ffeeba; padding: 10px; border-radius: 4px;",
+              shiny::tags$strong("Missing exercises:"),
+              shiny::tags$ul(
+                lapply(info$missing, function(x) shiny::tags$li(x))
+              )
+            )
+          } else {
+            shiny::tags$div(
+              style = "color: #155724; background-color: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 4px;",
+              shiny::tags$strong("All required exercises completed! You're ready to generate your hash.")
+            )
+          }
+        )
+      })
+    },
+    envir = p
+  )
 }
 ```
 
@@ -258,7 +353,7 @@ Create visualizations to compare vocabulary scores across social class groups.
 - **Spread:** Is the variability similar across groups?
 - **Unusual observations:** Are there outliers in any group?
 
-```{r vocabulary, exercise=TRUE}
+```{r vocabulary, exercise=TRUE, exercise.cap="vocabulary"}
 # Using gss, plot wordsum
 ggplot(data = ___, mapping = aes(___)) +
   # Add a histogram layer with appropriate binwidth
@@ -596,7 +691,7 @@ The `rank` variable has three levels:
 - Use `tidy()` to view a clean summary of the ANOVA table
 - Interpret the results at α = 0.025 (2.5% significance level)
 
-```{r vocabulary_2, exercise=TRUE}
+```{r vocabulary_2, exercise=TRUE, exercise.cap="vocabulary_2"}
 # Run an analysis of variance on score vs. rank
 aov_evals_rank <- aov(___, data = ___)
 
@@ -748,7 +843,7 @@ Calculate the standard deviation of vocabulary scores within each social class g
 3. Store the result in a column called `sd_wordsum`
 4. Examine the results: Is the ratio of largest to smallest SD less than 2?
 
-```{r vocabulary_3, exercise=TRUE}
+```{r vocabulary_3, exercise=TRUE, exercise.cap="vocabulary_3"}
 gss |>
   # Group by class
   group_by(___) |>
@@ -785,7 +880,7 @@ Standard deviations give us numbers, but visualizations help us **see** the vari
 3. Add density ridges using `geom_density_ridges()`
 4. Examine the plot: Do the distributions have similar spread?
 
-```{r vocabulary_4, exercise=TRUE}
+```{r vocabulary_4, exercise=TRUE, exercise.cap="vocabulary_4"}
 gss |>
   # Map wordsum to the x-axis and class to the y-axis
   ggplot(aes(x = ___, y = ___)) +
@@ -1053,7 +1148,7 @@ Now try the others! Let's create a comparison of all four methods.
    - `pairs(vocab_means, adjust = "fdr")`
    - `pairs(vocab_means, adjust = "tukey")`
 
-```{r vocabulary_5, exercise=TRUE}
+```{r vocabulary_5, exercise=TRUE, exercise.cap="vocabulary_5"}
 # Fit the ANOVA model
 vocab_aov <- aov(wordsum ~ class, data = gss)
 
@@ -1222,6 +1317,17 @@ You're now ready to generate your submission hash. Click "Next Topic" to proceed
 
 
 ## Submit
+
+```{r progress-check, echo=FALSE, context="server"}
+progress_checker_logic()
+```
+
+```{r progress-ui, echo=FALSE}
+shiny::actionButton("check_progress", "Check My Progress", 
+                    style = "margin-bottom: 15px; background-color: #007bff; color: white;")
+shiny::uiOutput("progress_output")
+shiny::tags$hr()
+```
 
 ```{r, echo=FALSE, context="server"}
 encoder_logic()

@@ -372,7 +372,7 @@ ggplot(data = ___, mapping = aes(___)) +
   ___ +
   # Facet by class
   facet_wrap(~___)</code></pre>
-<script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
+<script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"vocabulary"}</script>
 </div>
 <div class="tutorial-exercise-support" data-label="vocabulary-hint"
 data-completion="1" data-diagnostics="1" data-startover="1"
@@ -746,7 +746,7 @@ aov_evals_rank &lt;- aov(___, data = ___)
 
 # Tidy the model
 tidy(___)</code></pre>
-<script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
+<script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"vocabulary_2"}</script>
 </div>
 <div class="tutorial-exercise-support" data-label="vocabulary_2-hint"
 data-completion="1" data-diagnostics="1" data-startover="1"
@@ -826,9 +826,8 @@ them.</p>
 independent of each other</p>
 <p>How to verify: - ✓ <strong>Random sampling</strong> ensures
 independence - ✓ For experiments: random assignment helps (but consider
-potential relationships) - ✓ <strong>10% rule:</strong> Each sample size
-should be less than 10% of its respective population - ✓ No obvious
-clustering or time dependencies</p>
+potential relationships) - ✓ No obvious clustering or time
+dependencies</p>
 <p><strong>Between groups:</strong> Groups must be independent of each
 other</p>
 <p>What to watch for: - ✗ <strong>Paired or repeated measures:</strong>
@@ -839,8 +838,6 @@ samples:</strong> Groups deliberately matched on characteristics - ✓
 <ul>
 <li>✓ The GSS uses random sampling → within-group independence
 satisfied</li>
-<li>✓ Sample size (n = 795) is much less than 10% of the US adult
-population</li>
 <li>✓ Each respondent appears in only one social class group →
 between-group independence satisfied</li>
 </ul>
@@ -852,7 +849,9 @@ study design details.</p>
 class="section level3">
 <h3>Condition 2: Approximate Normality</h3>
 <p><strong>Requirement:</strong> The response variable should be
-approximately normal <strong>within each group</strong></p>
+approximately normal <strong>within each group</strong>. Note: this is
+the same as saying the normality of the residuals since residuals =
+observed - group mean.</p>
 <p><strong>When it matters most:</strong> When sample sizes are
 <strong>small</strong> (n &lt; 30 per group)</p>
 <p><strong>When it matters less:</strong> When sample sizes are
@@ -938,7 +937,7 @@ data-lines="0" data-pipe="|&gt;">
   group_by(___) |&gt;
   # Calculate the std dev of wordsum as sd_wordsum
   summarize(___ = ___)</code></pre>
-<script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
+<script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"vocabulary_3"}</script>
 </div>
 <div class="tutorial-exercise-support" data-label="vocabulary_3-hint"
 data-completion="1" data-diagnostics="1" data-startover="1"
@@ -983,7 +982,7 @@ data-lines="0" data-pipe="|&gt;">
   ggplot(aes(x = ___, y = ___)) +
   # Add density ridges to the plot! 
   geom_density_ridges()</code></pre>
-<script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
+<script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"vocabulary_4"}</script>
 </div>
 <div class="tutorial-exercise-support" data-label="vocabulary_4-hint"
 data-completion="1" data-diagnostics="1" data-startover="1"
@@ -1035,8 +1034,8 @@ regression.</p>
 residuals</p>
 <ul>
 <li>Points should fall roughly along the diagonal line</li>
-<li>Our data: Mostly linear with slight deviations at the
-tails—normality is reasonably satisfied</li>
+<li>Our data: Mostly linear with large deviations at the tails;
+normality is probably violated</li>
 </ul>
 <p><strong>Right plot (Scale-Location):</strong> Checks equal
 variance</p>
@@ -1049,13 +1048,13 @@ reasonable</li>
 <p><strong>Overall assessment for the vocabulary ANOVA:</strong></p>
 <ul>
 <li>✓ Independence: Satisfied (random sampling, large population)</li>
-<li>✓ Normality: Reasonably satisfied (Q-Q plot looks good, large sample
-sizes)</li>
+<li>✓ Normality: Reasonably satisfied (Q-Q plot doesn’t look great but
+large sample size is reassuring)</li>
 <li>✓ Equal variance: Reasonably satisfied (SDs similar, scale-location
 plot okay)</li>
 </ul>
-<p><strong>Conclusion:</strong> We can proceed with confidence in our
-ANOVA results!</p>
+<p><strong>Conclusion:</strong> We can proceed, with some caution, in
+our ANOVA</p>
 </div>
 </div>
 <div id="section-post-hoc-testing-with-emmeans" class="section level2">
@@ -1065,17 +1064,18 @@ class="section level3">
 <h3>The Next Question: Which Groups Differ?</h3>
 <p>We conducted our ANOVA and found a significant result (p &lt; 0.001).
 This tells us that <strong>at least one</strong> social class group has
-a different average vocabulary score.</p>
+a different average vocabulary score (i.e., we reject the omnibus null
+hypothesis).</p>
 <p><strong>But which ones?</strong></p>
 <ul>
 <li>Is lower class different from upper class?</li>
 <li>Is working class different from middle class?</li>
 <li>Are all four groups different from each other?</li>
 </ul>
-<p>ANOVA doesn’t answer these questions—it only tells us “something
+<p>ANOVA doesn’t answer these questions — it only tells us “something
 differs somewhere.”</p>
 <p>To answer the “which groups?” question, we need <strong>post-hoc
-tests</strong> (Latin for “after this”)—tests conducted
+tests</strong> (Latin for “after this”) — tests conducted
 <strong>after</strong> finding a significant ANOVA result.</p>
 </div>
 <div id="section-the-multiple-comparisons-problem-revisited"
@@ -1124,7 +1124,8 @@ doing individual t-tests:</p>
 overall MSE (pooled variance) from the ANOVA model, giving more stable
 estimates</p></li>
 <li><p><strong>Handles complex designs:</strong> Works seamlessly with
-unbalanced designs, covariates, and interactions</p></li>
+unbalanced designs, covariates, and interactions (we will cover this
+later in the semester)</p></li>
 <li><p><strong>Multiple comparison adjustments:</strong> Easily
 implements Bonferroni, Holm, Tukey, FDR, and many other
 adjustments</p></li>
@@ -1161,8 +1162,9 @@ I errors and have relatively few comparisons</p>
 <div id="section-holm-method-sequential-bonferroni"
 class="section level4">
 <h4>2. Holm Method (Sequential Bonferroni)</h4>
-<p><strong>Method:</strong> Order p-values from smallest to largest,
-then apply decreasing adjustments</p>
+<p><strong>Method:</strong> This is also known as the Holm-Bonferroni
+adjustment. Order p-values from smallest to largest, then apply
+decreasing adjustments</p>
 <ol style="list-style-type: decimal">
 <li>Multiply smallest p-value by k</li>
 <li>Multiply second smallest by k-1</li>
@@ -1170,11 +1172,13 @@ then apply decreasing adjustments</p>
 <li>Ensure monotonicity (adjusted p-values never decrease)</li>
 </ol>
 <p><strong>Pros:</strong> - Always more powerful than Bonferroni - Still
-controls FWER strictly - Nearly as easy to understand</p>
+controls FWER strictly (like Bonferroni) - Nearly as easy to
+understand</p>
 <p><strong>Cons:</strong> - Still somewhat conservative - Requires
 ordering comparisons</p>
-<p><strong>When to use:</strong> Default choice for FWER
-control—uniformly better than Bonferroni!</p>
+<p><strong>When to use:</strong> Default choice for FWER control —
+uniformly better than Bonferroni! Downside is it can not be applied to
+confidence intervals.</p>
 </div>
 <div id="section-fdr-false-discovery-rate---benjamini-hochberg"
 class="section level4">
@@ -1185,7 +1189,7 @@ discoveries among rejected hypotheses</p>
 positive?” (FWER)</p>
 <p>Controls: “What proportion of our ‘discoveries’ are false?” (FDR)</p>
 <p><strong>Pros:</strong> - Much more powerful than Bonferroni/Holm -
-Appropriate for exploratory analysis - Good when doing many
+Appropriate for exploratory analysis - Good when doing VERY many
 comparisons</p>
 <p><strong>Cons:</strong> - Allows some false positives (by design) -
 Less strict control than FWER methods - Requires more explanation</p>
@@ -1196,14 +1200,15 @@ tolerate some false positives, especially in exploratory research</p>
 class="section level4">
 <h4>4. Tukey HSD (Honestly Significant Difference)</h4>
 <p><strong>Method:</strong> Uses the studentized range distribution (q)
-to adjust for multiple comparisons</p>
+to adjust for multiple comparisons for all possible pairwise
+comparisons</p>
 <p><strong>Specifically designed for pairwise comparisons in
 ANOVA</strong></p>
 <p><strong>Pros:</strong> - Optimal for <strong>all pairwise
 comparisons</strong> in ANOVA - More powerful than Bonferroni for this
-specific case - Gold standard for balanced designs - Provides
-simultaneous confidence intervals</p>
-<p><strong>Cons:</strong> - Only works for pairwise comparisons -
+specific case - Gold standard for balanced designs with pairwise
+comparisons - Provides simultaneous confidence intervals</p>
+<p><strong>Cons:</strong> - Only works for pairwise comparisons! -
 Slightly more complex calculation - Assumes equal sample sizes work best
 (but handles unequal sizes)</p>
 <p><strong>When to use:</strong> When you want to compare <strong>all
@@ -1341,7 +1346,7 @@ pairs(vocab_means, adjust = &quot;fdr&quot;)
 
 # Tukey HSD
 pairs(vocab_means, adjust = &quot;tukey&quot;)</code></pre>
-<script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
+<script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"vocabulary_5"}</script>
 </div>
 <div class="tutorial-exercise-support" data-label="vocabulary_5-hint"
 data-completion="1" data-diagnostics="1" data-startover="1"
@@ -1430,34 +1435,46 @@ too!</li>
 <li><strong>Working class vs. Middle class?</strong> → And this
 one!</li>
 </ul>
-<p><strong>Your interpretation task:</strong></p>
-<p>For each comparison, note: 1. The estimated difference in means 2.
-Whether it’s significant (p &lt; 0.05) under each adjustment method 3.
-What this tells us about vocabulary scores across social classes</p>
 </div>
 <div id="section-visualizing-the-comparisons" class="section level3">
 <h3>Visualizing the Comparisons</h3>
 <p>A plot can help us see which groups differ. Let’s visualize the
 estimated means with confidence intervals:</p>
 <pre class="r"><code># Plot estimated marginal means
-plot(vocab_means) +
+plot(vocab_means, comparisons = TRUE) +
   labs(x = &quot;Estimated Mean Vocabulary Score&quot;,
        y = &quot;Social Class&quot;,
        title = &quot;Estimated Marginal Means with 95% CIs&quot;) +
   theme_minimal()</code></pre>
 <p><img src="ims-anova_files/figure-html/unnamed-chunk-9-1.png" width="480" style="display: block; margin: auto;" /></p>
-<p><strong>How to read this plot:</strong></p>
-<ul>
-<li>Points show the estimated mean for each group</li>
-<li>Horizontal lines show 95% confidence intervals</li>
-<li>Groups whose CIs <strong>don’t overlap</strong> are likely
-significantly different</li>
-<li>Groups whose CIs <strong>do overlap</strong> might or might not be
-different (need formal test)</li>
-</ul>
-<p><strong>Reflection:</strong> Looking at this plot, which groups
-appear most different from each other? Does this match your statistical
-test results?</p>
+<p>The blue bars are confidence intervals for the EMMs, and the red
+arrows are for the comparisons among them. If an arrow from one mean
+overlaps an arrow from another group, the difference is not
+“significant”” based on the adjust setting (which defaults to “tukey” in
+<code>emmeans</code>) and the value of alpha (which defaults to
+0.05).</p>
+<p>Note: Don’t ever use confidence intervals for EMMs to perform
+comparisons; they can be very misleading. Use the comparison arrows
+instead; or better yet, use pwpp().</p>
+<p>A caution: it really is not good practice to draw a bright
+distinction based on whether or not a P value exceeds some cutoff. This
+display does dim such distinctions somewhat by allowing the viewer to
+judge whether a P value is close to alpha one way or the other; but a
+better strategy is to simply obtain all the P values using pairs(), and
+look at them individually.</p>
+<p>We can also use <code>pwpp()</code> to create a more detailed plot of
+pairwise comparisons:</p>
+<pre class="r"><code># Plot estimated marginal means
+pwpp(vocab_means) +
+  labs(
+       title = &quot;Pairwise Comparisons&quot;) +
+  theme_minimal()</code></pre>
+<p><img src="ims-anova_files/figure-html/unnamed-chunk-10-1.png" width="480" style="display: block; margin: auto;" /></p>
+<p>Each comparison is associated with a vertical line segment that joins
+the scale positions of the two EMMs being compared, and whose horizontal
+position is determined by the P value of that comparison.</p>
+<p>This kind of plot can get quite “busy” as the number of means being
+compared goes up…</p>
 </div>
 <div id="section-which-adjustment-should-you-use"
 class="section level3">
@@ -1495,25 +1512,32 @@ rate across all 6 pairwise comparisons.”</li>
 </ul></li>
 <li><strong>Significant findings</strong>
 <ul>
-<li>“We found significant differences between upper class and lower
-class (p &lt; 0.001, d = 1.5 words) and between middle class and lower
-class (p = 0.003, d = 0.9 words).”</li>
+<li>“We found significant differences between middle class and lower
+class (p &lt; 0.001, d = 1.6 words) and between middle class and working
+class (p &lt; 0.001, d = 1 word).”</li>
 </ul></li>
 <li><strong>Non-significant findings</strong> (especially if important!)
 <ul>
-<li>“We found no significant difference between working class and middle
-class (p = 0.45).”</li>
+<li>“We found no significant difference between working class and upper
+class (p = 0.80).”</li>
 </ul></li>
 <li><strong>Effect sizes</strong>
 <ul>
 <li>Report actual differences in means, not just p-values</li>
-<li>“On average, upper class respondents scored 1.5 words higher than
-lower class respondents on the 10-word vocabulary test.”</li>
 </ul></li>
 </ol>
 <p><strong>Remember:</strong> Statistical significance tells us if
 differences are unlikely to be exactly <em>zero</em>. Practical
 significance tells us if differences matter in the real world!</p>
+<p>Overall, post-hoc testing with <code>emmeans</code> provides a
+powerful, flexible, and principled way to explore group differences
+after ANOVA. Additionally, after inspecting the results with
+<code>emmeans</code>, our interpretation is very interesting because we
+can see that the means differ between the lower and middle classes, and
+between the working and middle classes, but not between the lower and
+working classes, or between the upper class and any of the other
+classes. This suggests that the middle class is driving the differences
+in vocabulary scores.</p>
 </div>
 </div>
 <div id="section-congratulations" class="section level2">
@@ -1524,6 +1548,9 @@ to proceed.</p>
 </div>
 <div id="section-submit" class="section level2">
 <h2>Submit</h2>
+<button id="check_progress" type="button" class="btn btn-default action-button" style="margin-bottom: 15px; background-color: #007bff; color: white;">Check My Progress</button>
+<div id="progress_output" class="shiny-html-output"></div>
+<hr/>
 <div class="encoder_ui">
 <div>
 If you have completed this tutorial and are happy with all of your
@@ -1536,7 +1563,7 @@ solutions, please enter your identifying information, then click the button belo
 <label class="control-label" id="studentID-label" for="studentID">What is your student ID?</label>
 <input id="studentID" type="text" class="shiny-input-text form-control" value="" data-update-on="change"/>
 </div>
-<div id="out296cdd58eec00be2" class="shiny-text-output"></div>
+<div id="out1eb94d9df1f665d0" class="shiny-text-output"></div>
 </div>
 <div class="row" style="padding-bottom: 0.5em;">
 <div class="col-sm-3">
@@ -1602,13 +1629,14 @@ solutions, please enter your identifying information, then click the button belo
 <script type="application/shiny-prerendered" data-context="server-start">
 # load packages ----------------------------------------------------------------
 library(learnr)
-library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(readr)
+library(purrr)
+library(tidyr)
 library(infer)
 library(broom)
-library(emo)
-library(openintro)
 library(ggridges)
-library(magrittr)
 library(ggfortify)
 library(emmeans)
 
@@ -1624,6 +1652,15 @@ knitr::opts_chunk$set(fig.align = "center",
 # data prep --------------------------------------------------------------------
 
 gss <- read_csv("data/gss_wordsum_class.csv")
+
+# Required exercises for progress tracking
+REQUIRED_EXERCISES <- c(
+  "vocabulary",
+  "vocabulary_2",
+  "vocabulary_3",
+  "vocabulary_4",
+  "vocabulary_5"
+)
 
 # Hash generation helpers
 # Should ideally be loaded from the imstutorials package when it exists
@@ -1693,6 +1730,91 @@ hash_encoder_ui <- {
     input$caption
   }), )
 }
+
+# Progress checker logic
+progress_checker_logic <- function() {
+  p <- parent.frame()
+  check_server_context(p)
+  local(
+    {
+      # Reactive to check progress when button is clicked
+      progress_info <- shiny::eventReactive(
+        input$check_progress,
+        {
+          state <- learnr:::get_tutorial_state()
+          
+          # Get labels of completed exercises (any submission counts)
+          completed_labels <- names(state)
+          
+          # Check which required exercises are completed
+          completed_required <- REQUIRED_EXERCISES %in% completed_labels
+          n_completed <- sum(completed_required)
+          n_total <- length(REQUIRED_EXERCISES)
+          pct <- round(100 * n_completed / n_total)
+          
+          # Build detailed status
+          missing <- REQUIRED_EXERCISES[!completed_required]
+          
+          list(
+            n_completed = n_completed,
+            n_total = n_total,
+            pct = pct,
+            missing = missing
+          )
+        }
+      )
+      
+      # Render the progress output
+      output$progress_output <- shiny::renderUI({
+        info <- progress_info()
+        
+        # Color based on completion
+        bar_color <- if (info$pct == 100) {
+          "#28a745"  # green
+        } else if (info$pct >= 75) {
+          "#ffc107"  # yellow
+        } else {
+          "#dc3545"  # red
+        }
+        
+        # Build the UI
+        shiny::tagList(
+          shiny::tags$div(
+            style = "margin-bottom: 10px; font-weight: bold;",
+            sprintf("Progress: %d / %d exercises completed (%d%%)", 
+                    info$n_completed, info$n_total, info$pct)
+          ),
+          # Progress bar
+          shiny::tags$div(
+            style = "background-color: #e9ecef; border-radius: 4px; height: 24px; margin-bottom: 15px;",
+            shiny::tags$div(
+              style = sprintf(
+                "background-color: %s; width: %d%%; height: 100%%; border-radius: 4px; transition: width 0.3s;",
+                bar_color, info$pct
+              )
+            )
+          ),
+          # Show missing exercises if any
+          if (length(info$missing) > 0) {
+            shiny::tags$div(
+              style = "color: #856404; background-color: #fff3cd; border: 1px solid #ffeeba; padding: 10px; border-radius: 4px;",
+              shiny::tags$strong("Missing exercises:"),
+              shiny::tags$ul(
+                lapply(info$missing, function(x) shiny::tags$li(x))
+              )
+            )
+          } else {
+            shiny::tags$div(
+              style = "color: #155724; background-color: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 4px;",
+              shiny::tags$strong("All required exercises completed! You're ready to generate your hash.")
+            )
+          }
+        )
+      })
+    },
+    envir = p
+  )
+}
 </script>
  
 <script type="application/shiny-prerendered" data-context="server">
@@ -1725,15 +1847,18 @@ output$`tutorial-exercise-vocabulary-output` <- renderUI({
 
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "vocabulary", global_setup = structure(c("# load packages ----------------------------------------------------------------", 
-"library(learnr)", "library(tidyverse)", "library(infer)", "library(broom)", 
-"library(emo)", "library(openintro)", "library(ggridges)", "library(magrittr)", 
-"library(ggfortify)", "library(emmeans)", "", "# knitr options ----------------------------------------------------------------", 
+"library(learnr)", "library(dplyr)", "library(ggplot2)", "library(readr)", 
+"library(purrr)", "library(tidyr)", "library(infer)", "library(broom)", 
+"library(ggridges)", "library(ggfortify)", "library(emmeans)", 
+"", "# knitr options ----------------------------------------------------------------", 
 "", "knitr::opts_chunk$set(fig.align = \"center\", ", "                      fig.height = 3, ", 
 "                      fig.width = 5,", "                      echo = FALSE, ", 
 "                      message = FALSE, ", "                      warning = FALSE)", 
 "", "# data prep --------------------------------------------------------------------", 
-"", "gss <- read_csv(\"data/gss_wordsum_class.csv\")", "", "# Hash generation helpers", 
-"# Should ideally be loaded from the imstutorials package when it exists", 
+"", "gss <- read_csv(\"data/gss_wordsum_class.csv\")", "", "# Required exercises for progress tracking", 
+"REQUIRED_EXERCISES <- c(", "  \"vocabulary\",", "  \"vocabulary_2\",", 
+"  \"vocabulary_3\",", "  \"vocabulary_4\",", "  \"vocabulary_5\"", 
+")", "", "# Hash generation helpers", "# Should ideally be loaded from the imstutorials package when it exists", 
 "is_server_context <- function(.envir) {", "  # We are in the server context if there are the follow:", 
 "  # * input - input reactive values", "  # * output - shiny output", 
 "  # * session - shiny session", "  #", "  # Check context by examining the class of each of these.", 
@@ -1762,22 +1887,59 @@ learnr:::store_exercise_cache(structure(list(label = "vocabulary", global_setup 
 "        }", "      )", "      output$hash_output <- shiny::renderText(encoded_txt())", 
 "    },", "    envir = p", "  )", "}", "", "hash_encoder_ui <- {", 
 "  shiny::div(\"If you have completed this tutorial and are happy with all of your\", \"solutions, please enter your identifying information, then click the button below to generate your hash\", textInput(\"name\", \"What's your name?\"), textInput(\"studentID\", \"What is your student ID?\"), renderText({", 
-"    input$caption", "  }), )", "}"), chunk_opts = list(label = "setup", 
+"    input$caption", "  }), )", "}", "", "# Progress checker logic", 
+"progress_checker_logic <- function() {", "  p <- parent.frame()", 
+"  check_server_context(p)", "  local(", "    {", "      # Reactive to check progress when button is clicked", 
+"      progress_info <- shiny::eventReactive(", "        input$check_progress,", 
+"        {", "          state <- learnr:::get_tutorial_state()", 
+"          ", "          # Get labels of completed exercises (any submission counts)", 
+"          completed_labels <- names(state)", "          ", "          # Check which required exercises are completed", 
+"          completed_required <- REQUIRED_EXERCISES %in% completed_labels", 
+"          n_completed <- sum(completed_required)", "          n_total <- length(REQUIRED_EXERCISES)", 
+"          pct <- round(100 * n_completed / n_total)", "          ", 
+"          # Build detailed status", "          missing <- REQUIRED_EXERCISES[!completed_required]", 
+"          ", "          list(", "            n_completed = n_completed,", 
+"            n_total = n_total,", "            pct = pct,", "            missing = missing", 
+"          )", "        }", "      )", "      ", "      # Render the progress output", 
+"      output$progress_output <- shiny::renderUI({", "        info <- progress_info()", 
+"        ", "        # Color based on completion", "        bar_color <- if (info$pct == 100) {", 
+"          \"#28a745\"  # green", "        } else if (info$pct >= 75) {", 
+"          \"#ffc107\"  # yellow", "        } else {", "          \"#dc3545\"  # red", 
+"        }", "        ", "        # Build the UI", "        shiny::tagList(", 
+"          shiny::tags$div(", "            style = \"margin-bottom: 10px; font-weight: bold;\",", 
+"            sprintf(\"Progress: %d / %d exercises completed (%d%%)\", ", 
+"                    info$n_completed, info$n_total, info$pct)", 
+"          ),", "          # Progress bar", "          shiny::tags$div(", 
+"            style = \"background-color: #e9ecef; border-radius: 4px; height: 24px; margin-bottom: 15px;\",", 
+"            shiny::tags$div(", "              style = sprintf(", 
+"                \"background-color: %s; width: %d%%; height: 100%%; border-radius: 4px; transition: width 0.3s;\",", 
+"                bar_color, info$pct", "              )", "            )", 
+"          ),", "          # Show missing exercises if any", 
+"          if (length(info$missing) > 0) {", "            shiny::tags$div(", 
+"              style = \"color: #856404; background-color: #fff3cd; border: 1px solid #ffeeba; padding: 10px; border-radius: 4px;\",", 
+"              shiny::tags$strong(\"Missing exercises:\"),", 
+"              shiny::tags$ul(", "                lapply(info$missing, function(x) shiny::tags$li(x))", 
+"              )", "            )", "          } else {", "            shiny::tags$div(", 
+"              style = \"color: #155724; background-color: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 4px;\",", 
+"              shiny::tags$strong(\"All required exercises completed! You're ready to generate your hash.\")", 
+"            )", "          }", "        )", "      })", "    },", 
+"    envir = p", "  )", "}"), chunk_opts = list(label = "setup", 
     include = FALSE)), setup = NULL, chunks = list(list(label = "vocabulary", 
     code = "# Using gss, plot wordsum\nggplot(data = ___, mapping = aes(___)) +\n  # Add a histogram layer with appropriate binwidth\n  ___ +\n  # Facet by class\n  facet_wrap(~___)", 
-    opts = list(label = "\"vocabulary\"", exercise = "TRUE"), 
-    engine = "r")), code_check = NULL, error_check = NULL, check = NULL, 
-    solution = structure(c("# Using gss, plot wordsum", "ggplot(data = gss, mapping = aes(x = wordsum)) +", 
-    "  # Add a histogram layer", "  geom_histogram(binwidth = 1) +", 
-    "  # Facet by class", "  facet_wrap(~class)"), chunk_opts = list(
-        label = "vocabulary-solution")), tests = NULL, options = list(
-        eval = FALSE, echo = TRUE, results = "markup", tidy = FALSE, 
-        tidy.opts = NULL, collapse = FALSE, prompt = FALSE, comment = NA, 
-        highlight = FALSE, size = "normalsize", background = "#F7F7F7", 
-        strip.white = TRUE, cache = 0, cache.path = "ims-anova_cache/html/", 
-        cache.vars = NULL, cache.lazy = TRUE, dependson = NULL, 
-        autodep = FALSE, cache.rebuild = FALSE, fig.keep = "high", 
-        fig.show = "asis", fig.align = "center", fig.path = "ims-anova_files/figure-html/", 
+    opts = list(label = "\"vocabulary\"", exercise = "TRUE", 
+        exercise.cap = "\"vocabulary\""), engine = "r")), code_check = NULL, 
+    error_check = NULL, check = NULL, solution = structure(c("# Using gss, plot wordsum", 
+    "ggplot(data = gss, mapping = aes(x = wordsum)) +", "  # Add a histogram layer", 
+    "  geom_histogram(binwidth = 1) +", "  # Facet by class", 
+    "  facet_wrap(~class)"), chunk_opts = list(label = "vocabulary-solution")), 
+    tests = NULL, options = list(eval = FALSE, echo = TRUE, results = "markup", 
+        tidy = FALSE, tidy.opts = NULL, collapse = FALSE, prompt = FALSE, 
+        comment = NA, highlight = FALSE, size = "normalsize", 
+        background = "#F7F7F7", strip.white = TRUE, cache = 0, 
+        cache.path = "ims-anova_cache/html/", cache.vars = NULL, 
+        cache.lazy = TRUE, dependson = NULL, autodep = FALSE, 
+        cache.rebuild = FALSE, fig.keep = "high", fig.show = "asis", 
+        fig.align = "center", fig.path = "ims-anova_files/figure-html/", 
         dev = "png", dev.args = NULL, dpi = 192, fig.ext = "png", 
         fig.width = 5, fig.height = 3, fig.env = "figure", fig.cap = NULL, 
         fig.scap = NULL, fig.lp = "fig:", fig.subcap = NULL, 
@@ -1787,10 +1949,10 @@ learnr:::store_exercise_cache(structure(list(label = "vocabulary", global_setup 
         message = FALSE, render = NULL, ref.label = NULL, child = NULL, 
         engine = "r", split = FALSE, include = TRUE, purl = TRUE, 
         max.print = 1000, label = "vocabulary", exercise = TRUE, 
-        code = c("# Using gss, plot wordsum", "ggplot(data = ___, mapping = aes(___)) +", 
-        "  # Add a histogram layer with appropriate binwidth", 
+        exercise.cap = "vocabulary", code = c("# Using gss, plot wordsum", 
+        "ggplot(data = ___, mapping = aes(___)) +", "  # Add a histogram layer with appropriate binwidth", 
         "  ___ +", "  # Facet by class", "  facet_wrap(~___)"
-        ), out.width.px = 480, out.height.px = 288, params.src = "vocabulary, exercise=TRUE", 
+        ), out.width.px = 480, out.height.px = 288, params.src = "vocabulary, exercise=TRUE, exercise.cap=\"vocabulary\"", 
         fig.num = 0, exercise.df_print = "paged", exercise.checker = "NULL"), 
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
@@ -1839,15 +2001,18 @@ output$`tutorial-exercise-vocabulary_2-output` <- renderUI({
  
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "vocabulary_2", global_setup = structure(c("# load packages ----------------------------------------------------------------", 
-"library(learnr)", "library(tidyverse)", "library(infer)", "library(broom)", 
-"library(emo)", "library(openintro)", "library(ggridges)", "library(magrittr)", 
-"library(ggfortify)", "library(emmeans)", "", "# knitr options ----------------------------------------------------------------", 
+"library(learnr)", "library(dplyr)", "library(ggplot2)", "library(readr)", 
+"library(purrr)", "library(tidyr)", "library(infer)", "library(broom)", 
+"library(ggridges)", "library(ggfortify)", "library(emmeans)", 
+"", "# knitr options ----------------------------------------------------------------", 
 "", "knitr::opts_chunk$set(fig.align = \"center\", ", "                      fig.height = 3, ", 
 "                      fig.width = 5,", "                      echo = FALSE, ", 
 "                      message = FALSE, ", "                      warning = FALSE)", 
 "", "# data prep --------------------------------------------------------------------", 
-"", "gss <- read_csv(\"data/gss_wordsum_class.csv\")", "", "# Hash generation helpers", 
-"# Should ideally be loaded from the imstutorials package when it exists", 
+"", "gss <- read_csv(\"data/gss_wordsum_class.csv\")", "", "# Required exercises for progress tracking", 
+"REQUIRED_EXERCISES <- c(", "  \"vocabulary\",", "  \"vocabulary_2\",", 
+"  \"vocabulary_3\",", "  \"vocabulary_4\",", "  \"vocabulary_5\"", 
+")", "", "# Hash generation helpers", "# Should ideally be loaded from the imstutorials package when it exists", 
 "is_server_context <- function(.envir) {", "  # We are in the server context if there are the follow:", 
 "  # * input - input reactive values", "  # * output - shiny output", 
 "  # * session - shiny session", "  #", "  # Check context by examining the class of each of these.", 
@@ -1876,12 +2041,48 @@ learnr:::store_exercise_cache(structure(list(label = "vocabulary_2", global_setu
 "        }", "      )", "      output$hash_output <- shiny::renderText(encoded_txt())", 
 "    },", "    envir = p", "  )", "}", "", "hash_encoder_ui <- {", 
 "  shiny::div(\"If you have completed this tutorial and are happy with all of your\", \"solutions, please enter your identifying information, then click the button below to generate your hash\", textInput(\"name\", \"What's your name?\"), textInput(\"studentID\", \"What is your student ID?\"), renderText({", 
-"    input$caption", "  }), )", "}"), chunk_opts = list(label = "setup", 
+"    input$caption", "  }), )", "}", "", "# Progress checker logic", 
+"progress_checker_logic <- function() {", "  p <- parent.frame()", 
+"  check_server_context(p)", "  local(", "    {", "      # Reactive to check progress when button is clicked", 
+"      progress_info <- shiny::eventReactive(", "        input$check_progress,", 
+"        {", "          state <- learnr:::get_tutorial_state()", 
+"          ", "          # Get labels of completed exercises (any submission counts)", 
+"          completed_labels <- names(state)", "          ", "          # Check which required exercises are completed", 
+"          completed_required <- REQUIRED_EXERCISES %in% completed_labels", 
+"          n_completed <- sum(completed_required)", "          n_total <- length(REQUIRED_EXERCISES)", 
+"          pct <- round(100 * n_completed / n_total)", "          ", 
+"          # Build detailed status", "          missing <- REQUIRED_EXERCISES[!completed_required]", 
+"          ", "          list(", "            n_completed = n_completed,", 
+"            n_total = n_total,", "            pct = pct,", "            missing = missing", 
+"          )", "        }", "      )", "      ", "      # Render the progress output", 
+"      output$progress_output <- shiny::renderUI({", "        info <- progress_info()", 
+"        ", "        # Color based on completion", "        bar_color <- if (info$pct == 100) {", 
+"          \"#28a745\"  # green", "        } else if (info$pct >= 75) {", 
+"          \"#ffc107\"  # yellow", "        } else {", "          \"#dc3545\"  # red", 
+"        }", "        ", "        # Build the UI", "        shiny::tagList(", 
+"          shiny::tags$div(", "            style = \"margin-bottom: 10px; font-weight: bold;\",", 
+"            sprintf(\"Progress: %d / %d exercises completed (%d%%)\", ", 
+"                    info$n_completed, info$n_total, info$pct)", 
+"          ),", "          # Progress bar", "          shiny::tags$div(", 
+"            style = \"background-color: #e9ecef; border-radius: 4px; height: 24px; margin-bottom: 15px;\",", 
+"            shiny::tags$div(", "              style = sprintf(", 
+"                \"background-color: %s; width: %d%%; height: 100%%; border-radius: 4px; transition: width 0.3s;\",", 
+"                bar_color, info$pct", "              )", "            )", 
+"          ),", "          # Show missing exercises if any", 
+"          if (length(info$missing) > 0) {", "            shiny::tags$div(", 
+"              style = \"color: #856404; background-color: #fff3cd; border: 1px solid #ffeeba; padding: 10px; border-radius: 4px;\",", 
+"              shiny::tags$strong(\"Missing exercises:\"),", 
+"              shiny::tags$ul(", "                lapply(info$missing, function(x) shiny::tags$li(x))", 
+"              )", "            )", "          } else {", "            shiny::tags$div(", 
+"              style = \"color: #155724; background-color: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 4px;\",", 
+"              shiny::tags$strong(\"All required exercises completed! You're ready to generate your hash.\")", 
+"            )", "          }", "        )", "      })", "    },", 
+"    envir = p", "  )", "}"), chunk_opts = list(label = "setup", 
     include = FALSE)), setup = NULL, chunks = list(list(label = "vocabulary_2", 
     code = "# Run an analysis of variance on score vs. rank\naov_evals_rank <- aov(___, data = ___)\n\n# Tidy the model\ntidy(___)", 
-    opts = list(label = "\"vocabulary_2\"", exercise = "TRUE"), 
-    engine = "r")), code_check = NULL, error_check = NULL, check = NULL, 
-    solution = structure(c("# Run an analysis of variance on score vs. rank", 
+    opts = list(label = "\"vocabulary_2\"", exercise = "TRUE", 
+        exercise.cap = "\"vocabulary_2\""), engine = "r")), code_check = NULL, 
+    error_check = NULL, check = NULL, solution = structure(c("# Run an analysis of variance on score vs. rank", 
     "aov_evals_rank <- aov(score ~ rank, data = evals)", "", 
     "# Tidy the model", "tidy(aov_evals_rank)"), chunk_opts = list(
         label = "vocabulary_2-solution")), tests = NULL, options = list(
@@ -1901,11 +2102,11 @@ learnr:::store_exercise_cache(structure(list(label = "vocabulary_2", global_setu
         message = FALSE, render = NULL, ref.label = NULL, child = NULL, 
         engine = "r", split = FALSE, include = TRUE, purl = TRUE, 
         max.print = 1000, label = "vocabulary_2", exercise = TRUE, 
-        code = c("# Run an analysis of variance on score vs. rank", 
+        exercise.cap = "vocabulary_2", code = c("# Run an analysis of variance on score vs. rank", 
         "aov_evals_rank <- aov(___, data = ___)", "", "# Tidy the model", 
         "tidy(___)"), out.width.px = 480, out.height.px = 288, 
-        params.src = "vocabulary_2, exercise=TRUE", fig.num = 0, 
-        exercise.df_print = "paged", exercise.checker = "NULL"), 
+        params.src = "vocabulary_2, exercise=TRUE, exercise.cap=\"vocabulary_2\"", 
+        fig.num = 0, exercise.df_print = "paged", exercise.checker = "NULL"), 
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
 </script>
@@ -1958,15 +2159,18 @@ output$`tutorial-exercise-vocabulary_3-output` <- renderUI({
 
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "vocabulary_3", global_setup = structure(c("# load packages ----------------------------------------------------------------", 
-"library(learnr)", "library(tidyverse)", "library(infer)", "library(broom)", 
-"library(emo)", "library(openintro)", "library(ggridges)", "library(magrittr)", 
-"library(ggfortify)", "library(emmeans)", "", "# knitr options ----------------------------------------------------------------", 
+"library(learnr)", "library(dplyr)", "library(ggplot2)", "library(readr)", 
+"library(purrr)", "library(tidyr)", "library(infer)", "library(broom)", 
+"library(ggridges)", "library(ggfortify)", "library(emmeans)", 
+"", "# knitr options ----------------------------------------------------------------", 
 "", "knitr::opts_chunk$set(fig.align = \"center\", ", "                      fig.height = 3, ", 
 "                      fig.width = 5,", "                      echo = FALSE, ", 
 "                      message = FALSE, ", "                      warning = FALSE)", 
 "", "# data prep --------------------------------------------------------------------", 
-"", "gss <- read_csv(\"data/gss_wordsum_class.csv\")", "", "# Hash generation helpers", 
-"# Should ideally be loaded from the imstutorials package when it exists", 
+"", "gss <- read_csv(\"data/gss_wordsum_class.csv\")", "", "# Required exercises for progress tracking", 
+"REQUIRED_EXERCISES <- c(", "  \"vocabulary\",", "  \"vocabulary_2\",", 
+"  \"vocabulary_3\",", "  \"vocabulary_4\",", "  \"vocabulary_5\"", 
+")", "", "# Hash generation helpers", "# Should ideally be loaded from the imstutorials package when it exists", 
 "is_server_context <- function(.envir) {", "  # We are in the server context if there are the follow:", 
 "  # * input - input reactive values", "  # * output - shiny output", 
 "  # * session - shiny session", "  #", "  # Check context by examining the class of each of these.", 
@@ -1995,22 +2199,58 @@ learnr:::store_exercise_cache(structure(list(label = "vocabulary_3", global_setu
 "        }", "      )", "      output$hash_output <- shiny::renderText(encoded_txt())", 
 "    },", "    envir = p", "  )", "}", "", "hash_encoder_ui <- {", 
 "  shiny::div(\"If you have completed this tutorial and are happy with all of your\", \"solutions, please enter your identifying information, then click the button below to generate your hash\", textInput(\"name\", \"What's your name?\"), textInput(\"studentID\", \"What is your student ID?\"), renderText({", 
-"    input$caption", "  }), )", "}"), chunk_opts = list(label = "setup", 
+"    input$caption", "  }), )", "}", "", "# Progress checker logic", 
+"progress_checker_logic <- function() {", "  p <- parent.frame()", 
+"  check_server_context(p)", "  local(", "    {", "      # Reactive to check progress when button is clicked", 
+"      progress_info <- shiny::eventReactive(", "        input$check_progress,", 
+"        {", "          state <- learnr:::get_tutorial_state()", 
+"          ", "          # Get labels of completed exercises (any submission counts)", 
+"          completed_labels <- names(state)", "          ", "          # Check which required exercises are completed", 
+"          completed_required <- REQUIRED_EXERCISES %in% completed_labels", 
+"          n_completed <- sum(completed_required)", "          n_total <- length(REQUIRED_EXERCISES)", 
+"          pct <- round(100 * n_completed / n_total)", "          ", 
+"          # Build detailed status", "          missing <- REQUIRED_EXERCISES[!completed_required]", 
+"          ", "          list(", "            n_completed = n_completed,", 
+"            n_total = n_total,", "            pct = pct,", "            missing = missing", 
+"          )", "        }", "      )", "      ", "      # Render the progress output", 
+"      output$progress_output <- shiny::renderUI({", "        info <- progress_info()", 
+"        ", "        # Color based on completion", "        bar_color <- if (info$pct == 100) {", 
+"          \"#28a745\"  # green", "        } else if (info$pct >= 75) {", 
+"          \"#ffc107\"  # yellow", "        } else {", "          \"#dc3545\"  # red", 
+"        }", "        ", "        # Build the UI", "        shiny::tagList(", 
+"          shiny::tags$div(", "            style = \"margin-bottom: 10px; font-weight: bold;\",", 
+"            sprintf(\"Progress: %d / %d exercises completed (%d%%)\", ", 
+"                    info$n_completed, info$n_total, info$pct)", 
+"          ),", "          # Progress bar", "          shiny::tags$div(", 
+"            style = \"background-color: #e9ecef; border-radius: 4px; height: 24px; margin-bottom: 15px;\",", 
+"            shiny::tags$div(", "              style = sprintf(", 
+"                \"background-color: %s; width: %d%%; height: 100%%; border-radius: 4px; transition: width 0.3s;\",", 
+"                bar_color, info$pct", "              )", "            )", 
+"          ),", "          # Show missing exercises if any", 
+"          if (length(info$missing) > 0) {", "            shiny::tags$div(", 
+"              style = \"color: #856404; background-color: #fff3cd; border: 1px solid #ffeeba; padding: 10px; border-radius: 4px;\",", 
+"              shiny::tags$strong(\"Missing exercises:\"),", 
+"              shiny::tags$ul(", "                lapply(info$missing, function(x) shiny::tags$li(x))", 
+"              )", "            )", "          } else {", "            shiny::tags$div(", 
+"              style = \"color: #155724; background-color: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 4px;\",", 
+"              shiny::tags$strong(\"All required exercises completed! You're ready to generate your hash.\")", 
+"            )", "          }", "        )", "      })", "    },", 
+"    envir = p", "  )", "}"), chunk_opts = list(label = "setup", 
     include = FALSE)), setup = NULL, chunks = list(list(label = "vocabulary_3", 
     code = "gss |>\n  # Group by class\n  group_by(___) |>\n  # Calculate the std dev of wordsum as sd_wordsum\n  summarize(___ = ___)", 
-    opts = list(label = "\"vocabulary_3\"", exercise = "TRUE"), 
-    engine = "r")), code_check = NULL, error_check = NULL, check = NULL, 
-    solution = structure(c("gss |>", "  # Group by class", "  group_by(class) |>", 
-    "  # Calculate the std dev of wordsum as sd_wordsum", "  summarize(sd_wordsum = sd(wordsum))"
-    ), chunk_opts = list(label = "vocabulary_3-solution")), tests = NULL, 
-    options = list(eval = FALSE, echo = TRUE, results = "markup", 
-        tidy = FALSE, tidy.opts = NULL, collapse = FALSE, prompt = FALSE, 
-        comment = NA, highlight = FALSE, size = "normalsize", 
-        background = "#F7F7F7", strip.white = TRUE, cache = 0, 
-        cache.path = "ims-anova_cache/html/", cache.vars = NULL, 
-        cache.lazy = TRUE, dependson = NULL, autodep = FALSE, 
-        cache.rebuild = FALSE, fig.keep = "high", fig.show = "asis", 
-        fig.align = "center", fig.path = "ims-anova_files/figure-html/", 
+    opts = list(label = "\"vocabulary_3\"", exercise = "TRUE", 
+        exercise.cap = "\"vocabulary_3\""), engine = "r")), code_check = NULL, 
+    error_check = NULL, check = NULL, solution = structure(c("gss |>", 
+    "  # Group by class", "  group_by(class) |>", "  # Calculate the std dev of wordsum as sd_wordsum", 
+    "  summarize(sd_wordsum = sd(wordsum))"), chunk_opts = list(
+        label = "vocabulary_3-solution")), tests = NULL, options = list(
+        eval = FALSE, echo = TRUE, results = "markup", tidy = FALSE, 
+        tidy.opts = NULL, collapse = FALSE, prompt = FALSE, comment = NA, 
+        highlight = FALSE, size = "normalsize", background = "#F7F7F7", 
+        strip.white = TRUE, cache = 0, cache.path = "ims-anova_cache/html/", 
+        cache.vars = NULL, cache.lazy = TRUE, dependson = NULL, 
+        autodep = FALSE, cache.rebuild = FALSE, fig.keep = "high", 
+        fig.show = "asis", fig.align = "center", fig.path = "ims-anova_files/figure-html/", 
         dev = "png", dev.args = NULL, dpi = 192, fig.ext = "png", 
         fig.width = 5, fig.height = 3, fig.env = "figure", fig.cap = NULL, 
         fig.scap = NULL, fig.lp = "fig:", fig.subcap = NULL, 
@@ -2020,11 +2260,11 @@ learnr:::store_exercise_cache(structure(list(label = "vocabulary_3", global_setu
         message = FALSE, render = NULL, ref.label = NULL, child = NULL, 
         engine = "r", split = FALSE, include = TRUE, purl = TRUE, 
         max.print = 1000, label = "vocabulary_3", exercise = TRUE, 
-        code = c("gss |>", "  # Group by class", "  group_by(___) |>", 
-        "  # Calculate the std dev of wordsum as sd_wordsum", 
+        exercise.cap = "vocabulary_3", code = c("gss |>", "  # Group by class", 
+        "  group_by(___) |>", "  # Calculate the std dev of wordsum as sd_wordsum", 
         "  summarize(___ = ___)"), out.width.px = 480, out.height.px = 288, 
-        params.src = "vocabulary_3, exercise=TRUE", fig.num = 0, 
-        exercise.df_print = "paged", exercise.checker = "NULL"), 
+        params.src = "vocabulary_3, exercise=TRUE, exercise.cap=\"vocabulary_3\"", 
+        fig.num = 0, exercise.df_print = "paged", exercise.checker = "NULL"), 
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
 </script>
@@ -2039,15 +2279,18 @@ output$`tutorial-exercise-vocabulary_4-output` <- renderUI({
 
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "vocabulary_4", global_setup = structure(c("# load packages ----------------------------------------------------------------", 
-"library(learnr)", "library(tidyverse)", "library(infer)", "library(broom)", 
-"library(emo)", "library(openintro)", "library(ggridges)", "library(magrittr)", 
-"library(ggfortify)", "library(emmeans)", "", "# knitr options ----------------------------------------------------------------", 
+"library(learnr)", "library(dplyr)", "library(ggplot2)", "library(readr)", 
+"library(purrr)", "library(tidyr)", "library(infer)", "library(broom)", 
+"library(ggridges)", "library(ggfortify)", "library(emmeans)", 
+"", "# knitr options ----------------------------------------------------------------", 
 "", "knitr::opts_chunk$set(fig.align = \"center\", ", "                      fig.height = 3, ", 
 "                      fig.width = 5,", "                      echo = FALSE, ", 
 "                      message = FALSE, ", "                      warning = FALSE)", 
 "", "# data prep --------------------------------------------------------------------", 
-"", "gss <- read_csv(\"data/gss_wordsum_class.csv\")", "", "# Hash generation helpers", 
-"# Should ideally be loaded from the imstutorials package when it exists", 
+"", "gss <- read_csv(\"data/gss_wordsum_class.csv\")", "", "# Required exercises for progress tracking", 
+"REQUIRED_EXERCISES <- c(", "  \"vocabulary\",", "  \"vocabulary_2\",", 
+"  \"vocabulary_3\",", "  \"vocabulary_4\",", "  \"vocabulary_5\"", 
+")", "", "# Hash generation helpers", "# Should ideally be loaded from the imstutorials package when it exists", 
 "is_server_context <- function(.envir) {", "  # We are in the server context if there are the follow:", 
 "  # * input - input reactive values", "  # * output - shiny output", 
 "  # * session - shiny session", "  #", "  # Check context by examining the class of each of these.", 
@@ -2076,12 +2319,49 @@ learnr:::store_exercise_cache(structure(list(label = "vocabulary_4", global_setu
 "        }", "      )", "      output$hash_output <- shiny::renderText(encoded_txt())", 
 "    },", "    envir = p", "  )", "}", "", "hash_encoder_ui <- {", 
 "  shiny::div(\"If you have completed this tutorial and are happy with all of your\", \"solutions, please enter your identifying information, then click the button below to generate your hash\", textInput(\"name\", \"What's your name?\"), textInput(\"studentID\", \"What is your student ID?\"), renderText({", 
-"    input$caption", "  }), )", "}"), chunk_opts = list(label = "setup", 
+"    input$caption", "  }), )", "}", "", "# Progress checker logic", 
+"progress_checker_logic <- function() {", "  p <- parent.frame()", 
+"  check_server_context(p)", "  local(", "    {", "      # Reactive to check progress when button is clicked", 
+"      progress_info <- shiny::eventReactive(", "        input$check_progress,", 
+"        {", "          state <- learnr:::get_tutorial_state()", 
+"          ", "          # Get labels of completed exercises (any submission counts)", 
+"          completed_labels <- names(state)", "          ", "          # Check which required exercises are completed", 
+"          completed_required <- REQUIRED_EXERCISES %in% completed_labels", 
+"          n_completed <- sum(completed_required)", "          n_total <- length(REQUIRED_EXERCISES)", 
+"          pct <- round(100 * n_completed / n_total)", "          ", 
+"          # Build detailed status", "          missing <- REQUIRED_EXERCISES[!completed_required]", 
+"          ", "          list(", "            n_completed = n_completed,", 
+"            n_total = n_total,", "            pct = pct,", "            missing = missing", 
+"          )", "        }", "      )", "      ", "      # Render the progress output", 
+"      output$progress_output <- shiny::renderUI({", "        info <- progress_info()", 
+"        ", "        # Color based on completion", "        bar_color <- if (info$pct == 100) {", 
+"          \"#28a745\"  # green", "        } else if (info$pct >= 75) {", 
+"          \"#ffc107\"  # yellow", "        } else {", "          \"#dc3545\"  # red", 
+"        }", "        ", "        # Build the UI", "        shiny::tagList(", 
+"          shiny::tags$div(", "            style = \"margin-bottom: 10px; font-weight: bold;\",", 
+"            sprintf(\"Progress: %d / %d exercises completed (%d%%)\", ", 
+"                    info$n_completed, info$n_total, info$pct)", 
+"          ),", "          # Progress bar", "          shiny::tags$div(", 
+"            style = \"background-color: #e9ecef; border-radius: 4px; height: 24px; margin-bottom: 15px;\",", 
+"            shiny::tags$div(", "              style = sprintf(", 
+"                \"background-color: %s; width: %d%%; height: 100%%; border-radius: 4px; transition: width 0.3s;\",", 
+"                bar_color, info$pct", "              )", "            )", 
+"          ),", "          # Show missing exercises if any", 
+"          if (length(info$missing) > 0) {", "            shiny::tags$div(", 
+"              style = \"color: #856404; background-color: #fff3cd; border: 1px solid #ffeeba; padding: 10px; border-radius: 4px;\",", 
+"              shiny::tags$strong(\"Missing exercises:\"),", 
+"              shiny::tags$ul(", "                lapply(info$missing, function(x) shiny::tags$li(x))", 
+"              )", "            )", "          } else {", "            shiny::tags$div(", 
+"              style = \"color: #155724; background-color: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 4px;\",", 
+"              shiny::tags$strong(\"All required exercises completed! You're ready to generate your hash.\")", 
+"            )", "          }", "        )", "      })", "    },", 
+"    envir = p", "  )", "}"), chunk_opts = list(label = "setup", 
     include = FALSE)), setup = NULL, chunks = list(list(label = "vocabulary_4", 
     code = "gss |>\n  # Map wordsum to the x-axis and class to the y-axis\n  ggplot(aes(x = ___, y = ___)) +\n  # Add density ridges to the plot! \n  geom_density_ridges()", 
-    opts = list(label = "\"vocabulary_4\"", exercise = "TRUE"), 
-    engine = "r")), code_check = NULL, error_check = NULL, check = NULL, 
-    solution = structure(c("gss |>", "  # Map wordsum to the x-axis and class to the y-axis", 
+    opts = list(label = "\"vocabulary_4\"", exercise = "TRUE", 
+        exercise.cap = "\"vocabulary_4\""), engine = "r")), code_check = NULL, 
+    error_check = NULL, check = NULL, solution = structure(c("gss |>", 
+    "  # Map wordsum to the x-axis and class to the y-axis", 
     "  ggplot(aes(x = wordsum, y = class)) +", "  # Add density ridges to the plot! ", 
     "  geom_density_ridges()"), chunk_opts = list(label = "vocabulary_4-solution")), 
     tests = NULL, options = list(eval = FALSE, echo = TRUE, results = "markup", 
@@ -2101,11 +2381,11 @@ learnr:::store_exercise_cache(structure(list(label = "vocabulary_4", global_setu
         message = FALSE, render = NULL, ref.label = NULL, child = NULL, 
         engine = "r", split = FALSE, include = TRUE, purl = TRUE, 
         max.print = 1000, label = "vocabulary_4", exercise = TRUE, 
-        code = c("gss |>", "  # Map wordsum to the x-axis and class to the y-axis", 
+        exercise.cap = "vocabulary_4", code = c("gss |>", "  # Map wordsum to the x-axis and class to the y-axis", 
         "  ggplot(aes(x = ___, y = ___)) +", "  # Add density ridges to the plot! ", 
         "  geom_density_ridges()"), out.width.px = 480, out.height.px = 288, 
-        params.src = "vocabulary_4, exercise=TRUE", fig.num = 0, 
-        exercise.df_print = "paged", exercise.checker = "NULL"), 
+        params.src = "vocabulary_4, exercise=TRUE, exercise.cap=\"vocabulary_4\"", 
+        fig.num = 0, exercise.df_print = "paged", exercise.checker = "NULL"), 
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
 </script>
@@ -2120,15 +2400,18 @@ output$`tutorial-exercise-vocabulary_5-output` <- renderUI({
 
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "vocabulary_5", global_setup = structure(c("# load packages ----------------------------------------------------------------", 
-"library(learnr)", "library(tidyverse)", "library(infer)", "library(broom)", 
-"library(emo)", "library(openintro)", "library(ggridges)", "library(magrittr)", 
-"library(ggfortify)", "library(emmeans)", "", "# knitr options ----------------------------------------------------------------", 
+"library(learnr)", "library(dplyr)", "library(ggplot2)", "library(readr)", 
+"library(purrr)", "library(tidyr)", "library(infer)", "library(broom)", 
+"library(ggridges)", "library(ggfortify)", "library(emmeans)", 
+"", "# knitr options ----------------------------------------------------------------", 
 "", "knitr::opts_chunk$set(fig.align = \"center\", ", "                      fig.height = 3, ", 
 "                      fig.width = 5,", "                      echo = FALSE, ", 
 "                      message = FALSE, ", "                      warning = FALSE)", 
 "", "# data prep --------------------------------------------------------------------", 
-"", "gss <- read_csv(\"data/gss_wordsum_class.csv\")", "", "# Hash generation helpers", 
-"# Should ideally be loaded from the imstutorials package when it exists", 
+"", "gss <- read_csv(\"data/gss_wordsum_class.csv\")", "", "# Required exercises for progress tracking", 
+"REQUIRED_EXERCISES <- c(", "  \"vocabulary\",", "  \"vocabulary_2\",", 
+"  \"vocabulary_3\",", "  \"vocabulary_4\",", "  \"vocabulary_5\"", 
+")", "", "# Hash generation helpers", "# Should ideally be loaded from the imstutorials package when it exists", 
 "is_server_context <- function(.envir) {", "  # We are in the server context if there are the follow:", 
 "  # * input - input reactive values", "  # * output - shiny output", 
 "  # * session - shiny session", "  #", "  # Check context by examining the class of each of these.", 
@@ -2157,15 +2440,52 @@ learnr:::store_exercise_cache(structure(list(label = "vocabulary_5", global_setu
 "        }", "      )", "      output$hash_output <- shiny::renderText(encoded_txt())", 
 "    },", "    envir = p", "  )", "}", "", "hash_encoder_ui <- {", 
 "  shiny::div(\"If you have completed this tutorial and are happy with all of your\", \"solutions, please enter your identifying information, then click the button below to generate your hash\", textInput(\"name\", \"What's your name?\"), textInput(\"studentID\", \"What is your student ID?\"), renderText({", 
-"    input$caption", "  }), )", "}"), chunk_opts = list(label = "setup", 
+"    input$caption", "  }), )", "}", "", "# Progress checker logic", 
+"progress_checker_logic <- function() {", "  p <- parent.frame()", 
+"  check_server_context(p)", "  local(", "    {", "      # Reactive to check progress when button is clicked", 
+"      progress_info <- shiny::eventReactive(", "        input$check_progress,", 
+"        {", "          state <- learnr:::get_tutorial_state()", 
+"          ", "          # Get labels of completed exercises (any submission counts)", 
+"          completed_labels <- names(state)", "          ", "          # Check which required exercises are completed", 
+"          completed_required <- REQUIRED_EXERCISES %in% completed_labels", 
+"          n_completed <- sum(completed_required)", "          n_total <- length(REQUIRED_EXERCISES)", 
+"          pct <- round(100 * n_completed / n_total)", "          ", 
+"          # Build detailed status", "          missing <- REQUIRED_EXERCISES[!completed_required]", 
+"          ", "          list(", "            n_completed = n_completed,", 
+"            n_total = n_total,", "            pct = pct,", "            missing = missing", 
+"          )", "        }", "      )", "      ", "      # Render the progress output", 
+"      output$progress_output <- shiny::renderUI({", "        info <- progress_info()", 
+"        ", "        # Color based on completion", "        bar_color <- if (info$pct == 100) {", 
+"          \"#28a745\"  # green", "        } else if (info$pct >= 75) {", 
+"          \"#ffc107\"  # yellow", "        } else {", "          \"#dc3545\"  # red", 
+"        }", "        ", "        # Build the UI", "        shiny::tagList(", 
+"          shiny::tags$div(", "            style = \"margin-bottom: 10px; font-weight: bold;\",", 
+"            sprintf(\"Progress: %d / %d exercises completed (%d%%)\", ", 
+"                    info$n_completed, info$n_total, info$pct)", 
+"          ),", "          # Progress bar", "          shiny::tags$div(", 
+"            style = \"background-color: #e9ecef; border-radius: 4px; height: 24px; margin-bottom: 15px;\",", 
+"            shiny::tags$div(", "              style = sprintf(", 
+"                \"background-color: %s; width: %d%%; height: 100%%; border-radius: 4px; transition: width 0.3s;\",", 
+"                bar_color, info$pct", "              )", "            )", 
+"          ),", "          # Show missing exercises if any", 
+"          if (length(info$missing) > 0) {", "            shiny::tags$div(", 
+"              style = \"color: #856404; background-color: #fff3cd; border: 1px solid #ffeeba; padding: 10px; border-radius: 4px;\",", 
+"              shiny::tags$strong(\"Missing exercises:\"),", 
+"              shiny::tags$ul(", "                lapply(info$missing, function(x) shiny::tags$li(x))", 
+"              )", "            )", "          } else {", "            shiny::tags$div(", 
+"              style = \"color: #155724; background-color: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 4px;\",", 
+"              shiny::tags$strong(\"All required exercises completed! You're ready to generate your hash.\")", 
+"            )", "          }", "        )", "      })", "    },", 
+"    envir = p", "  )", "}"), chunk_opts = list(label = "setup", 
     include = FALSE)), setup = NULL, chunks = list(list(label = "vocabulary_5", 
     code = "# Fit the ANOVA model\nvocab_aov <- aov(wordsum ~ class, data = gss)\n\n# Estimate marginal means\nvocab_means <- emmeans(vocab_aov, ~ class)\n\n# Bonferroni adjustment\npairs(vocab_means, adjust = \"bonferroni\")\n\n# Holm adjustment\npairs(vocab_means, adjust = \"holm\")\n\n# FDR adjustment  \npairs(vocab_means, adjust = \"fdr\")\n\n# Tukey HSD\npairs(vocab_means, adjust = \"tukey\")", 
-    opts = list(label = "\"vocabulary_5\"", exercise = "TRUE"), 
-    engine = "r")), code_check = NULL, error_check = NULL, check = NULL, 
-    solution = structure(c("# Fit the ANOVA model", "vocab_aov <- aov(wordsum ~ class, data = gss)", 
-    "", "# Estimate marginal means", "vocab_means <- emmeans(vocab_aov, ~ class)", 
-    "", "# Bonferroni adjustment (most conservative)", "cat(\"=== Bonferroni ===\\n\")", 
-    "pairs(vocab_means, adjust = \"bonferroni\")", "", "# Holm adjustment (less conservative than Bonferroni)", 
+    opts = list(label = "\"vocabulary_5\"", exercise = "TRUE", 
+        exercise.cap = "\"vocabulary_5\""), engine = "r")), code_check = NULL, 
+    error_check = NULL, check = NULL, solution = structure(c("# Fit the ANOVA model", 
+    "vocab_aov <- aov(wordsum ~ class, data = gss)", "", "# Estimate marginal means", 
+    "vocab_means <- emmeans(vocab_aov, ~ class)", "", "# Bonferroni adjustment (most conservative)", 
+    "cat(\"=== Bonferroni ===\\n\")", "pairs(vocab_means, adjust = \"bonferroni\")", 
+    "", "# Holm adjustment (less conservative than Bonferroni)", 
     "cat(\"\\n=== Holm ===\\n\")", "pairs(vocab_means, adjust = \"holm\")", 
     "", "# FDR adjustment (controls false discovery rate)", "cat(\"\\n=== FDR ===\\n\")", 
     "pairs(vocab_means, adjust = \"fdr\")", "", "# Tukey HSD (optimal for all pairwise comparisons)", 
@@ -2193,18 +2513,24 @@ learnr:::store_exercise_cache(structure(list(label = "vocabulary_5", global_setu
         message = FALSE, render = NULL, ref.label = NULL, child = NULL, 
         engine = "r", split = FALSE, include = TRUE, purl = TRUE, 
         max.print = 1000, label = "vocabulary_5", exercise = TRUE, 
-        code = c("# Fit the ANOVA model", "vocab_aov <- aov(wordsum ~ class, data = gss)", 
-        "", "# Estimate marginal means", "vocab_means <- emmeans(vocab_aov, ~ class)", 
+        exercise.cap = "vocabulary_5", code = c("# Fit the ANOVA model", 
+        "vocab_aov <- aov(wordsum ~ class, data = gss)", "", 
+        "# Estimate marginal means", "vocab_means <- emmeans(vocab_aov, ~ class)", 
         "", "# Bonferroni adjustment", "pairs(vocab_means, adjust = \"bonferroni\")", 
         "", "# Holm adjustment", "pairs(vocab_means, adjust = \"holm\")", 
         "", "# FDR adjustment  ", "pairs(vocab_means, adjust = \"fdr\")", 
         "", "# Tukey HSD", "pairs(vocab_means, adjust = \"tukey\")"
-        ), out.width.px = 480, out.height.px = 288, params.src = "vocabulary_5, exercise=TRUE", 
+        ), out.width.px = 480, out.height.px = 288, params.src = "vocabulary_5, exercise=TRUE, exercise.cap=\"vocabulary_5\"", 
         fig.num = 0, exercise.df_print = "paged", exercise.checker = "NULL"), 
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
 </script>
  
+<script type="application/shiny-prerendered" data-context="server">
+progress_checker_logic()
+</script>
+
+
 <script type="application/shiny-prerendered" data-context="server">
 encoder_logic()
 </script>
@@ -2216,7 +2542,7 @@ encoder_logic()
 <!--/html_preserve-->
 <!--html_preserve-->
 <script type="application/shiny-prerendered" data-context="execution_dependencies">
-{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages","version"]},"class":{"type":"character","attributes":{},"value":["data.frame"]},"row.names":{"type":"integer","attributes":{},"value":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104]}},"value":[{"type":"character","attributes":{},"value":["airports","assertthat","backports","base","bit","bit64","broom","bslib","cachem","checkmate","cherryblossom","cli","coda","codetools","commonmark","compiler","crayon","datasets","digest","dplyr","ellipsis","emmeans","emo","estimability","evaluate","farver","fastmap","fontawesome","forcats","generics","ggfortify","ggplot2","ggridges","glue","graphics","grDevices","grid","gridExtra","gtable","hms","htmltools","htmlwidgets","httpuv","infer","jquerylib","jsonlite","knitr","labeling","later","lattice","learnr","learnrhash","lifecycle","litedown","lubridate","magrittr","markdown","MASS","Matrix","methods","mime","multcomp","mvtnorm","openintro","parallel","pillar","pkgconfig","promises","purrr","R6","RColorBrewer","Rcpp","readr","rlang","rmarkdown","rprojroot","rstudioapi","S7","sandwich","sass","scales","shiny","splines","stats","stringi","stringr","survival","TH.data","tibble","tidyr","tidyselect","tidyverse","timechange","tools","tzdb","usdata","utils","vctrs","vroom","withr","xfun","xtable","yaml","zoo"]},{"type":"character","attributes":{},"value":["0.1.0","0.2.1","1.5.0","4.5.1","4.6.0","4.6.0-1","1.0.9","0.9.0","1.1.0","2.3.3","0.1.0","3.6.5","0.19-4.1","0.2-20","2.0.0","4.5.1","1.5.3","4.5.1","0.6.37","1.1.4","0.3.2","1.11.2","0.0.0.9000","1.5.1","1.0.5","2.1.2","1.2.0","0.5.3","1.0.1","0.1.4","0.4.19","4.0.0","0.5.7","1.8.0","4.5.1","4.5.1","4.5.1","2.3","0.3.6","1.1.3","0.5.8.1","1.6.4","1.6.16","1.0.9","0.1.4","2.0.0","1.50","0.4.3","1.4.2","0.22-7","0.11.5","0.2.0","1.0.4","0.7","1.9.4","2.0.3","2.0","7.3-65","1.7-3","4.5.1","0.13","1.4-28","1.3-3","2.5.0","4.5.1","1.11.1","2.0.3","1.3.3","1.1.0","2.6.1","1.1-3","1.1.0","2.1.5","1.1.6","2.30","2.1.1","0.17.1","0.2.0","3.1-1","0.4.10","1.4.0","1.11.1","4.5.1","4.5.1","1.8.7","1.5.2","3.8-3","1.1-4","3.3.0","1.3.1","1.2.1","2.0.0","0.3.0","4.5.1","0.5.0","0.3.1","4.5.1","0.6.5","1.6.6","3.0.2","0.52","1.8-4","2.3.10","1.8-14"]}]}]}
+{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages","version"]},"class":{"type":"character","attributes":{},"value":["data.frame"]},"row.names":{"type":"integer","attributes":{},"value":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94]}},"value":[{"type":"character","attributes":{},"value":["backports","base","bit","bit64","broom","bslib","cachem","checkmate","cli","coda","codetools","commonmark","compiler","crayon","datasets","digest","dplyr","ellipsis","emmeans","estimability","evaluate","farver","fastmap","fontawesome","generics","ggfortify","ggplot2","ggridges","glue","graphics","grDevices","grid","gridExtra","gtable","hms","htmltools","htmlwidgets","httpuv","infer","jquerylib","jsonlite","knitr","labeling","later","lattice","learnr","learnrhash","lifecycle","litedown","magrittr","markdown","MASS","Matrix","methods","mime","multcomp","mvtnorm","parallel","pillar","pkgconfig","promises","purrr","R6","RColorBrewer","Rcpp","readr","rlang","rmarkdown","rprojroot","rstudioapi","S7","sandwich","sass","scales","shiny","splines","stats","stringi","stringr","survival","TH.data","tibble","tidyr","tidyselect","tools","tzdb","utils","vctrs","vroom","withr","xfun","xtable","yaml","zoo"]},{"type":"character","attributes":{},"value":["1.5.0","4.5.1","4.6.0","4.6.0-1","1.0.9","0.9.0","1.1.0","2.3.3","3.6.5","0.19-4.1","0.2-20","2.0.0","4.5.1","1.5.3","4.5.1","0.6.37","1.1.4","0.3.2","1.11.2","1.5.1","1.0.5","2.1.2","1.2.0","0.5.3","0.1.4","0.4.19","4.0.0","0.5.7","1.8.0","4.5.1","4.5.1","4.5.1","2.3","0.3.6","1.1.3","0.5.8.1","1.6.4","1.6.16","1.0.9","0.1.4","2.0.0","1.50","0.4.3","1.4.2","0.22-7","0.11.5","0.2.0","1.0.4","0.7","2.0.3","2.0","7.3-65","1.7-3","4.5.1","0.13","1.4-28","1.3-3","4.5.1","1.11.1","2.0.3","1.3.3","1.1.0","2.6.1","1.1-3","1.1.0","2.1.5","1.1.6","2.30","2.1.1","0.17.1","0.2.0","3.1-1","0.4.10","1.4.0","1.11.1","4.5.1","4.5.1","1.8.7","1.5.2","3.8-3","1.1-4","3.3.0","1.3.1","1.2.1","4.5.1","0.5.0","4.5.1","0.6.5","1.6.6","3.0.2","0.52","1.8-4","2.3.10","1.8-14"]}]}]}
 </script>
 <!--/html_preserve-->
 </div>

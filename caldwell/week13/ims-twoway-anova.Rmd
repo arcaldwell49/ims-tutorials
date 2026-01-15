@@ -12,14 +12,15 @@ runtime: shiny_prerendered
 ```{r setup, include=FALSE}
 # load packages ----------------------------------------------------------------
 library(learnr)
-library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
 library(broom)
-library(emo)
-library(openintro)
 library(ggfortify)
 library(emmeans)
 library(car)  # For Anova() function with different SS types
 library(effects)  # For effect plots
+library(gridExtra)  # For grid.arrange()
 
 # knitr options ----------------------------------------------------------------
 
@@ -32,38 +33,20 @@ knitr::opts_chunk$set(fig.align = "center",
 
 # data prep --------------------------------------------------------------------
 
-# We'll use multiple datasets to illustrate different concepts
+# Load datasets from local RDS files
+data_path <- file.path("data")
 
-# Dataset 1: Tooth growth data (built-in to R)
-data("ToothGrowth")
-tooth <- ToothGrowth |>
-  mutate(dose = factor(dose))
+tooth <- readRDS(file.path(data_path, "tooth.rds"))
+evals_subset <- readRDS(file.path(data_path, "evals_subset.rds"))
+learning_data <- readRDS(file.path(data_path, "learning_data.rds"))
 
-# Dataset 2: Course evaluations with gender and rank
-evals_subset <- evals |>
-  select(score, rank, gender, age, bty_avg) |>
-  drop_na()
-
-# Dataset 3: Simulated data for demonstrating interactions
-set.seed(2024)
-learning_data <- tibble(
-  teaching_method = rep(c("Lecture", "Active Learning"), each = 60),
-  class_size = rep(rep(c("Small", "Large"), each = 30), 2),
-  test_score = c(
-    # Lecture + Small: mean = 75
-    rnorm(30, 75, 8),
-    # Lecture + Large: mean = 70
-    rnorm(30, 70, 8),
-    # Active Learning + Small: mean = 85
-    rnorm(30, 85, 8),
-    # Active Learning + Large: mean = 82
-    rnorm(30, 82, 8)
-  )
-) |>
-  mutate(
-    teaching_method = factor(teaching_method),
-    class_size = factor(class_size)
-  )
+# Required exercises for progress tracking
+REQUIRED_EXERCISES <- c(
+  "interaction_practice",
+  "twoway_practice",
+  "diagnostics_practice",
+  "emmeans_practice"
+)
 
 # Hash generation helpers
 is_server_context <- function(.envir) {
@@ -108,10 +91,85 @@ encoder_logic <- function(strip_output = FALSE) {
             answer = as.list(c(input$name, input$studentID)),
             timestamp = format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z", tz = "UTC")
           )
-          learnrhash::encode_obj(bind_rows(user_info, user_state))
+          learnrhash::encode_obj(dplyr::bind_rows(user_info, user_state))
         }
       )
       output$hash_output <- shiny::renderText(encoded_txt())
+    },
+    envir = p
+  )
+}
+
+# Progress checker logic
+progress_checker_logic <- function() {
+  p <- parent.frame()
+  check_server_context(p)
+  local(
+    {
+      progress_info <- shiny::eventReactive(
+        input$check_progress,
+        {
+          state <- learnr:::get_tutorial_state()
+          
+          completed_labels <- names(state)
+          completed_required <- REQUIRED_EXERCISES %in% completed_labels
+          n_completed <- sum(completed_required)
+          n_total <- length(REQUIRED_EXERCISES)
+          pct <- round(100 * n_completed / n_total)
+          
+          missing <- REQUIRED_EXERCISES[!completed_required]
+          
+          list(
+            n_completed = n_completed,
+            n_total = n_total,
+            pct = pct,
+            missing = missing
+          )
+        }
+      )
+      
+      output$progress_output <- shiny::renderUI({
+        info <- progress_info()
+        
+        bar_color <- if (info$pct == 100) {
+          "#28a745"
+        } else if (info$pct >= 75) {
+          "#ffc107"
+        } else {
+          "#dc3545"
+        }
+        
+        shiny::tagList(
+          shiny::tags$div(
+            style = "margin-bottom: 10px; font-weight: bold;",
+            sprintf("Progress: %d / %d exercises completed (%d%%)", 
+                    info$n_completed, info$n_total, info$pct)
+          ),
+          shiny::tags$div(
+            style = "background-color: #e9ecef; border-radius: 4px; height: 24px; margin-bottom: 15px;",
+            shiny::tags$div(
+              style = sprintf(
+                "background-color: %s; width: %d%%; height: 100%%; border-radius: 4px; transition: width 0.3s;",
+                bar_color, info$pct
+              )
+            )
+          ),
+          if (length(info$missing) > 0) {
+            shiny::tags$div(
+              style = "color: #856404; background-color: #fff3cd; border: 1px solid #ffeeba; padding: 10px; border-radius: 4px;",
+              shiny::tags$strong("Missing exercises:"),
+              shiny::tags$ul(
+                lapply(info$missing, function(x) shiny::tags$li(x))
+              )
+            )
+          } else {
+            shiny::tags$div(
+              style = "color: #155724; background-color: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 4px;",
+              shiny::tags$strong("All required exercises completed! You're ready to generate your hash.")
+            )
+          }
+        )
+      })
     },
     envir = p
   )
@@ -290,7 +348,7 @@ ggplot(tooth_means, aes(x = dose, y = mean_len,
 
 - At low dosages (0.5 mg), OJ appears more effective than VC
 - At high dosages (2.0 mg), the supplements appear similar
-- The lines are **not parallel** --- this suggests an **interaction**!
+- The lines are **not parallel** - this suggests an **interaction**!
 
 ### Understanding Interactions Visually
 
@@ -345,7 +403,7 @@ p3 <- ggplot(strong_int, aes(x = x, y = y, color = group, group = group)) +
   labs(title = "Plot C: Crossing Lines") + theme_minimal() +
   ylim(5, 30)
 
-gridExtra::grid.arrange(p1, p2, p3, ncol = 3)
+grid.arrange(p1, p2, p3, ncol = 3)
 ```
 
 ```{r quiz_1}
@@ -374,7 +432,7 @@ We have simulated data on student test scores with two factors:
 1. Calculate mean test scores for each combination of teaching method and class size
 2. Create an interaction plot showing how teaching method effects vary by class size
 
-```{r interaction_practice, exercise=TRUE}
+```{r interaction_practice, exercise=TRUE, exercise.cap="Create Interaction Plot"}
 # Calculate means
 learning_means <- learning_data |>
   group_by(___, ___) |>
@@ -607,7 +665,7 @@ Now it's your turn! Use the learning data (teaching method and class size).
 3. View the ANOVA table using `anova()`
 4. Determine which effects are significant at α = 0.05
 
-```{r twoway_practice, exercise=TRUE}
+```{r twoway_practice, exercise=TRUE, exercise.cap="Fit Two-Way ANOVA"}
 # Fit interactive model
 learning_model <- lm(___ ~ ___ * ___, data = learning_data)
 
@@ -715,13 +773,13 @@ Type II compares these models:
 - For testing B: `lm(~ A)` vs. `lm(~ A + B)`
 - For testing A×B: `lm(~ A + B)` vs. `lm(~ A + B + A:B)`
 
-Notice that we never test a main effect in the presence of its interaction---we only include the interaction when testing the interaction itself. This follows the hierarchical principle.
+Notice that we never test a main effect in the presence of its interaction. We only include the interaction when testing the interaction itself. This follows the hierarchical principle.
 
 **Model comparison notation:**
 
-- Main effect A: SS(A | B) --- "A given B, not given A×B"
-- Main effect B: SS(B | A) --- "B given A, not given A×B"  
-- Interaction: SS(AB | A, B) --- "A×B given both main effects"
+- Main effect A: SS(A | B) - "A given B, not given A×B"
+- Main effect B: SS(B | A) - "B given A, not given A×B"  
+- Interaction: SS(AB | A, B) - "A×B given both main effects"
 
 ### Type III Sums of Squares: Violating Marginality
 
@@ -743,9 +801,9 @@ These model comparisons are **not hierarchical**! The reduced model includes the
 
 **Model comparison notation:**
 
-- Main effect A: SS(A | B, AB) --- "A given B AND A×B" ⚠️
-- Main effect B: SS(B | A, AB) --- "B given A AND A×B" ⚠️
-- Interaction: SS(AB | A, B) --- "A×B given both main effects"
+- Main effect A: SS(A | B, AB) - "A given B AND A×B" (Warning!)
+- Main effect B: SS(B | A, AB) - "B given A AND A×B" (Warning!)
+- Interaction: SS(AB | A, B) - "A×B given both main effects"
 
 ### The Controversy: Criticisms of Type III
 
@@ -787,12 +845,12 @@ Despite these criticisms, Type III is common in some fields, particularly becaus
 
 **Reasons to prefer Type II:**
 
-1. ✓ **Respects the principle of marginality** - tests are theoretically sound
-2. ✓ **More powerful** when interaction is absent or negligible
-3. ✓ **Philosophically coherent** - doesn't test odd hypotheses
-4. ✓ **Endorsed by prominent statisticians** (Nelder, Senn, Langsrud, Fox)
-5. ✓ **Default in the R community** via the `car` package
-6. ✓ **Natural interpretation** - tests main effects controlling for other main effects
+1. **Respects the principle of marginality** - tests are theoretically sound
+2. **More powerful** when interaction is absent or negligible
+3. **Philosophically coherent** - doesn't test odd hypotheses
+4. **Endorsed by prominent statisticians** (Nelder, Senn, Langsrud, Fox)
+5. **Default in the R community** via the `car` package
+6. **Natural interpretation** - tests main effects controlling for other main effects
 
 **How Type II works in practice:**
 
@@ -805,7 +863,7 @@ When the interaction is not significant:
 When the interaction IS significant:
 
 - Type II tells us the main effects aren't significant after controlling for other main effects
-- But this doesn't matter---we should focus on simple effects anyway!
+- But this doesn't matter. We should focus on simple effects anyway!
 - The fact that Type II "assumes no interaction" just means it gives us less information about marginal means (which we don't care about with a significant interaction)
 
 ### When You Might Use Type III
@@ -989,19 +1047,19 @@ autoplot(tooth_int, which = 1:4, ncol = 2, nrow = 2)
 
 **What to look for:**
 
-- ✓ **Good:** Points randomly scattered around horizontal line at 0
-- ✓ **Good:** No clear pattern or trend
-- ✓ **Good:** Roughly equal spread across the range
+- **Good:** Points randomly scattered around horizontal line at 0
+- **Good:** No clear pattern or trend
+- **Good:** Roughly equal spread across the range
 
 **Red flags:**
 
-- ✗ Curved pattern → Nonlinearity (may need transformation)
-- ✗ Funnel shape → Heteroscedasticity (unequal variance)
-- ✗ Clusters or gaps → Missing factor or interaction
+- Curved pattern → Nonlinearity (may need transformation)
+- Funnel shape → Heteroscedasticity (unequal variance)
+- Clusters or gaps → Missing factor or interaction
 
 **For our tooth growth model:**
 
-The points are fairly randomly scattered with no obvious pattern. There might be slight differences in spread, but nothing alarming. ✓
+The points are fairly randomly scattered with no obvious pattern. There might be slight differences in spread, but nothing alarming.
 
 ### Plot 2: Normal Q-Q Plot
 
@@ -1009,18 +1067,18 @@ The points are fairly randomly scattered with no obvious pattern. There might be
 
 **What to look for:**
 
-- ✓ **Good:** Points fall close to the diagonal line
-- ✓ **Good:** Slight deviations at extremes are okay
+- **Good:** Points fall close to the diagonal line
+- **Good:** Slight deviations at extremes are okay
 
 **Red flags:**
 
-- ✗ Points deviate substantially from line → Non-normality
-- ✗ S-shaped curve → Skewed distribution
-- ✗ Points far from line at both ends → Heavy tails (outliers)
+- Points deviate substantially from line → Non-normality
+- S-shaped curve → Skewed distribution
+- Points far from line at both ends → Heavy tails (outliers)
 
 **For our tooth growth model:**
 
-Points follow the line quite well with minor deviations at the ends. This is acceptable, especially with moderate sample sizes. ✓
+Points follow the line quite well with minor deviations at the ends. This is acceptable, especially with moderate sample sizes.
 
 **Remember:** ANOVA is fairly robust to minor violations of normality, especially with:
 - Balanced designs
@@ -1032,13 +1090,13 @@ Points follow the line quite well with minor deviations at the ends. This is acc
 
 **What to look for:**
 
-- ✓ **Good:** Horizontal red line (roughly flat)
-- ✓ **Good:** Points equally spread across range
+- **Good:** Horizontal red line (roughly flat)
+- **Good:** Points equally spread across range
 
 **Red flags:**
 
-- ✗ Rising or falling red line → Heteroscedasticity
-- ✗ Funnel or cone shape → Variance increases with fitted values
+- Rising or falling red line → Heteroscedasticity
+- Funnel or cone shape → Variance increases with fitted values
 
 **Why standardized residuals?**
 
@@ -1046,7 +1104,7 @@ Standardization accounts for the fact that residuals naturally have different va
 
 **For our tooth growth model:**
 
-The red line is relatively flat and the spread is fairly consistent. No serious heteroscedasticity detected. ✓
+The red line is relatively flat and the spread is fairly consistent. No serious heteroscedasticity detected.
 
 ### Plot 4: Residuals vs. Leverage
 
@@ -1054,8 +1112,8 @@ The red line is relatively flat and the spread is fairly consistent. No serious 
 
 **What to look for:**
 
-- ✓ **Good:** Points clustered together with low leverage and low residuals
-- ⚠ **Check:** Points with high leverage (far right) or large residuals (far from 0)
+- **Good:** Points clustered together with low leverage and low residuals
+- **Check:** Points with high leverage (far right) or large residuals (far from 0)
 
 **Key concepts:**
 
@@ -1065,7 +1123,7 @@ The red line is relatively flat and the spread is fairly consistent. No serious 
 
 **For our tooth growth model:**
 
-No points show particularly high Cook's distance. All observations appear reasonable. ✓
+No points show particularly high Cook's distance. All observations appear reasonable.
 
 **What if you find influential points?**
 
@@ -1100,7 +1158,7 @@ Now check the diagnostics for the learning data model you fit earlier.
    - Is variance roughly constant? (Plot 3)
    - Are there influential points? (Plot 4)
 
-```{r diagnostics_practice, exercise=TRUE}
+```{r diagnostics_practice, exercise=TRUE, exercise.cap="Model Diagnostics"}
 # Fit the model
 learning_model <- lm(test_score ~ teaching_method * class_size, 
                      data = learning_data)
@@ -1299,7 +1357,7 @@ rank_emm
 pairs(rank_emm, adjust = "tukey")
 ```
 
-**Interpretation:** These are the average evaluation scores for each rank, averaged across both genders. Since we assume no interaction, this averaging is meaningful --- the rank effect is similar for both genders.
+**Interpretation:** These are the average evaluation scores for each rank, averaged across both genders. Since we assume no interaction, this averaging is meaningful. The rank effect is similar for both genders.
 
 ```{r echo=TRUE}
 # Marginal means for gender (averaged over rank)
@@ -1419,13 +1477,13 @@ plot(emmeans(tooth_model, pairwise ~ supp | dose),
 
 Let's practice using different strategies with the learning data:
 
-```{r emmeans_practice, exercise=TRUE}
+```{r emmeans_practice, exercise=TRUE, exercise.cap="Post-Hoc with emmeans"}
 # Fit the full model
 learning_model <- lm(test_score ~ teaching_method * class_size, 
                      data = learning_data)
 
 # Check the interaction
-Anova(learning_model, type = 3)
+Anova(learning_model, type = 2)
 
 # Strategy 1: Simple effects (if interaction significant)
 # Compare teaching methods within each class size
@@ -1457,7 +1515,7 @@ learning_model <- lm(test_score ~ teaching_method * class_size,
                      data = learning_data)
 
 # Check the interaction
-Anova(learning_model, type = 3)
+Anova(learning_model, type = 2)
 
 # Strategy 1: Simple effects
 cat("=== Simple Effects Analysis ===\n")
@@ -1542,7 +1600,7 @@ emmeans(model, pairwise ~ factorA | factorB)  # Simple effects
 emmeans(model, pairwise ~ A | B)
 
 # RIGHT: Check interaction first, then decide
-Anova(model, type = 3)  # Check interaction p-value
+Anova(model, type = 2)  # Check interaction p-value
 # Then choose appropriate emmeans strategy
 ```
 
@@ -1552,15 +1610,15 @@ Anova(model, type = 3)  # Check interaction p-value
 
 **Key principles:**
 
-1. ✓ Always fit the full model with interactions
-2. ✓ Check the interaction p-value first
-3. ✓ Choose your emmeans strategy based on the interaction:
+1. Always fit the full model with interactions
+2. Check the interaction p-value first
+3. Choose your emmeans strategy based on the interaction:
    - Significant → simple effects (primary focus)
    - Not significant → marginal means (interpretable)
    - Borderline → both (with proper caveats)
-4. ✓ Visualize your results
-5. ✓ Use appropriate multiple comparison adjustments
-6. ✓ Report what you found clearly
+4. Visualize your results
+5. Use appropriate multiple comparison adjustments
+6. Report what you found clearly
 
 **The golden rule:** The model stays the same. Your analysis strategy adapts to what the data show.
 
@@ -1573,7 +1631,7 @@ Anova(model, type = 3)  # Check interaction p-value
 - Real-world phenomena often involve **multiple interacting factors**
 - **Interactions** tell us when effects aren't simply additive
 - **Non-parallel lines** in interaction plots signal interactions
-- Focus on interactions first---they're usually most interesting!
+- Focus on interactions first. They're usually most interesting!
 
 **About Model Building:**
 
@@ -1587,7 +1645,7 @@ Anova(model, type = 3)  # Check interaction p-value
 - **Balanced designs:** All three types give same results
 - **Sequential** testing: Type I
 - **Unbalanced designs:** Type II or III usually preferred
-- **Type III** is most conservative and most common
+- **Type II** is often preferred and respects marginality
 - Choose your type **before** looking at results!
 
 **About Assumptions:**
@@ -1603,7 +1661,7 @@ Anova(model, type = 3)  # Check interaction p-value
 - With interactions: Use **simple effects**
 - Without interactions: Test **main effects separately**
 - Always use **multiple comparison adjustments**
-- **Visualize** results---plots often clarify complex patterns
+- **Visualize** results. Plots often clarify complex patterns
 
 
 ### Common Pitfalls to Avoid
@@ -1660,6 +1718,17 @@ You've learned how to:
 You're now ready to generate your submission hash. Click "Next Topic" to proceed.
 
 ## Submit
+
+```{r progress-check, echo=FALSE, context="server"}
+progress_checker_logic()
+```
+
+```{r progress-ui, echo=FALSE}
+shiny::actionButton("check_progress", "Check My Progress", 
+                    style = "margin-bottom: 15px; background-color: #007bff; color: white;")
+shiny::uiOutput("progress_output")
+shiny::tags$hr()
+```
 
 ```{r, echo=FALSE, context="server"}
 encoder_logic()
